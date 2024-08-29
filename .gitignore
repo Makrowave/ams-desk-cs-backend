@@ -1,2 +1,5 @@
 .vs
-#/ams-desk-cs-backend/DBSettings.cs
+ams-desk-cs-backend/DBSettings.cs
+/ams-desk-cs-backend/obj/
+/ams-desk-cs-backend/bin/
+
