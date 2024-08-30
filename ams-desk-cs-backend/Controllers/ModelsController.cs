@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ams_desk_cs_backend.Models;
 using Microsoft.EntityFrameworkCore.Internal;
+using ams_desk_cs_backend.Dtos;
+using System.Numerics;
+using System.Text.RegularExpressions;
 
 namespace ams_desk_cs_backend.Controllers
 {
@@ -26,6 +29,78 @@ namespace ams_desk_cs_backend.Controllers
         public async Task<ActionResult<IEnumerable<Model>>> GetModels()
         {
             return await _context.Models.ToListAsync();
+        }
+
+        // GET: api/Models
+        [HttpGet("notSold")]
+        public async Task<ActionResult<IEnumerable<BikeRecordDto>>> GetModelsJoinBikes(bool avaible, bool ready)
+        {
+            //var bikes = await _context.Models.Include(m => m.Bikes.Where(b => b.StatusId != 3)).Where(m => m.Bikes.Count() > 0).ToListAsync();
+            var bikes = _context.Models
+                .GroupJoin(
+                    _context.Bikes.Where(bi => bi.StatusId != 3),
+                    mo => mo.ModelId,
+                    bi => bi.ModelId,
+                    (mo, bi) => new { mo, bi }
+                )
+                .SelectMany(
+                    r => r.bi.DefaultIfEmpty(),
+                    (r, bi) => new { r.mo, bi }
+                )
+                .GroupBy(
+                    r => new
+                    {
+                        r.mo.ModelId,
+                        r.mo.ProductCode,
+                        r.mo.EanCode,
+                        r.mo.ModelName,
+                        r.mo.FrameSize,
+                        r.mo.WheelSize,
+                        r.mo.ManufacturerId,
+                        r.mo.Price,
+                        r.mo.IsWoman,
+                        r.mo.IsElectric
+                    }
+                );
+            if(avaible)
+            {
+                bikes = bikes.Where(
+                    g => g.Count(r => r.bi != null) > 0
+                );
+            }
+            if (ready)
+            {
+                bikes = bikes.Where(
+                    g => g.Count(r => r.bi != null && r.bi.StatusId == 2) > 0
+                );
+            }
+            //Implement dynamic orderBy somewhere around here
+            var result = await bikes.OrderBy(g => g.Key.ModelId)
+                .Select(g => new BikeRecordDto
+                {
+                    ModelId = g.Key.ModelId,
+                    ProductCode = g.Key.ProductCode,
+                    EanCode = g.Key.EanCode,
+                    ModelName = g.Key.ModelName,
+                    FrameSize = g.Key.FrameSize,
+                    WheelSize = g.Key.WheelSize,
+                    ManufacturerId = g.Key.ManufacturerId,
+                    Price = g.Key.Price,
+                    IsWoman = g.Key.IsWoman,
+                    IsElectric = g.Key.IsElectric,
+                    BikeCount = g.Count(r => r.bi != null),
+                    PlaceBikeCount = g.Where(r => r.bi != null && r.bi.PlaceId != null)
+                                        .GroupBy(r => new { r.bi.PlaceId })
+                                        .Select(d => new PlaceBikeCountDto
+                                        {
+                                            PlaceId = d.Key.PlaceId,
+                                            Count = d.Count()
+                                        })
+
+                }).ToListAsync();
+
+            return result;
+            //return await _context.Models.ToListAsync();
         }
 
         // GET: api/Models/5
