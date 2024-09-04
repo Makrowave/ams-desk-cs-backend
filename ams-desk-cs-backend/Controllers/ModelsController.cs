@@ -33,9 +33,8 @@ namespace ams_desk_cs_backend.Controllers
 
         // GET: api/Models
         [HttpGet("notSold")]
-        public async Task<ActionResult<IEnumerable<BikeRecordDto>>> GetModelsJoinBikes(bool avaible, bool ready)
+        public async Task<ActionResult<IEnumerable<BikeRecordDto>>> GetModelsJoinBikes(bool avaible, bool ready, bool electric, int? manufacturer_id, int? wheel_size, int? frame_size, string? name)
         {
-            //var bikes = await _context.Models.Include(m => m.Bikes.Where(b => b.StatusId != 3)).Where(m => m.Bikes.Count() > 0).ToListAsync();
             var bikes = _context.Models
                 .GroupJoin(
                     _context.Bikes.Where(bi => bi.StatusId != 3),
@@ -74,7 +73,37 @@ namespace ams_desk_cs_backend.Controllers
                     g => g.Count(r => r.bi != null && r.bi.StatusId == 2) > 0
                 );
             }
-            //Implement dynamic orderBy somewhere around here
+            if (electric)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.IsElectric == true
+                );
+            }
+            if (manufacturer_id != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ManufacturerId == manufacturer_id
+                );
+            }
+            if (wheel_size != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.WheelSize == wheel_size
+                );
+            }
+            if (frame_size != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.FrameSize == frame_size
+                );
+            }
+            if (name != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ModelName.ToLower().Contains(name)
+                );
+            }
+
             var result = await bikes.OrderBy(g => g.Key.ModelId)
                 .Select(g => new BikeRecordDto
                 {
