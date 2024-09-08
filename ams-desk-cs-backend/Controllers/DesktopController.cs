@@ -34,6 +34,43 @@ namespace ams_desk_cs_backend.Controllers
             return NoContent();
         }
 
+        [HttpPut("sell/{id}")]
+        public async Task<IActionResult> Sell(int id, int salePrice)
+        {
+            if (!BikeExists(id))
+            {
+                return NotFound();
+            }
+            var bike = await _context.Bikes.Where(bi => bi.BikeId == id).ToListAsync();
+            if (bike.Any(bi => bi.StatusId == 3))
+            {
+                return BadRequest();
+            }
+            bike.ForEach(bi => bi.SalePrice = salePrice);
+            bike.ForEach(bi => bi.StatusId = 3);
+            bike.ForEach(bi => bi.SaleDate = DateOnly.FromDateTime(DateTime.Today));
+            _context.SaveChanges();
+            return NoContent();
+        }
+
+        [HttpPut("move/{id}")]
+        public async Task<IActionResult> Assemble(int id, short placeId)
+        {
+            if (!BikeExists(id))
+            {
+                return NotFound();
+            }
+            var bike = await _context.Bikes.Where(bi => bi.BikeId == id).ToListAsync();
+            if (bike.Any(bi => bi.PlaceId == placeId))
+            {
+                return BadRequest();
+            }
+            bike.ForEach(bi => bi.PlaceId = placeId);
+            _context.SaveChanges();
+            return NoContent();
+        }
+
+
 
         [HttpPost("add_bike")]
         public async Task<IActionResult> AddBike(AddBikeDto bike)

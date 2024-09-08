@@ -38,6 +38,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ModelId).HasColumnName("model_id");
             entity.Property(e => e.PlaceId).HasColumnName("place_id");
             entity.Property(e => e.SaleDate).HasColumnName("sale_date");
+            entity.Property(e => e.SalePrice).HasColumnName("sale_price");
             entity.Property(e => e.StatusId).HasColumnName("status_id");
 
             entity.HasOne(d => d.Model).WithMany(p => p.Bikes)

@@ -17,6 +17,8 @@ public partial class Bike
 
     public DateOnly? SaleDate { get; set; }
 
+    public int? SalePrice { get; set; }
+
     public virtual Model? Model { get; set; }
 
     public virtual Place? Place { get; set; }
