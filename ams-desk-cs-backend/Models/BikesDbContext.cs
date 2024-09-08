@@ -33,7 +33,7 @@ public partial class BikesDbContext : DbContext
 
             entity.ToTable("bikes");
 
-            entity.Property(e => e.BikeId).HasColumnName("bike_id");
+            entity.Property(e => e.BikeId).HasColumnName("bike_id").ValueGeneratedOnAdd();
             entity.Property(e => e.InsertionDate).HasColumnName("insertion_date");
             entity.Property(e => e.ModelId).HasColumnName("model_id");
             entity.Property(e => e.PlaceId).HasColumnName("place_id");

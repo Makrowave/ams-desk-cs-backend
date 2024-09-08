@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ams_desk_cs_backend.Models;
+using ams_desk_cs_backend.Dtos;
 
 namespace ams_desk_cs_backend.Controllers
 {
@@ -39,6 +40,40 @@ namespace ams_desk_cs_backend.Controllers
             }
 
             return bike;
+        }
+
+        // GET: api/Bikes
+        [HttpGet("bikesByModelId/{modelId}")]
+        public async Task<ActionResult<IEnumerable<BikeSubRecordDto>>> GetBikesByModel(int modelId)
+        {
+            var bikes = _context.Bikes.Where(bi => bi.ModelId == modelId && bi.StatusId != 3)
+                .GroupJoin(
+                    _context.Places,
+                    bi => bi.PlaceId,
+                    pl => pl.PlaceId,
+                    (bi, pl) => new {bi, pl}
+                )
+                .SelectMany(
+                    g => g.pl.DefaultIfEmpty(),
+                    (g1, pl) => new {g1.bi, pl}
+                )
+                .GroupJoin(
+                    _context.Statuses,
+                    g => g.bi.StatusId,
+                    st => st.StatusId,
+                    (g, st) => new { g.bi, g.pl, st }
+                )
+                .SelectMany(
+                    g => g.st.DefaultIfEmpty(),
+                    (g, st) => new BikeSubRecordDto
+                    {
+                        Id = g.bi.BikeId,
+                        Place = g.pl.PlaceName,
+                        Status = st.StatusName,
+                    }
+                ).ToListAsync();
+
+            return await bikes;
         }
 
         // PUT: api/Bikes/5
