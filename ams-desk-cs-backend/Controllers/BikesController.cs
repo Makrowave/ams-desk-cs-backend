@@ -44,9 +44,15 @@ namespace ams_desk_cs_backend.Controllers
 
         // GET: api/Bikes
         [HttpGet("bikesByModelId/{modelId}")]
-        public async Task<ActionResult<IEnumerable<BikeSubRecordDto>>> GetBikesByModel(int modelId)
+        public async Task<ActionResult<IEnumerable<BikeSubRecordDto>>> GetBikesByModel(int modelId, int placeId)
         {
-            var bikes = _context.Bikes.Where(bi => bi.ModelId == modelId && bi.StatusId != 3)
+            var maxPlaceId = placeId;
+            if(placeId == 0)
+            {
+                maxPlaceId = 999;
+            }
+            //Find more elegant solution to placeId
+            var bikes = _context.Bikes.Where(bi => bi.ModelId == modelId && bi.StatusId != 3 && bi.PlaceId >= placeId && bi.PlaceId <= maxPlaceId)
                 .GroupJoin(
                     _context.Places,
                     bi => bi.PlaceId,

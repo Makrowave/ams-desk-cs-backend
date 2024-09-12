@@ -79,7 +79,7 @@ public partial class BikesDbContext : DbContext
 
             entity.HasIndex(e => e.EanCode, "models_ean_code_key").IsUnique();
 
-            entity.Property(e => e.ModelId).HasColumnName("model_id");
+            entity.Property(e => e.ModelId).HasColumnName("model_id").ValueGeneratedOnAdd();
             entity.Property(e => e.EanCode)
                 .HasMaxLength(13)
                 .HasColumnName("ean_code");

@@ -17,7 +17,7 @@ namespace ams_desk_cs_backend.Controllers
             _context = context;
         }
 
-        [HttpPut("assemble/{id}")]
+        [HttpPut("Assemble/{id}")]
         public async Task<IActionResult> Assemble(int id)
         {
             if(!BikeExists(id))
@@ -34,7 +34,7 @@ namespace ams_desk_cs_backend.Controllers
             return NoContent();
         }
 
-        [HttpPut("sell/{id}")]
+        [HttpPut("Sell/{id}")]
         public async Task<IActionResult> Sell(int id, int salePrice)
         {
             if (!BikeExists(id))
@@ -53,7 +53,7 @@ namespace ams_desk_cs_backend.Controllers
             return NoContent();
         }
 
-        [HttpPut("move/{id}")]
+        [HttpPut("Move/{id}")]
         public async Task<IActionResult> Assemble(int id, short placeId)
         {
             if (!BikeExists(id))
@@ -72,7 +72,7 @@ namespace ams_desk_cs_backend.Controllers
 
 
 
-        [HttpPost("add_bike")]
+        [HttpPost("AddBike")]
         public async Task<IActionResult> AddBike(AddBikeDto bike)
         {
             var postBike = new Bike
@@ -90,6 +90,230 @@ namespace ams_desk_cs_backend.Controllers
                 routeValues: new { id = postBike.BikeId },
                 value: postBike
             );
+        }
+
+        // GET: api/Models
+        [HttpGet("GetBikes")]
+        public async Task<ActionResult<IEnumerable<BikeRecordDto>>> GetModelsJoinBikes(
+            bool avaible,
+            bool ready,
+            bool electric,
+            int? manufacturerId,
+            int? wheelSize,
+            int? frameSize,
+            string? name,
+            bool? isWoman
+            )
+        {
+            var bikes = _context.Models
+                .GroupJoin(
+                    _context.Bikes.Where(bi => bi.StatusId != 3),
+                    mo => mo.ModelId,
+                    bi => bi.ModelId,
+                    (mo, bi) => new { mo, bi }
+                )
+                .SelectMany(
+                    r => r.bi.DefaultIfEmpty(),
+                    (r, bi) => new { r.mo, bi }
+                )
+                .GroupBy(
+                    r => new
+                    {
+                        r.mo.ModelId,
+                        r.mo.ProductCode,
+                        r.mo.EanCode,
+                        r.mo.ModelName,
+                        r.mo.FrameSize,
+                        r.mo.WheelSize,
+                        r.mo.ManufacturerId,
+                        r.mo.Price,
+                        r.mo.IsWoman,
+                        r.mo.IsElectric
+                    }
+                );
+            if (avaible)
+            {
+                bikes = bikes.Where(
+                    g => g.Count(r => r.bi != null) > 0
+                );
+            }
+            if (isWoman != null)
+            {
+                bikes = bikes.Where(
+                     g => g.Key.IsWoman == isWoman
+                );
+            }
+            if (ready)
+            {
+                bikes = bikes.Where(
+                    g => g.Count(r => r.bi != null && r.bi.StatusId == 2) > 0
+                );
+            }
+            if (electric)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.IsElectric == true
+                );
+            }
+            if (manufacturerId != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ManufacturerId == manufacturerId
+                );
+            }
+            if (wheelSize != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.WheelSize == wheelSize
+                );
+            }
+            if (frameSize != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.FrameSize == frameSize
+                );
+            }
+            if (name != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ModelName.ToLower().Contains(name)
+                );
+            }
+
+            var result = await bikes.OrderBy(g => g.Key.ModelId)
+                .Select(g => new BikeRecordDto
+                {
+                    ModelId = g.Key.ModelId,
+                    ProductCode = g.Key.ProductCode,
+                    EanCode = g.Key.EanCode,
+                    ModelName = g.Key.ModelName,
+                    FrameSize = g.Key.FrameSize,
+                    WheelSize = g.Key.WheelSize,
+                    ManufacturerId = g.Key.ManufacturerId,
+                    Price = g.Key.Price,
+                    IsWoman = g.Key.IsWoman,
+                    IsElectric = g.Key.IsElectric,
+                    BikeCount = g.Count(r => r.bi != null),
+                    PlaceBikeCount = g.Where(r => r.bi != null && r.bi.PlaceId != null)
+                                        .GroupBy(r => new { r.bi.PlaceId })
+                                        .Select(d => new PlaceBikeCountDto
+                                        {
+                                            PlaceId = d.Key.PlaceId,
+                                            Count = d.Count()
+                                        })
+
+                }).ToListAsync();
+
+            return result;
+        }
+
+
+        [HttpGet("GetBikesByPlace/{placeId}")]
+        public async Task<ActionResult<IEnumerable<BikeRecordDto>>> GetModelsJoinBikesById(
+            bool avaible,
+            bool ready,
+            bool electric,
+            int? manufacturerId,
+            int? wheelSize,
+            int? frameSize,
+            string? name,
+            bool? isWoman,
+            int? placeId
+            )
+        {
+            var bikes = _context.Models
+                .GroupJoin(
+                    _context.Bikes.Where(bi => bi.StatusId != 3 && bi.PlaceId == placeId),
+                    mo => mo.ModelId,
+                    bi => bi.ModelId,
+                    (mo, bi) => new { mo, bi }
+                )
+                .SelectMany(
+                    r => r.bi.DefaultIfEmpty(),
+                    (r, bi) => new { r.mo, bi }
+                )
+                .GroupBy(
+                    r => new
+                    {
+                        r.mo.ModelId,
+                        r.mo.ProductCode,
+                        r.mo.EanCode,
+                        r.mo.ModelName,
+                        r.mo.FrameSize,
+                        r.mo.WheelSize,
+                        r.mo.ManufacturerId,
+                        r.mo.Price,
+                        r.mo.IsWoman,
+                        r.mo.IsElectric
+                    }
+                );
+            if (avaible)
+            {
+                bikes = bikes.Where(
+                    g => g.Count(r => r.bi != null) > 0
+                );
+            }
+            if (isWoman != null)
+            {
+                bikes = bikes.Where(
+                     g => g.Key.IsWoman == isWoman
+                );
+            }
+            if (ready)
+            {
+                bikes = bikes.Where(
+                    g => g.Count(r => r.bi != null && r.bi.StatusId == 2) > 0
+                );
+            }
+            if (electric)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.IsElectric == true
+                );
+            }
+            if (manufacturerId != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ManufacturerId == manufacturerId
+                );
+            }
+            if (wheelSize != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.WheelSize == wheelSize
+                );
+            }
+            if (frameSize != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.FrameSize == frameSize
+                );
+            }
+            if (name != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ModelName.ToLower().Contains(name)
+                );
+            }
+
+            var result = await bikes.OrderBy(g => g.Key.ModelId)
+                .Select(g => new BikeRecordDto
+                {
+                    ModelId = g.Key.ModelId,
+                    ProductCode = g.Key.ProductCode,
+                    EanCode = g.Key.EanCode,
+                    ModelName = g.Key.ModelName,
+                    FrameSize = g.Key.FrameSize,
+                    WheelSize = g.Key.WheelSize,
+                    ManufacturerId = g.Key.ManufacturerId,
+                    Price = g.Key.Price,
+                    IsWoman = g.Key.IsWoman,
+                    IsElectric = g.Key.IsElectric,
+                    BikeCount = g.Count(r => r.bi != null),
+                    PlaceBikeCount = new List<PlaceBikeCountDto>()
+
+                }).ToListAsync();
+            return result;
         }
 
         private bool BikeExists(int id)
