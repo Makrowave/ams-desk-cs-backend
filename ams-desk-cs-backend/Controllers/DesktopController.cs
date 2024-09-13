@@ -102,7 +102,8 @@ namespace ams_desk_cs_backend.Controllers
             int? wheelSize,
             int? frameSize,
             string? name,
-            bool? isWoman
+            bool? isWoman,
+            bool isKids
             )
         {
             var bikes = _context.Models
@@ -141,6 +142,12 @@ namespace ams_desk_cs_backend.Controllers
             {
                 bikes = bikes.Where(
                      g => g.Key.IsWoman == isWoman
+                );
+            }
+            if (isKids)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.WheelSize <= 24
                 );
             }
             if (ready)
@@ -218,7 +225,8 @@ namespace ams_desk_cs_backend.Controllers
             int? frameSize,
             string? name,
             bool? isWoman,
-            int? placeId
+            int? placeId,
+            bool isKids
             )
         {
             var bikes = _context.Models
@@ -263,6 +271,12 @@ namespace ams_desk_cs_backend.Controllers
             {
                 bikes = bikes.Where(
                     g => g.Count(r => r.bi != null && r.bi.StatusId == 2) > 0
+                );
+            }
+            if (isKids)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.WheelSize <= 24
                 );
             }
             if (electric)
