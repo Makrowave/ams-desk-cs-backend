@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace ams_desk_cs_backend.Models;
+namespace ams_desk_cs_backend.BikeService.Models;
 
 public partial class BikesDbContext : DbContext
 {

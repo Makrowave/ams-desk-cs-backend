@@ -5,53 +5,53 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ams_desk_cs_backend.Models;
+using ams_desk_cs_backend.BikeService.Models;
 
-namespace ams_desk_cs_backend.Controllers
+namespace ams_desk_cs_backend.BikeService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PlacesController : ControllerBase
+    public class ManufacturersController : ControllerBase
     {
         private readonly BikesDbContext _context;
 
-        public PlacesController(BikesDbContext context)
+        public ManufacturersController(BikesDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Places
+        // GET: api/Manufacturers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Place>>> GetPlaces()
+        public async Task<ActionResult<IEnumerable<Manufacturer>>> GetManufacturers()
         {
-            return await _context.Places.ToListAsync();
+            return await _context.Manufacturers.ToListAsync();
         }
 
-        // GET: api/Places/5
+        // GET: api/Manufacturers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Place>> GetPlace(short id)
+        public async Task<ActionResult<Manufacturer>> GetManufacturer(short id)
         {
-            var place = await _context.Places.FindAsync(id);
+            var manufacturer = await _context.Manufacturers.FindAsync(id);
 
-            if (place == null)
+            if (manufacturer == null)
             {
                 return NotFound();
             }
 
-            return place;
+            return manufacturer;
         }
 
-        // PUT: api/Places/5
+        // PUT: api/Manufacturers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPlace(short id, Place place)
+        public async Task<IActionResult> PutManufacturer(short id, Manufacturer manufacturer)
         {
-            if (id != place.PlaceId)
+            if (id != manufacturer.ManufacturerId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(place).State = EntityState.Modified;
+            _context.Entry(manufacturer).State = EntityState.Modified;
 
             try
             {
@@ -59,7 +59,7 @@ namespace ams_desk_cs_backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PlaceExists(id))
+                if (!ManufacturerExists(id))
                 {
                     return NotFound();
                 }
@@ -72,19 +72,19 @@ namespace ams_desk_cs_backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Places
+        // POST: api/Manufacturers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Place>> PostPlace(Place place)
+        public async Task<ActionResult<Manufacturer>> PostManufacturer(Manufacturer manufacturer)
         {
-            _context.Places.Add(place);
+            _context.Manufacturers.Add(manufacturer);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (PlaceExists(place.PlaceId))
+                if (ManufacturerExists(manufacturer.ManufacturerId))
                 {
                     return Conflict();
                 }
@@ -94,28 +94,28 @@ namespace ams_desk_cs_backend.Controllers
                 }
             }
 
-            return CreatedAtAction("GetPlace", new { id = place.PlaceId }, place);
+            return CreatedAtAction("GetManufacturer", new { id = manufacturer.ManufacturerId }, manufacturer);
         }
 
-        // DELETE: api/Places/5
+        // DELETE: api/Manufacturers/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePlace(short id)
+        public async Task<IActionResult> DeleteManufacturer(short id)
         {
-            var place = await _context.Places.FindAsync(id);
-            if (place == null)
+            var manufacturer = await _context.Manufacturers.FindAsync(id);
+            if (manufacturer == null)
             {
                 return NotFound();
             }
 
-            _context.Places.Remove(place);
+            _context.Manufacturers.Remove(manufacturer);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool PlaceExists(short id)
+        private bool ManufacturerExists(short id)
         {
-            return _context.Places.Any(e => e.PlaceId == id);
+            return _context.Manufacturers.Any(e => e.ManufacturerId == id);
         }
     }
 }

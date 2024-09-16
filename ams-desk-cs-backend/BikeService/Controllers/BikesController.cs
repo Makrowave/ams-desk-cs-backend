@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ams_desk_cs_backend.Models;
-using ams_desk_cs_backend.Dtos;
+using ams_desk_cs_backend.BikeService.Dtos;
+using ams_desk_cs_backend.BikeService.Models;
 
-namespace ams_desk_cs_backend.Controllers
+namespace ams_desk_cs_backend.BikeService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -47,7 +47,7 @@ namespace ams_desk_cs_backend.Controllers
         public async Task<ActionResult<IEnumerable<BikeSubRecordDto>>> GetBikesByModel(int modelId, int placeId)
         {
             var maxPlaceId = placeId;
-            if(placeId == 0)
+            if (placeId == 0)
             {
                 maxPlaceId = 999;
             }
@@ -57,11 +57,11 @@ namespace ams_desk_cs_backend.Controllers
                     _context.Places,
                     bi => bi.PlaceId,
                     pl => pl.PlaceId,
-                    (bi, pl) => new {bi, pl}
+                    (bi, pl) => new { bi, pl }
                 )
                 .SelectMany(
                     g => g.pl.DefaultIfEmpty(),
-                    (g1, pl) => new {g1.bi, pl}
+                    (g1, pl) => new { g1.bi, pl }
                 )
                 .GroupJoin(
                     _context.Statuses,

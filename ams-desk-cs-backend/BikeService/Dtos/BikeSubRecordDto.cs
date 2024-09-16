@@ -1,4 +1,4 @@
-﻿namespace ams_desk_cs_backend.Dtos
+﻿namespace ams_desk_cs_backend.BikeService.Dtos
 {
     public class BikeSubRecordDto
     {

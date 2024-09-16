@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ams_desk_cs_backend.Models;
+using ams_desk_cs_backend.BikeService.Models;
 
-namespace ams_desk_cs_backend.Controllers
+namespace ams_desk_cs_backend.BikeService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

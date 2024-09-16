@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ams_desk_cs_backend.Models;
+namespace ams_desk_cs_backend.BikeService.Models;
 
 public partial class Bike
 {

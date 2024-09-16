@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ams_desk_cs_backend.Models;
+namespace ams_desk_cs_backend.BikeService.Models;
 
 public partial class Model
 {
@@ -26,5 +26,5 @@ public partial class Model
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 
     public virtual Manufacturer? Manufacturer { get; set; }
-    
+
 }

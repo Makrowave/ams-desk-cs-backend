@@ -2,9 +2,9 @@ using Npgsql;
 using ams_desk_cs_backend;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
-using ams_desk_cs_backend.Models;
-using ams_desk_cs_backend.Controllers;
+using ams_desk_cs_backend.BikeService.Controllers;
 using System.Text.Json.Serialization;
+using ams_desk_cs_backend.BikeService.Models;
 var builder = WebApplication.CreateBuilder(args);
 var ReactFrontend = "reactFrontEnd";
 // Add services to the container.

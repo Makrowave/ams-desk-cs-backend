@@ -1,10 +1,10 @@
-﻿using ams_desk_cs_backend.Dtos;
-using ams_desk_cs_backend.Models;
+﻿using ams_desk_cs_backend.BikeService.Dtos;
+using ams_desk_cs_backend.BikeService.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ams_desk_cs_backend.Controllers
+namespace ams_desk_cs_backend.BikeService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,7 +20,7 @@ namespace ams_desk_cs_backend.Controllers
         [HttpPut("Assemble/{id}")]
         public async Task<IActionResult> Assemble(int id)
         {
-            if(!BikeExists(id))
+            if (!BikeExists(id))
             {
                 return NotFound();
             }
