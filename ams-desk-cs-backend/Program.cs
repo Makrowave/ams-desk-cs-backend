@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 var builder = WebApplication.CreateBuilder(args);
 
 // Connect to DBs
-var connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
+var connectionString = builder.Configuration["Bikes:ConnectionString"];
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<BikesDbContext>(options
     => options.UseNpgsql(connectionString));
 
-var loginConnectionString = builder.Configuration.GetConnectionString("LoginDBConnectionString");
+var loginConnectionString = builder.Configuration["Login:ConnectionString"];
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<UserCredContext>(options
     => options.UseNpgsql(loginConnectionString));
 
