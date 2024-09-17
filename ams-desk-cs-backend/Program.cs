@@ -1,22 +1,41 @@
-using Npgsql;
-using ams_desk_cs_backend;
-using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
-using ams_desk_cs_backend.BikeService.Controllers;
 using System.Text.Json.Serialization;
 using ams_desk_cs_backend.BikeService.Models;
+using ams_desk_cs_backend.LoginService.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 var builder = WebApplication.CreateBuilder(args);
-var ReactFrontend = "reactFrontEnd";
-// Add services to the container.
+
+// Connect to DBs
 var connectionString = builder.Configuration.GetConnectionString("DBConnectionString");
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<BikesDbContext>(options
     => options.UseNpgsql(connectionString));
 
+var loginConnectionString = builder.Configuration.GetConnectionString("LoginDBConnectionString");
+builder.Services.AddEntityFrameworkNpgsql().AddDbContext<UserCredContext>(options
+    => options.UseNpgsql(loginConnectionString));
+
+// Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(o => { o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+// Authentication
+
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//   options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+//
+//}).AddJwtBearer(options =>
+//{
+//
+//})
+
+// Configure CORS
+var ReactFrontend = "reactFrontEnd";
 builder.Services.AddCors(options =>
     {
         options.AddPolicy(name: ReactFrontend,
@@ -40,6 +59,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors(ReactFrontend);
+
 app.UseAuthorization();
 
 app.MapControllers();
