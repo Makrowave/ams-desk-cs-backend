@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ams_desk_cs_backend.BikeService.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ams_desk_cs_backend.BikeService.Controllers
 {
+    [Authorize(Policy = "AccessToken")]
     [Route("api/[controller]")]
     [ApiController]
     public class PlacesController : ControllerBase

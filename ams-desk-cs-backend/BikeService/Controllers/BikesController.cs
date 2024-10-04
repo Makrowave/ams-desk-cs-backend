@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ams_desk_cs_backend.BikeService.Dtos;
 using ams_desk_cs_backend.BikeService.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ams_desk_cs_backend.BikeService.Controllers
 {
+    [Authorize(Policy = "AccessToken")]
     [Route("api/[controller]")]
     [ApiController]
     public class BikesController : ControllerBase
@@ -74,8 +76,9 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     (g, st) => new BikeSubRecordDto
                     {
                         Id = g.bi.BikeId,
-                        Place = g.pl.PlaceName,
-                        Status = st.StatusName,
+                        Place = g.pl!.PlaceName,
+                        Status = st!.StatusName,
+                        StatusId = st.StatusId
                     }
                 ).ToListAsync();
 

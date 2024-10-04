@@ -3,6 +3,8 @@ using System.Text.Json.Serialization;
 using ams_desk_cs_backend.BikeService.Models;
 using ams_desk_cs_backend.LoginService.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Connect to DBs
@@ -21,18 +23,70 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-// Authentication
 
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//   options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-//
-//}).AddJwtBearer(options =>
-//{
-//
-//})
+// Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+
+}).AddJwtBearer("AccessToken", options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidIssuer = builder.Configuration["Login:JWT:Issuer"],
+        ValidAudience = builder.Configuration["Login:JWT:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Login:JWT:Key"]!)),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero,
+    };
+}).AddJwtBearer("RefreshToken", options =>
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidIssuer = builder.Configuration["Login:JWT:Issuer"],
+        ValidAudience = builder.Configuration["Login:JWT:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Login:JWT:Key"]!)),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero,
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("refresh_token"))
+            {
+                context.Token = context.Request.Cookies["refresh_token"];
+                Console.WriteLine(context.Request.Cookies["refresh_token"]);
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
+
+// Authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AccessToken", policy =>
+    {
+        policy.AddAuthenticationSchemes("AccessToken");
+        policy.RequireAuthenticatedUser();
+    });
+
+    options.AddPolicy("RefreshToken", policy =>
+    {
+        policy.AddAuthenticationSchemes("RefreshToken");
+        policy.RequireAuthenticatedUser();
+    });
+});
 
 // Configure CORS
 var ReactFrontend = "reactFrontEnd";
@@ -41,9 +95,11 @@ builder.Services.AddCors(options =>
         options.AddPolicy(name: ReactFrontend,
             policy =>
             {
-                policy.WithOrigins("http://localhost:3000")
-                    .WithMethods("GET", "PUT", "DELETE")
-                    .AllowAnyHeader();
+                policy.WithOrigins(["http://makrowave.duckdns.org"])
+               // policy.WithOrigins(["http://localhost:3000"])
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
             });
     });
 
@@ -60,6 +116,7 @@ app.UseHttpsRedirection();
 
 app.UseCors(ReactFrontend);
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

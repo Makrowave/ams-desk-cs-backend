@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public string Place { get; set; } = null!;
+        public int StatusId { get; set; }
         public string Status { get; set; } = null!;
     }
 }
