@@ -47,7 +47,7 @@ namespace ams_desk_cs_backend.LoginService.Controllers
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.None,
+                    SameSite = SameSiteMode.Strict,
                     Expires = DateTime.UtcNow.AddHours(expiry)
                 });
                 return Ok();
@@ -55,7 +55,7 @@ namespace ams_desk_cs_backend.LoginService.Controllers
             return Unauthorized();
         }
 
-        //[Authorize(Policy="RefreshToken", AuthenticationSchemes ="RefreshToken")]
+        [Authorize(Policy="RefreshToken", AuthenticationSchemes ="RefreshToken")]
         [HttpPost("Refresh")]
         public IActionResult Refresh()
         {
@@ -82,7 +82,7 @@ namespace ams_desk_cs_backend.LoginService.Controllers
             return tokenValue;
         }
 
-        //[Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
+        [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
@@ -90,7 +90,7 @@ namespace ams_desk_cs_backend.LoginService.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None,
+                SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddHours(-1)
             });
             return Ok();

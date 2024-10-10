@@ -5,6 +5,7 @@ using ams_desk_cs_backend.LoginService.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 // Connect to DBs
@@ -89,17 +90,24 @@ builder.Services.AddAuthorization(options =>
 });
 
 // Configure CORS
-var ReactFrontend = "reactFrontEnd";
+var FrontEndURL = builder.Configuration["CORSOrigins"];
+var PolicyName = "FrontEnd";
 builder.Services.AddCors(options =>
     {
-        options.AddPolicy(name: ReactFrontend,
+        options.AddPolicy(name: PolicyName,
             policy =>
             {
-                policy.WithOrigins(["http://makrowave.duckdns.org"])
-               // policy.WithOrigins(["http://localhost:3000"])
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials();
+                if(FrontEndURL != null)
+                {
+                    policy.WithOrigins([FrontEndURL])
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+                }
+                else
+                {
+                    throw new ConfigurationErrorsException("FrontEndURL was not specified in appsettings.json");
+                }
             });
     });
 
@@ -114,7 +122,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(ReactFrontend);
+app.UseCors(PolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
