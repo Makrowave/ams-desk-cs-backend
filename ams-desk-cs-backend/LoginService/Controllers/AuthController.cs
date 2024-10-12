@@ -47,7 +47,7 @@ namespace ams_desk_cs_backend.LoginService.Controllers
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.None,
                     Expires = DateTime.UtcNow.AddHours(expiry)
                 });
                 return Ok();
@@ -90,7 +90,7 @@ namespace ams_desk_cs_backend.LoginService.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddHours(-1)
             });
             return Ok();
