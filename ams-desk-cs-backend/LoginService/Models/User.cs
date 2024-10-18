@@ -7,7 +7,7 @@ public partial class User
 {
     public short UserId { get; set; }
 
-    public string Username { get; set; } = null!;
+    public required string Username { get; set; }
 
-    public string Hash { get; set; } = null!;
+    public required string Hash { get; set; }
 }

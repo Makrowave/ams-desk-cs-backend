@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace ams_desk_cs_backend.BikeService.Controllers
 {
@@ -21,7 +22,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
         }
 
         [HttpPut("Assemble/{id}")]
-        public async Task<IActionResult> Assemble(int id)
+        public async Task<IActionResult> Assemble(int id, short employeeId)
         {
             if (!BikeExists(id))
             {
@@ -32,7 +33,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             {
                 return BadRequest();
             }
-            bike.ForEach(bi => bi.StatusId = 2);
+            bike.ForEach(bi => { bi.StatusId = 2; bi.AssembledBy = employeeId; });
             _context.SaveChanges();
             return NoContent();
         }
@@ -57,7 +58,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
         }
 
         [HttpPut("Move/{id}")]
-        public async Task<IActionResult> Assemble(int id, short placeId)
+        public async Task<IActionResult> Move(int id, short placeId)
         {
             if (!BikeExists(id))
             {
@@ -72,8 +73,24 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             _context.SaveChanges();
             return NoContent();
         }
-
-
+        [HttpPut("ChangeColor/{id}")]
+        public async Task<IActionResult> ChangeColor(int id, string primaryColor, string secondaryColor)
+        {
+            primaryColor = "#" + primaryColor; 
+            secondaryColor = "#" + secondaryColor;
+            if (!ModelExists(id))
+            {
+                return NotFound();
+            }
+            if(!isValidHex(primaryColor) || !isValidHex(secondaryColor))
+            {
+                return BadRequest();
+            }
+            var model = await _context.Models.Where(m => m.ModelId == id).ToListAsync();
+            model.ForEach(m => { m.PrimaryColor = primaryColor; m.SecondaryColor = secondaryColor; });
+            _context.SaveChanges();
+            return NoContent();
+        }
 
         [HttpPost("AddBike")]
         public async Task<IActionResult> AddBike(AddBikeDto bike)
@@ -97,7 +114,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
 
         // GET: api/Models
         [HttpGet("GetBikes")]
-        public async Task<ActionResult<IEnumerable<BikeRecordDto>>> GetModelsJoinBikes(
+        public async Task<ActionResult<IEnumerable<ModelRecordDTO>>> GetModelsJoinBikes(
             bool avaible,
             bool ready,
             bool electric,
@@ -106,7 +123,9 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             int? frameSize,
             string? name,
             bool? isWoman,
-            bool isKids
+            bool isKids,
+            int? categoryId,
+            int? colorId
             )
         {
             var bikes = _context.Models
@@ -132,9 +151,25 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                         r.mo.ManufacturerId,
                         r.mo.Price,
                         r.mo.IsWoman,
-                        r.mo.IsElectric
+                        r.mo.IsElectric,
+                        r.mo.CategoryId, 
+                        r.mo.ColorId,
+                        r.mo.PrimaryColor,
+                        r.mo.SecondaryColor,
                     }
                 );
+            if(categoryId != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.CategoryId == categoryId
+                );
+            }
+            if(colorId != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ColorId == colorId
+                );
+            }
             if (avaible)
             {
                 bikes = bikes.Where(
@@ -191,7 +226,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             }
 
             var result = await bikes.OrderBy(g => g.Key.ModelId)
-                .Select(g => new BikeRecordDto
+                .Select(g => new ModelRecordDTO
                 {
                     ModelId = g.Key.ModelId,
                     ProductCode = g.Key.ProductCode,
@@ -203,6 +238,9 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     Price = g.Key.Price,
                     IsWoman = g.Key.IsWoman,
                     IsElectric = g.Key.IsElectric,
+                    PrimaryColor = g.Key.PrimaryColor,
+                    SecondaryColor = g.Key.SecondaryColor,
+                    CategoryId = g.Key.CategoryId,
                     BikeCount = g.Count(r => r.bi != null),
                     PlaceBikeCount = g.Where(r => r.bi != null && r.bi.PlaceId != null)
                                         .GroupBy(r => new { r.bi.PlaceId })
@@ -219,7 +257,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
 
 
         [HttpGet("GetBikesByPlace/{placeId}")]
-        public async Task<ActionResult<IEnumerable<BikeRecordDto>>> GetModelsJoinBikesById(
+        public async Task<ActionResult<IEnumerable<ModelRecordDTO>>> GetModelsJoinBikesById(
             bool avaible,
             bool ready,
             bool electric,
@@ -314,7 +352,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             }
 
             var result = await bikes.OrderBy(g => g.Key.ModelId)
-                .Select(g => new BikeRecordDto
+                .Select(g => new ModelRecordDTO
                 {
                     ModelId = g.Key.ModelId,
                     ProductCode = g.Key.ProductCode,
@@ -336,6 +374,15 @@ namespace ams_desk_cs_backend.BikeService.Controllers
         private bool BikeExists(int id)
         {
             return _context.Bikes.Any(e => e.BikeId == id);
+        }
+        private bool ModelExists(int id)
+        {
+            return _context.Models.Any(e => e.ModelId == id);
+        }
+        private bool isValidHex(string code)
+        {
+            string pattern = @"^#([a-fA-F0-9]{6})$";
+            return Regex.IsMatch(code, pattern);
         }
     }
 }

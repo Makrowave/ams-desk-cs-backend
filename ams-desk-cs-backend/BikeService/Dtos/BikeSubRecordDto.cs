@@ -3,8 +3,9 @@
     public class BikeSubRecordDto
     {
         public int Id { get; set; }
-        public string Place { get; set; } = null!;
+        public required string Place { get; set; }
         public int StatusId { get; set; }
-        public string Status { get; set; } = null!;
+        public required string Status { get; set; }
+        public string? AssembledBy { get; set; }
     }
 }

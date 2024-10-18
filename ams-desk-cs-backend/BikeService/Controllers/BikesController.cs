@@ -48,13 +48,10 @@ namespace ams_desk_cs_backend.BikeService.Controllers
         [HttpGet("bikesByModelId/{modelId}")]
         public async Task<ActionResult<IEnumerable<BikeSubRecordDto>>> GetBikesByModel(int modelId, int placeId)
         {
-            var maxPlaceId = placeId;
-            if (placeId == 0)
-            {
-                maxPlaceId = 999;
-            }
-            //Find more elegant solution to placeId
-            var bikes = _context.Bikes.Where(bi => bi.ModelId == modelId && bi.StatusId != 3 && bi.PlaceId >= placeId && bi.PlaceId <= maxPlaceId)
+            //Select bikes that are not sold (statusId 3), from certain model and if placeId==0 return all places,
+            //othrewise return bikes in the specific place
+            var bikes = _context.Bikes
+                .Where(bi => bi.ModelId == modelId && bi.StatusId != 3 && (placeId == 0 || bi.PlaceId == placeId))
                 .GroupJoin(
                     _context.Places,
                     bi => bi.PlaceId,
@@ -73,12 +70,23 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                 )
                 .SelectMany(
                     g => g.st.DefaultIfEmpty(),
-                    (g, st) => new BikeSubRecordDto
+                    (g, st) => new { g.bi, g.pl, st }
+                )
+                .GroupJoin(
+                    _context.Employees,
+                    g => g.bi.AssembledBy,
+                    emp => emp.EmployeeId,
+                    (g, emp) => new { g.bi, g.pl, g.st, emp }
+                )
+                .SelectMany(
+                    g => g.emp.DefaultIfEmpty(),
+                    (g, emp) => new BikeSubRecordDto
                     {
                         Id = g.bi.BikeId,
                         Place = g.pl!.PlaceName,
-                        Status = st!.StatusName,
-                        StatusId = st.StatusId
+                        Status = g.st!.StatusName,
+                        StatusId = g.st.StatusId,
+                        AssembledBy = emp != null ? emp.EmployeeName : "Brak"
                     }
                 ).ToListAsync();
 

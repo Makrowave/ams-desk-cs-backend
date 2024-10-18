@@ -18,10 +18,12 @@ public partial class Bike
     public DateOnly? SaleDate { get; set; }
 
     public int? SalePrice { get; set; }
+    public short? AssembledBy { get; set; }
 
     public virtual Model? Model { get; set; }
 
     public virtual Place? Place { get; set; }
 
     public virtual Status? Status { get; set; }
+    public virtual Employee? Employee { get; set; }
 }

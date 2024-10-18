@@ -7,10 +7,10 @@ public partial class Model
 {
     public int ModelId { get; set; }
 
-    public string ProductCode { get; set; } = null!;
+    public required string ProductCode { get; set; }
 
-    public string EanCode { get; set; } = null!;
-    public string ModelName { get; set; } = null!;
+    public required string EanCode { get; set; }
+    public required string ModelName { get; set; }
     public short FrameSize { get; set; }
 
     public bool IsWoman { get; set; }
@@ -18,6 +18,10 @@ public partial class Model
     public short WheelSize { get; set; }
 
     public short ManufacturerId { get; set; }
+    public short ColorId { get; set; }
+    public short CategoryId { get; set; }
+    public string? PrimaryColor { get; set; }
+    public string? SecondaryColor { get; set; }
 
     public int Price { get; set; }
 
@@ -26,5 +30,6 @@ public partial class Model
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 
     public virtual Manufacturer? Manufacturer { get; set; }
-
+    public virtual Color? Color { get; set; }
+    public virtual Category? Category { get; set; }
 }

@@ -7,7 +7,7 @@ public partial class Status
 {
     public short StatusId { get; set; }
 
-    public string StatusName { get; set; } = null!;
+    public required string StatusName { get; set; }
 
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 }

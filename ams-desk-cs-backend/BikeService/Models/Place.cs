@@ -7,7 +7,7 @@ public partial class Place
 {
     public short PlaceId { get; set; }
 
-    public string PlaceName { get; set; } = null!;
+    public required string PlaceName { get; set; }
 
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 }
