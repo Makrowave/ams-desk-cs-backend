@@ -26,6 +26,7 @@
         public string? PrimaryColor { get; set; }
         public string? SecondaryColor { get; set; }
         public short CategoryId { get; set; }
+        public short ColorId {  get; set; }
 
         public required IEnumerable<PlaceBikeCountDto> PlaceBikeCount { get; set; }
     }

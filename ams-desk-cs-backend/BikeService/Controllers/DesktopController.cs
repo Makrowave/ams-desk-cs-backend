@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 using System.Text.RegularExpressions;
 
 namespace ams_desk_cs_backend.BikeService.Controllers
@@ -121,6 +122,8 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             int? manufacturerId,
             int? wheelSize,
             int? frameSize,
+            int minPrice,
+            int maxPrice,
             string? name,
             bool? isWoman,
             bool isKids,
@@ -158,6 +161,10 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                         r.mo.SecondaryColor,
                     }
                 );
+            bikes = bikes.Where(
+                g => g.Key.Price >= minPrice && g.Key.Price <= maxPrice
+            );
+
             if(categoryId != null)
             {
                 bikes = bikes.Where(
@@ -241,6 +248,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     PrimaryColor = g.Key.PrimaryColor,
                     SecondaryColor = g.Key.SecondaryColor,
                     CategoryId = g.Key.CategoryId,
+                    ColorId = g.Key.ColorId,
                     BikeCount = g.Count(r => r.bi != null),
                     PlaceBikeCount = g.Where(r => r.bi != null && r.bi.PlaceId != null)
                                         .GroupBy(r => new { r.bi.PlaceId })
@@ -267,7 +275,9 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             string? name,
             bool? isWoman,
             int? placeId,
-            bool isKids
+            bool isKids,
+            int? categoryId,
+            int? colorId
             )
         {
             var bikes = _context.Models
@@ -293,9 +303,25 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                         r.mo.ManufacturerId,
                         r.mo.Price,
                         r.mo.IsWoman,
-                        r.mo.IsElectric
+                        r.mo.IsElectric,
+                        r.mo.CategoryId, 
+                        r.mo.ColorId,
+                        r.mo.PrimaryColor,
+                        r.mo.SecondaryColor,
                     }
                 );
+            if (categoryId != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.CategoryId == categoryId
+                );
+            }
+            if (colorId != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ColorId == colorId
+                );
+            }
             if (avaible)
             {
                 bikes = bikes.Where(
@@ -365,6 +391,10 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     IsWoman = g.Key.IsWoman,
                     IsElectric = g.Key.IsElectric,
                     BikeCount = g.Count(r => r.bi != null),
+                    CategoryId = g.Key.CategoryId,
+                    ColorId = g.Key.ColorId,
+                    PrimaryColor = g.Key.PrimaryColor,
+                    SecondaryColor = g.Key.SecondaryColor,
                     PlaceBikeCount = new List<PlaceBikeCountDto>()
 
                 }).ToListAsync();
