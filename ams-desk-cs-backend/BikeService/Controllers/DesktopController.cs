@@ -133,11 +133,11 @@ namespace ams_desk_cs_backend.BikeService.Controllers
         [HttpGet("GetBikes")]
         public async Task<ActionResult<IEnumerable<ModelRecordDTO>>> GetModelsJoinBikes(
             bool avaible,
-            bool ready,
             bool electric,
             int? manufacturerId,
             int? wheelSize,
             int? frameSize,
+            int? statusId,
             int minPrice,
             int maxPrice,
             string? name,
@@ -211,10 +211,10 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     g => g.Key.WheelSize <= 24
                 );
             }
-            if (ready)
+            if (statusId != null)
             {
                 bikes = bikes.Where(
-                    g => g.Count(r => r.bi != null && r.bi.StatusId == 2) > 0
+                    g => g.Count(r => r.bi != null && r.bi.StatusId == statusId) > 0
                 );
             }
             if (electric)
@@ -283,7 +283,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
         [HttpGet("GetBikesByPlace/{placeId}")]
         public async Task<ActionResult<IEnumerable<ModelRecordDTO>>> GetModelsJoinBikesById(
             bool avaible,
-            bool ready,
+            int? statusId,
             bool electric,
             int? manufacturerId,
             int? wheelSize,
@@ -350,10 +350,10 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                      g => g.Key.IsWoman == isWoman
                 );
             }
-            if (ready)
+            if (statusId != null)
             {
                 bikes = bikes.Where(
-                    g => g.Count(r => r.bi != null && r.bi.StatusId == 2) > 0
+                    g => g.Count(r => r.bi != null && r.bi.StatusId == statusId) > 0
                 );
             }
             if (isKids)
