@@ -74,6 +74,22 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             _context.SaveChanges();
             return NoContent();
         }
+        [HttpPut("ChangeStatus/{id}")]
+        public async Task<IActionResult> ChangeStatus(int id, short statusId)
+        {
+            if (!BikeExists(id))
+            {
+                return NotFound();
+            }
+            var bike = await _context.Bikes.Where(bi => bi.BikeId == id).ToListAsync();
+            if (bike.Any(bi => bi.StatusId == statusId))
+            {
+                return BadRequest();
+            }
+            bike.ForEach(bi => { bi.StatusId = statusId; bi.AssembledBy = null;});
+            _context.SaveChanges();
+            return NoContent();
+        }
         [HttpPut("ChangeColor/{id}")]
         public async Task<IActionResult> ChangeColor(int id, string primaryColor, string secondaryColor)
         {

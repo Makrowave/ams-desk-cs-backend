@@ -84,6 +84,10 @@ namespace ams_desk_cs_backend.BikeService.Controllers
         [HttpPost]
         public async Task<ActionResult<Model>> PostModel(Model model)
         {
+            if(_context.Models.Any(m => m.EanCode == model.EanCode))
+            {
+                return BadRequest();
+            }
             _context.Models.Add(model);
             await _context.SaveChangesAsync();
 
