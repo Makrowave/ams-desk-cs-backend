@@ -8,6 +8,5 @@ public partial class Place
     public short PlaceId { get; set; }
 
     public required string PlaceName { get; set; }
-
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 }

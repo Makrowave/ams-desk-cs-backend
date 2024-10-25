@@ -1,10 +1,9 @@
-﻿namespace ams_desk_cs_backend.BikeService.Models
+﻿namespace ams_desk_cs_backend.BikeService.Dtos
 {
-    public partial class Color
+    public class ColorDto
     {
         public short ColorId { get; set; }
         public required string ColorName { get; set; }
         public required string HexCode { get; set; }
-        public ICollection<Model> Models { get; set; } = new List<Model>();
     }
 }

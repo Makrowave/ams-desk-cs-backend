@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ams_desk_cs_backend.BikeService.Models;
 using Microsoft.AspNetCore.Authorization;
+using ams_desk_cs_backend.BikeService.Dtos;
 
 namespace ams_desk_cs_backend.BikeService.Controllers
 {
@@ -24,14 +25,35 @@ namespace ams_desk_cs_backend.BikeService.Controllers
 
         // GET: api/Status
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Status>>> GetStatuses()
+        public async Task<ActionResult<IEnumerable<StatusDto>>> GetStatuses()
         {
-            return await _context.Statuses.ToListAsync();
+            return await _context.Statuses.Select(
+                s => new StatusDto
+                {
+                    StatusId = s.StatusId,
+                    StatusName = s.StatusName,
+                    HexCode = s.HexCode,
+                }
+                ).ToListAsync();
+        }
+
+        // GET: api/StatusNotSold
+        [HttpGet("NotSold")]
+        public async Task<ActionResult<IEnumerable<StatusDto>>> GetStatusesNotSold()
+        {
+            return await _context.Statuses.Where(s => s.StatusId != 3).Select(
+                s => new StatusDto
+                {
+                    StatusId = s.StatusId,
+                    StatusName = s.StatusName,
+                    HexCode = s.HexCode,
+                }
+                ).ToListAsync();
         }
 
         // GET: api/Status/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Status>> GetStatus(short id)
+        public async Task<ActionResult<StatusDto>> GetStatus(short id)
         {
             var status = await _context.Statuses.FindAsync(id);
 
@@ -40,7 +62,12 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                 return NotFound();
             }
 
-            return status;
+            return new StatusDto
+            {
+                StatusId = status.StatusId,
+                StatusName = status.StatusName,
+                HexCode = status.HexCode,
+            };
         }
 
         // PUT: api/Status/5

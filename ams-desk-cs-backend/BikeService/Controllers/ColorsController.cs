@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ams_desk_cs_backend.BikeService.Models;
 using Microsoft.AspNetCore.Authorization;
+using ams_desk_cs_backend.BikeService.Dtos;
 
 namespace ams_desk_cs_backend.BikeService.Controllers
 {
@@ -24,14 +25,19 @@ namespace ams_desk_cs_backend.BikeService.Controllers
 
         // GET: api/Colors
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Color>>> GetColors()
+        public async Task<ActionResult<IEnumerable<ColorDto>>> GetColors()
         {
-            return await _context.Colors.ToListAsync();
+            return await _context.Colors.Select(
+                c => new ColorDto { 
+                    ColorId = c.ColorId, 
+                    ColorName = c.ColorName, 
+                    HexCode = c.HexCode
+                }).ToListAsync();
         }
 
         // GET: api/Colors/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Color>> GetColor(short id)
+        public async Task<ActionResult<ColorDto>> GetColor(short id)
         {
             var color = await _context.Colors.FindAsync(id);
 
@@ -40,7 +46,12 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                 return NotFound();
             }
 
-            return color;
+            return new ColorDto
+            {
+                ColorId = color.ColorId,
+                ColorName = color.ColorName,
+                HexCode = color.HexCode,
+            };
         }
 
         // PUT: api/Colors/5

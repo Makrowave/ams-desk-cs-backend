@@ -149,6 +149,9 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.StatusName)
                 .HasMaxLength(16)
                 .HasColumnName("status_name");
+            entity.Property(e => e.HexCode)
+                .HasMaxLength(7)
+                .HasColumnName("hex_code");
         });
 
         modelBuilder.Entity<Color>(entity =>
@@ -161,6 +164,9 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ColorName)
                 .HasMaxLength(30)
                 .HasColumnName("color_name");
+            entity.Property(e => e.HexCode)
+                .HasMaxLength(7)
+                .HasColumnName("hex_code");
         });
         modelBuilder.Entity<Employee>(entity =>
         {
