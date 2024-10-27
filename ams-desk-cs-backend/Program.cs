@@ -7,8 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Configuration;
 var builder = WebApplication.CreateBuilder(args);
-//builder.Configuration.SetBasePath(AppContext.BaseDirectory)
-//    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddEnvironmentVariables();
+if (!builder.Environment.IsDevelopment())
+{
+  builder.Configuration.SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddEnvironmentVariables();
+}
+    
 // Connect to DBs
 var connectionString = builder.Configuration["Bikes:ConnectionString"];
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<BikesDbContext>(options

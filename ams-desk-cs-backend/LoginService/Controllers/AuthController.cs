@@ -26,9 +26,9 @@ namespace ams_desk_cs_backend.LoginService.Controllers
         public AuthController(UserCredContext context, IConfiguration configuration)
         {
             _context = context;
-            _issuer = configuration["Login:JWT:Issuer"];
-            _audience = configuration["Login:JWT:Audience"];
-            _key = configuration["Login:JWT:Key"];
+            _issuer = configuration["Login:JWT:Issuer"] ?? throw new ArgumentNullException(nameof(configuration));
+            _audience = configuration["Login:JWT:Audience"] ?? throw new ArgumentNullException(nameof(configuration));
+            _key = configuration["Login:JWT:Key"] ?? throw new ArgumentNullException(nameof(configuration));
             
         }
 

@@ -143,7 +143,23 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             _context.SaveChanges();
             return NoContent();
         }
+        [HttpPut("ChangeColorMain/{id}")]
+        public async Task<IActionResult> ChangeColorMain(int id, short colorId)
+        {
+            if (!ModelExists(id))
+            {
+                return NotFound();
+            }
+            if(!_context.Colors.Any(c => c.ColorId == colorId))
+            {
+                return BadRequest();
+            }
 
+            var model = await _context.Models.Where(m => m.ModelId == id).ToListAsync();
+            model.ForEach(m => m.ColorId = colorId);
+            _context.SaveChanges();
+            return NoContent();
+        }
         [HttpPost("AddBike")]
         public async Task<IActionResult> AddBike(AddBikeDto bike)
         {
@@ -466,8 +482,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
         }
         private bool isValidHex(string code)
         {
-            string pattern = @"^#([a-fA-F0-9]{6})$";
-            return Regex.IsMatch(code, pattern);
+            return Regex.IsMatch(code, "^#([a-fA-F0-9]{6})$");
         }
     }
 }

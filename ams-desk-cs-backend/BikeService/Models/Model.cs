@@ -18,7 +18,7 @@ public partial class Model
     public short WheelSize { get; set; }
 
     public short ManufacturerId { get; set; }
-    public short ColorId { get; set; }
+    public short? ColorId { get; set; }
     public short CategoryId { get; set; }
     public string? PrimaryColor { get; set; }
     public string? SecondaryColor { get; set; }
