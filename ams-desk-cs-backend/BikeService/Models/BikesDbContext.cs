@@ -99,6 +99,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.IsElectric).HasColumnName("is_electric");
             entity.Property(e => e.IsWoman).HasColumnName("is_woman");
             entity.Property(e => e.ManufacturerId).HasColumnName("manufacturer_id");
+            entity.Property(e => e.InsertionDate).HasColumnName("insertion_date");
             entity.Property(e => e.ColorId).HasColumnName("color_id");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Price).HasColumnName("price");
