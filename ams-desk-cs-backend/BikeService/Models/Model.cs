@@ -9,7 +9,7 @@ public partial class Model
 
     public required string ProductCode { get; set; }
 
-    public required string EanCode { get; set; }
+    public string? EanCode { get; set; }
     public required string ModelName { get; set; }
     public short FrameSize { get; set; }
 
@@ -26,6 +26,7 @@ public partial class Model
     public int Price { get; set; }
 
     public bool IsElectric { get; set; }
+    public string? Link { get; set; }
 
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 

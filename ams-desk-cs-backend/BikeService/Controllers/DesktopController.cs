@@ -38,6 +38,41 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             _context.SaveChanges();
             return NoContent();
         }
+        [HttpPut("AddLink/{id}")]
+        public async Task<IActionResult> AddLink(int id, string link)
+        {
+            if (!ModelExists(id))
+            {
+                return NotFound();
+            }
+            var model = await _context.Models.Where(mo => mo.ModelId == id).ToListAsync();
+            if(!(link.StartsWith("https://") || !link.StartsWith("http://"))) 
+            {
+                return BadRequest();
+            }
+            model.ForEach(mo => mo.Link = link);
+            _context.SaveChanges();
+            return NoContent();
+        }
+        [HttpPut("AddEan/{id}")]
+        public async Task<IActionResult> AddEan(int id, string ean)
+        {
+
+            if (!Regex.IsMatch(ean, "^[0-9]{13}$"))
+            {
+                return BadRequest("Zły format EAN");
+            }
+
+            if (!ModelExists(id))
+            {
+                return NotFound();
+            }
+            var model = await _context.Models.Where(mo => mo.ModelId == id).ToListAsync();
+            
+            model.ForEach(mo => mo.EanCode = ean);
+            _context.SaveChanges();
+            return NoContent();
+        }
 
         [HttpPut("Sell/{id}")]
         public async Task<IActionResult> Sell(int id, int salePrice)
@@ -175,6 +210,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                         r.mo.ColorId,
                         r.mo.PrimaryColor,
                         r.mo.SecondaryColor,
+                        r.mo.Link,
                     }
                 );
             bikes = bikes.Where(
@@ -265,9 +301,10 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     SecondaryColor = g.Key.SecondaryColor,
                     CategoryId = g.Key.CategoryId,
                     ColorId = g.Key.ColorId,
+                    Link = g.Key.Link,
                     BikeCount = g.Count(r => r.bi != null),
-                    PlaceBikeCount = g.Where(r => r.bi != null && r.bi.PlaceId != null)
-                                        .GroupBy(r => new { r.bi.PlaceId })
+                    PlaceBikeCount = g.Where(r => r.bi != null)
+                                        .GroupBy(r => new { r.bi!.PlaceId })
                                         .Select(d => new PlaceBikeCountDto
                                         {
                                             PlaceId = d.Key.PlaceId,
@@ -324,6 +361,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                         r.mo.ColorId,
                         r.mo.PrimaryColor,
                         r.mo.SecondaryColor,
+                        r.mo.Link,
                     }
                 );
             if (categoryId != null)
@@ -411,6 +449,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     ColorId = g.Key.ColorId,
                     PrimaryColor = g.Key.PrimaryColor,
                     SecondaryColor = g.Key.SecondaryColor,
+                    Link = g.Key.Link,
                     PlaceBikeCount = new List<PlaceBikeCountDto>()
 
                 }).ToListAsync();

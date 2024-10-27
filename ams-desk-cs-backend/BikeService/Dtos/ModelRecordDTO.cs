@@ -6,7 +6,7 @@
 
         public required string ProductCode { get; set; }
 
-        public required string EanCode { get; set; }
+        public string? EanCode { get; set; }
 
         public required string ModelName { get; set; }
 
@@ -27,6 +27,7 @@
         public string? SecondaryColor { get; set; }
         public short CategoryId { get; set; }
         public short ColorId {  get; set; }
+        public string? Link { get; set; }
 
         public required IEnumerable<PlaceBikeCountDto> PlaceBikeCount { get; set; }
     }

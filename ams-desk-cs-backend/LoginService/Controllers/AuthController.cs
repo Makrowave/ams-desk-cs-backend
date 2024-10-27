@@ -37,7 +37,6 @@ namespace ams_desk_cs_backend.LoginService.Controllers
         {
             var expiry = 24 * 30;
             var hash = Argon2.Hash(user.Password);
-            Console.WriteLine(hash);
             if (UserExists(user.Username) && Argon2.Verify((
                 await _context.Users.FirstOrDefaultAsync(u => u.Username == user.Username))!.Hash, 
                 user.Password))
@@ -95,7 +94,13 @@ namespace ams_desk_cs_backend.LoginService.Controllers
             });
             return Ok();
         }
-
+        //Hash generator;
+        //[HttpGet("Hash")]
+        //public string GetHash(string pwd)
+        //{
+        //    var hash = Argon2.Hash(pwd);
+        //    return hash;
+        //}
         private bool UserExists(string username)
         {
             return _context.Users.Any(x => x.Username == username);
