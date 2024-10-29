@@ -155,8 +155,8 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                 return BadRequest();
             }
 
-            var model = await _context.Models.Where(m => m.ModelId == id).ToListAsync();
-            model.ForEach(m => m.ColorId = colorId);
+            var model = await _context.Models.FindAsync(id);
+            model!.ColorId = colorId;
             _context.SaveChanges();
             return NoContent();
         }
@@ -207,6 +207,27 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                 routeValues: new { id = postModel.ModelId },
                 value: postModel
             );
+        }
+
+        [HttpPut("PatchModel/{id}")]
+        public async Task<ActionResult<Model>> PatchModel(int id, PatchModelDto modelDto) 
+        {
+            if(!ModelExists(id)) 
+            {
+                return BadRequest();
+            }
+            var model = await _context.Models.FindAsync(id);
+            model!.ProductCode = modelDto.ProductCode;
+            model!.ModelName = modelDto.ModelName;
+            model!.FrameSize = modelDto.FrameSize;
+            model!.WheelSize = modelDto.WheelSize;
+            model!.IsWoman = modelDto.IsWoman;
+            model!.ManufacturerId = modelDto.ManufacturerId;
+            model!.CategoryId = modelDto.CategoryId;
+            model!.Price = modelDto.Price;
+            model!.IsElectric = modelDto.IsElectric;
+            _context.SaveChanges();
+            return NoContent();
         }
 
         // GET: api/Models
