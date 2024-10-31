@@ -224,12 +224,13 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             bool? isWoman,
             bool isKids,
             int? categoryId,
-            int? colorId
+            int? colorId,
+            int? placeId
             )
         {
             var bikes = _context.Models
                 .GroupJoin(
-                    _context.Bikes.Where(bi => bi.StatusId != 3),
+                    _context.Bikes.Where(bi => bi.StatusId != 3 && (placeId == 0 || bi.PlaceId == placeId)),
                     mo => mo.ModelId,
                     bi => bi.ModelId,
                     (mo, bi) => new { mo, bi }
@@ -324,8 +325,10 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             }
             if (name != null)
             {
+                //Find just first word in name so query returns less for later step (don't really know if it's optimal)
+                var words = name.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 bikes = bikes.Where(
-                    g => g.Key.ModelName.ToLower().Contains(name)
+                    g => g.Key.ModelName.ToLower().Contains(words[0])
                 );
             }
 
@@ -357,149 +360,32 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                                         })
 
                 }).ToListAsync();
-
-            return result;
-        }
-
-
-        [HttpGet("GetBikesByPlace/{placeId}")]
-        public async Task<ActionResult<IEnumerable<ModelRecordDTO>>> GetModelsJoinBikesById(
-            bool avaible,
-            int? statusId,
-            bool electric,
-            int? manufacturerId,
-            int? wheelSize,
-            int? frameSize,
-            string? name,
-            bool? isWoman,
-            int? placeId,
-            bool isKids,
-            int? categoryId,
-            int? colorId
-            )
-        {
-            var bikes = _context.Models
-                .GroupJoin(
-                    _context.Bikes.Where(bi => bi.StatusId != 3 && bi.PlaceId == placeId),
-                    mo => mo.ModelId,
-                    bi => bi.ModelId,
-                    (mo, bi) => new { mo, bi }
-                )
-                .SelectMany(
-                    r => r.bi.DefaultIfEmpty(),
-                    (r, bi) => new { r.mo, bi }
-                )
-                .GroupBy(
-                    r => new
-                    {
-                        r.mo.ModelId,
-                        r.mo.ProductCode,
-                        r.mo.EanCode,
-                        r.mo.ModelName,
-                        r.mo.FrameSize,
-                        r.mo.WheelSize,
-                        r.mo.ManufacturerId,
-                        r.mo.Price,
-                        r.mo.IsWoman,
-                        r.mo.IsElectric,
-                        r.mo.CategoryId, 
-                        r.mo.ColorId,
-                        r.mo.PrimaryColor,
-                        r.mo.SecondaryColor,
-                        r.mo.Link,
-                    }
-                );
-            if (categoryId != null)
-            {
-                bikes = bikes.Where(
-                    g => g.Key.CategoryId == categoryId
-                );
-            }
-            if (colorId != null)
-            {
-                bikes = bikes.Where(
-                    g => g.Key.ColorId == colorId
-                );
-            }
-            if (avaible)
-            {
-                bikes = bikes.Where(
-                    g => g.Count(r => r.bi != null) > 0
-                );
-            }
-            if (isWoman != null)
-            {
-                bikes = bikes.Where(
-                     g => g.Key.IsWoman == isWoman
-                );
-            }
-            if (statusId != null)
-            {
-                bikes = bikes.Where(
-                    g => g.Count(r => r.bi != null && r.bi.StatusId == statusId) > 0
-                );
-            }
-            if (isKids)
-            {
-                bikes = bikes.Where(
-                    g => g.Key.WheelSize <= 24
-                );
-            }
-            if (electric)
-            {
-                bikes = bikes.Where(
-                    g => g.Key.IsElectric == true
-                );
-            }
-            if (manufacturerId != null)
-            {
-                bikes = bikes.Where(
-                    g => g.Key.ManufacturerId == manufacturerId
-                );
-            }
-            if (wheelSize != null)
-            {
-                bikes = bikes.Where(
-                    g => g.Key.WheelSize == wheelSize
-                );
-            }
-            if (frameSize != null)
-            {
-                bikes = bikes.Where(
-                    g => g.Key.FrameSize == frameSize
-                );
-            }
+            //Checks for words from input string in model name in order but with gaps
+            //For example input "Bike XL blue" will match with "Bike 4.0 XL blue" and "...Bike XL blue 4.0..."
+            //but not with "Bike 4.0 blue XL"
+            //And input "Bike XL XL" will not match with "Bike XL"
             if (name != null)
             {
-                bikes = bikes.Where(
-                    g => g.Key.ModelName.ToLower().Contains(name)
-                );
+                 var words = name.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    result = result.FindAll(model => {
+                        string modelName = model.ModelName.ToLower();
+                        foreach(var word in words)
+                        {
+                            if(!modelName.Contains(word))
+                            {
+                                return false;
+                            }
+                            //Shorten string so it won't match second occurence in input to first in model name
+                            modelName = modelName.Substring(modelName.IndexOf(word) + word.Length);
+                        }
+                        return true;
+                    });
             }
-
-            var result = await bikes.OrderBy(g => g.Key.ModelId)
-                .Select(g => new ModelRecordDTO
-                {
-                    ModelId = g.Key.ModelId,
-                    ProductCode = g.Key.ProductCode,
-                    EanCode = g.Key.EanCode,
-                    ModelName = g.Key.ModelName,
-                    FrameSize = g.Key.FrameSize,
-                    WheelSize = g.Key.WheelSize,
-                    ManufacturerId = g.Key.ManufacturerId,
-                    Price = g.Key.Price,
-                    IsWoman = g.Key.IsWoman,
-                    IsElectric = g.Key.IsElectric,
-                    BikeCount = g.Count(r => r.bi != null),
-                    CategoryId = g.Key.CategoryId,
-                    ColorId = g.Key.ColorId,
-                    PrimaryColor = g.Key.PrimaryColor,
-                    SecondaryColor = g.Key.SecondaryColor,
-                    Link = g.Key.Link,
-                    PlaceBikeCount = new List<PlaceBikeCountDto>()
-
-                }).ToListAsync();
             return result;
         }
+
+
+        
 
         private bool BikeExists(int id)
         {
