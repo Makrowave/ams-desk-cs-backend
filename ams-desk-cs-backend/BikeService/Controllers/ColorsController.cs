@@ -32,7 +32,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     ColorId = c.ColorId, 
                     ColorName = c.ColorName, 
                     HexCode = c.HexCode
-                }).ToListAsync();
+                }).OrderBy(c => c.ColorId).ToListAsync();
         }
 
         // GET: api/Colors/5

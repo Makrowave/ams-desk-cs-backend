@@ -34,7 +34,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     StatusName = s.StatusName,
                     HexCode = s.HexCode,
                 }
-                ).ToListAsync();
+                ).OrderBy(s => s.StatusId).ToListAsync();
         }
 
         // GET: api/StatusNotSold
@@ -48,7 +48,7 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     StatusName = s.StatusName,
                     HexCode = s.HexCode,
                 }
-                ).ToListAsync();
+                ).OrderBy(s => s.StatusId).ToListAsync();
         }
 
         // GET: api/Status/5
