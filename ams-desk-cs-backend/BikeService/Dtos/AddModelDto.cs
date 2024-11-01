@@ -4,7 +4,7 @@ namespace ams_desk_cs_backend.BikeService.Dtos
 {
     public class AddModelDto
     {
-        public required string ProductCode { get; set; }
+        public string? ProductCode { get; set; }
         public string? EanCode { get; set; }
         public required string ModelName { get; set; }
         public short FrameSize { get; set; }
