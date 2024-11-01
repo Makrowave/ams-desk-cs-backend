@@ -246,7 +246,8 @@ namespace ams_desk_cs_backend.BikeService.Controllers
             bool isKids,
             int? categoryId,
             int? colorId,
-            int? placeId
+            int? placeId,
+            string? productCode
             )
         {
             var bikes = _context.Models
@@ -290,7 +291,13 @@ namespace ams_desk_cs_backend.BikeService.Controllers
                     g => g.Key.CategoryId == categoryId
                 );
             }
-            if(colorId != null)
+            if (productCode != null)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ProductCode.Contains(productCode)
+                );
+            }
+            if (colorId != null)
             {
                 bikes = bikes.Where(
                     g => g.Key.ColorId == colorId
