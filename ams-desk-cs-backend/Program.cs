@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-using ams_desk_cs_backend.BikeService.Models;
 using ams_desk_cs_backend.LoginService.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Configuration;
+using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
+using ams_desk_cs_backend.BikeApp.Application.Interfaces;
+using ams_desk_cs_backend.BikeApp.Application.Services;
+using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
+using ams_desk_cs_backend.BikeApp.Application.Validators;
 var builder = WebApplication.CreateBuilder(args);
 if (!builder.Environment.IsDevelopment())
 {
@@ -25,6 +29,18 @@ builder.Services.AddEntityFrameworkNpgsql().AddDbContext<UserCredContext>(option
 // Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(o => { o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; });
+//Bikes app services
+builder.Services.AddScoped<IBikesService, BikesService>();
+builder.Services.AddScoped<IColorsService, ColorsService>();
+builder.Services.AddScoped<IStatusService, StatusService>();
+builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+builder.Services.AddScoped<IEmployeesService, EmployeesService>();
+builder.Services.AddScoped<IManufacturersService, ManufacturersService>();
+builder.Services.AddScoped<IPlacesService, PlaceService>();
+builder.Services.AddScoped<IModelsService, ModelsService>();
+
+//Bikes app validators
+builder.Services.AddScoped<IModelValidator, IncompleteModelValidator>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
