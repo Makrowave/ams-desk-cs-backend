@@ -1,17 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Isopoh.Cryptography.Argon2;
-using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.AspNetCore.Authorization;
-using System.Composition;
-using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
 using ams_desk_cs_backend.LoginApp.Api.Dtos;
 using ams_desk_cs_backend.LoginApp.Application.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
-using NuGet.Common;
 
 namespace ams_desk_cs_backend.LoginApp.Api.Controllers
 {
@@ -31,7 +25,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
             var result = await _authService.Login(user);
             if(result.Status == ServiceStatus.Ok)
             {
-                Response.Cookies.Append("refresh_token", result.Data!, new CookieOptions
+                Response.Cookies.Append("refresh_token", result.Data, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,

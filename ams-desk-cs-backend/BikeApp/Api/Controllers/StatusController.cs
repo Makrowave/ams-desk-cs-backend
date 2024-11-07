@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Enums;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
 using ams_desk_cs_backend.Shared.Results;

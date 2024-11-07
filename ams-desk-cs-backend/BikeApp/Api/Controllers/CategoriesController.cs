@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
-using ams_desk_cs_backend.BikeApp.Application.Results;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 
 namespace ams_desk_cs_backend.BikeApp.Api.Controllers

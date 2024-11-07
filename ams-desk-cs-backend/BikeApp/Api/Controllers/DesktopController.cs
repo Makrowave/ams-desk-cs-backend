@@ -1,10 +1,6 @@
-﻿using ams_desk_cs_backend.BikeApp.Api.Dtos;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Enums;
+﻿using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
 namespace ams_desk_cs_backend.BikeApp.Api.Controllers

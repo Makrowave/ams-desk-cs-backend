@@ -4,11 +4,8 @@ using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data.Models;
 using ams_desk_cs_backend.Shared.Results;
 using Isopoh.Cryptography.Argon2;
-using Microsoft.CodeAnalysis.Elfie.Model.Strings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NuGet.Common;
-using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -34,6 +31,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
                 ?? throw new ArgumentNullException(nameof(configuration)));
             _refreshTokenLength = Int32.Parse(configuration["Login:User:RefreshTokenLength"] 
                 ?? throw new ArgumentNullException(nameof(configuration)));
+            _jwtHandler = new JwtSecurityTokenHandler();
         }
 
         public async Task<ServiceResult> ChangePassword(UserDto userDto)
@@ -60,7 +58,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
                 var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId);
                 return new ServiceResult<string> (ServiceStatus.Ok, String.Empty, token);
             }
-            return new ServiceResult<string>(ServiceStatus.Ok, "Nieprawidłowe dane logowania", null);
+            return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
         }
 
         public string Refresh(string name, string version, string id)

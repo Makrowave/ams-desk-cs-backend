@@ -10,6 +10,8 @@ using ams_desk_cs_backend.BikeApp.Application.Services;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
 using ams_desk_cs_backend.BikeApp.Application.Validators;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
+using ams_desk_cs_backend.LoginApp.Application.Interfaces;
+using ams_desk_cs_backend.LoginApp.Application.Services;
 var builder = WebApplication.CreateBuilder(args);
 if (!builder.Environment.IsDevelopment())
 {
@@ -42,6 +44,8 @@ builder.Services.AddScoped<IModelsService, ModelsService>();
 //Bikes app validators
 builder.Services.AddScoped<IModelValidator, IncompleteModelValidator>();
 
+//Auth
+builder.Services.AddScoped<IAuthService, AuthService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
