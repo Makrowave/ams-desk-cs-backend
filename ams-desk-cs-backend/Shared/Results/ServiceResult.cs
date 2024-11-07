@@ -1,4 +1,4 @@
-﻿namespace ams_desk_cs_backend.BikeApp.Application.Results
+﻿namespace ams_desk_cs_backend.Shared.Results
 {
     public enum ServiceStatus
     {
@@ -7,6 +7,7 @@
         NoChanges,
         BadRequest,
         NoContent,
+        Unauthorized,
     }
 
     public class ServiceResult

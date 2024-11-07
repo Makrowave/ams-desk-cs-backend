@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using ams_desk_cs_backend.LoginApp.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ams_desk_cs_backend.LoginService.Models;
+namespace ams_desk_cs_backend.LoginApp.Infrastructure.Data;
 
 public partial class UserCredContext : DbContext
 {
@@ -35,6 +36,13 @@ public partial class UserCredContext : DbContext
             entity.Property(e => e.Username)
                 .HasMaxLength(32)
                 .HasColumnName("username");
+            entity.Property(e => e.TokenVersion)
+                .HasColumnName("token_version");
+            entity.Property(e => e.IsAdmin)
+                .HasColumnName("is_admin");
+            entity.Property(e => e.AdminHash)
+                .HasMaxLength(64)
+                .HasColumnName("admin_hash");
         });
 
         OnModelCreatingPartial(modelBuilder);

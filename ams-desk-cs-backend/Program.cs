@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-using ams_desk_cs_backend.LoginService.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -10,6 +9,7 @@ using ams_desk_cs_backend.BikeApp.Application.Interfaces;
 using ams_desk_cs_backend.BikeApp.Application.Services;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
 using ams_desk_cs_backend.BikeApp.Application.Validators;
+using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
 var builder = WebApplication.CreateBuilder(args);
 if (!builder.Environment.IsDevelopment())
 {
