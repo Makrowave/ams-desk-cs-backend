@@ -6,6 +6,7 @@ using ams_desk_cs_backend.Shared.Results;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -61,9 +62,18 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
         }
 
-        public string Refresh(string name, string version, string id)
+        public string Refresh(string token)
         {
-            return GenerateJwtToken(_accessTokenLength, name, version, Int32.Parse(id));
+            var parsedToken = ParseToken(token);
+            return GenerateJwtToken(_accessTokenLength, 
+                parsedToken[JwtRegisteredClaimNames.Name], 
+                parsedToken[ClaimTypes.Version], 
+                Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]));
+        }
+
+        private Dictionary<string, string> ParseToken(string token)
+        {
+            return _jwtHandler.ReadJwtToken(token).Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
         }
 
         private string GenerateJwtToken(int minutes, string name, string version, int id)
@@ -104,47 +114,6 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return _refreshTokenLength;
         }
 
-        public async Task<ServiceResult<Dictionary<string, string>>> ValidateToken(string token)
-        {
-            bool isValid = true;
-            if(!_jwtHandler.CanReadToken(token))
-            {
-                isValid = false;
-            }
-            var jwtToken = _jwtHandler.ReadJwtToken(token);
-            var claims = jwtToken.Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
-            string name, version, id;
-            if (!claims.TryGetValue(JwtRegisteredClaimNames.Name, out name!))
-            {
-                isValid = false;
-            }
-            if (!claims.TryGetValue(ClaimTypes.Version, out version!))
-            {
-                isValid = false;
-            }
-            if (!claims.TryGetValue(JwtRegisteredClaimNames.Sub, out id!))
-            {
-                isValid = false;
-            }
-            if (!UserExists(name))
-            {
-                isValid = false;
-            }
-            var user = await GetUserAsync(name);
-            if (!Int32.TryParse(version, out int outVersion))
-            {
-                isValid = false;
-            }
-            if (outVersion != user.TokenVersion)
-            {
-                isValid = false;
-            }
-            if(!isValid)
-            {
-                return new ServiceResult<Dictionary<string, string>>(ServiceStatus.Unauthorized, "Nie udało się zautoryzować użytkownika", null);
-            }
-            return new ServiceResult<Dictionary<string, string>>(ServiceStatus.Ok, String.Empty, claims);
-        }
         private async Task<User> GetUserAsync(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);

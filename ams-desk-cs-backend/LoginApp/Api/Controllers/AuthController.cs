@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.LoginApp.Api.Dtos;
 using ams_desk_cs_backend.LoginApp.Application.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
+using ams_desk_cs_backend.LoginApp.Infrastructure.Data.Models;
 
 namespace ams_desk_cs_backend.LoginApp.Api.Controllers
 {
@@ -25,7 +26,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
             var result = await _authService.Login(user);
             if(result.Status == ServiceStatus.Ok)
             {
-                Response.Cookies.Append("refresh_token", result.Data, new CookieOptions
+                Response.Cookies.Append("refresh_token", result.Data!, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
@@ -39,44 +40,29 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
 
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         [HttpPost("Refresh")]
-        public async Task<IActionResult> Refresh()
+        public IActionResult Refresh()
         {
-            //Should be valid JWT anyways since it goes through Authorize so no check
             string token = Request.Cookies["refresh_token"]!;
-            var result = await _authService.ValidateToken(token);
-            if (result.Status == ServiceStatus.Ok)
-            {
-                return Ok(_authService.Refresh(
-                    result.Data![JwtRegisteredClaimNames.Name],
-                    result.Data![ClaimTypes.Version],
-                    result.Data![JwtRegisteredClaimNames.Sub]
-                    ));
-            }
-            LogoutCookie();
-            return Unauthorized();
+            return Ok(_authService.Refresh(token));
         }
 
-        [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
+            [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
             LogoutCookie();
             return Ok();
         }
+        //Finish this
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         [HttpPost("ChangePassword")]
         public async Task<IActionResult> ChangePassword(UserDto userDto)
         {
-            string token = Request.Cookies["refresh_token"]!;
-            var result = await _authService.ValidateToken(token);
-            if (result.Status == ServiceStatus.Ok)
-            {
-                var hash = Argon2.Hash(userDto.NewPassword);
-                var changeResult = _authService.ChangePassword(userDto); //? why not async????
-                LogoutCookie();
-                return Ok();
-            }
-            return BadRequest();
+            var hash = Argon2.Hash(userDto.NewPassword);
+            var changeResult = _authService.ChangePassword(userDto); //? why not async????
+            LogoutCookie();
+            return Ok();
+            
         }
 
         private void LogoutCookie()

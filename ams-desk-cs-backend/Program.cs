@@ -12,6 +12,9 @@ using ams_desk_cs_backend.BikeApp.Application.Validators;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
 using ams_desk_cs_backend.LoginApp.Application.Interfaces;
 using ams_desk_cs_backend.LoginApp.Application.Services;
+using ams_desk_cs_backend.LoginApp.Application.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
 var builder = WebApplication.CreateBuilder(args);
 if (!builder.Environment.IsDevelopment())
 {
@@ -70,6 +73,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero,
     };
+    options.MapInboundClaims = false;
 }).AddJwtBearer("RefreshToken", options =>
 {
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -83,7 +87,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ClockSkew = TimeSpan.Zero,
     };
-
+    options.MapInboundClaims = false;
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -104,6 +108,7 @@ builder.Services.AddAuthorization(options =>
     {
         policy.AddAuthenticationSchemes("AccessToken");
         policy.RequireAuthenticatedUser();
+        policy.AddRequirements(new VersionRequirement());
     });
 
     options.AddPolicy("RefreshToken", policy =>
@@ -112,6 +117,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser();
     });
 });
+builder.Services.AddScoped<IAuthorizationHandler, VersionAuthorizationHandler>();
 
 // Configure CORS
 var FrontEndURL = builder.Configuration["CORSOrigins"];
@@ -147,7 +153,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors(PolicyName);
-
 app.UseAuthentication();
 app.UseAuthorization();
 
