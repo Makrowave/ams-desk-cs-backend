@@ -46,7 +46,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
             return Ok(_authService.Refresh(token));
         }
 
-            [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
+        [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
@@ -58,10 +58,13 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         [HttpPost("ChangePassword")]
         public async Task<IActionResult> ChangePassword(UserDto userDto)
         {
-            var hash = Argon2.Hash(userDto.NewPassword);
-            var changeResult = _authService.ChangePassword(userDto); //? why not async????
-            LogoutCookie();
-            return Ok();
+            var result = await _authService.ChangePassword(userDto);
+            if(result.Status == ServiceStatus.Ok)
+            {
+                LogoutCookie();
+                return Ok();
+            }
+            return BadRequest();
             
         }
 

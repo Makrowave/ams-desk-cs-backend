@@ -38,10 +38,15 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
         public async Task<ServiceResult> ChangePassword(UserDto userDto)
         {
             var user = await GetUserAsync(userDto.Username);
-            if(user != null && userDto.Username == user.Username)
+            if (user != null
+                && userDto.Username == user.Username
+                && userDto.Password != null
+                && userDto.NewPassword != null
+                && Argon2.Verify(user.Hash, userDto.Password))
             {
                 var hash = Argon2.Hash(userDto.NewPassword);
                 user.Hash = hash;
+                user.TokenVersion++;
                 await _context.SaveChangesAsync();
                 return new ServiceResult(ServiceStatus.Ok, String.Empty);
             }

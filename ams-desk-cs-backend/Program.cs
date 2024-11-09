@@ -118,6 +118,7 @@ builder.Services.AddAuthorization(options =>
     });
 });
 builder.Services.AddScoped<IAuthorizationHandler, VersionAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, AdminAuthorizationHandler>();
 
 // Configure CORS
 var FrontEndURL = builder.Configuration["CORSOrigins"];

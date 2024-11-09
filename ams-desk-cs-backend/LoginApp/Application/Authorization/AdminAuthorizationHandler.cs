@@ -1,36 +1,35 @@
 ﻿using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
+using ams_desk_cs_backend.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace ams_desk_cs_backend.LoginApp.Application.Authorization
 {
-    public class VersionAuthorizationHandler : AuthorizationHandler<VersionRequirement>
+    public class AdminAuthorizationHandler : AuthorizationHandler<AdminRequirement>
     {
         private readonly UserCredContext _userCredContext;
-        public VersionAuthorizationHandler(UserCredContext userCredContext)
+        public AdminAuthorizationHandler(UserCredContext userCredContext)
         {
             _userCredContext = userCredContext;
         }
+
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context, 
-            VersionRequirement requirement)
+            AdminRequirement requirement)
         {
-            var nameClaim = context.User.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
-            var versionClaim = context.User.FindFirst(ClaimTypes.Version)?.Value;
+            var roleClaim = context.User.FindFirst(JwtApplicationClaimNames.Role)?.Value;
             var subClaim = context.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            string output = "\n";
-            foreach (var claim in context.User.Claims)
-            {
-                output += claim.ToString() + "\n";
+            if (roleClaim == null || subClaim == null) 
+            { 
+                context.Fail();
+                return;
             }
-            if (nameClaim == null || versionClaim == null || subClaim == null)
+            if (roleClaim != "admin")
             {
                 context.Fail();
                 return;
             }
-            if (!int.TryParse(versionClaim, out int tokenVersion) ||
-                !short.TryParse(subClaim, out short userId))
+            if (!short.TryParse(subClaim, out short userId))
             {
                 context.Fail();
                 return;
@@ -41,7 +40,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Authorization
                 context.Fail();
                 return;
             }
-            if (user!.TokenVersion != tokenVersion)
+            if (user!.IsAdmin == false)
             {
                 context.Fail();
                 return;
