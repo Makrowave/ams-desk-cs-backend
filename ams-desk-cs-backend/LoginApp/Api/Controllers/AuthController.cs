@@ -15,6 +15,9 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly string _role = "User";
+        private readonly string _cookieName = "refresh_token";
+
         public AuthController(IAuthService authService)
         {
             _authService = authService;
@@ -23,10 +26,10 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserDto user)
         {
-            var result = await _authService.Login(user);
+            var result = await _authService.Login(user, _role);
             if(result.Status == ServiceStatus.Ok)
             {
-                Response.Cookies.Append("refresh_token", result.Data!, new CookieOptions
+                Response.Cookies.Append(_cookieName, result.Data!, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
@@ -42,7 +45,11 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         [HttpPost("Refresh")]
         public IActionResult Refresh()
         {
-            string token = Request.Cookies["refresh_token"]!;
+            string token = Request.Cookies[_cookieName];
+            if (token == null)
+            {
+                return Unauthorized("User not logged in");
+            }
             return Ok(_authService.Refresh(token));
         }
 
@@ -70,7 +77,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
 
         private void LogoutCookie()
         {
-            Response.Cookies.Append("refresh_token", "", new CookieOptions
+            Response.Cookies.Append(_cookieName, "", new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,

@@ -26,6 +26,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Validators
             }
             return true;
         }
+        //Most likely redundant
         public bool ValidateColor(string? color)
         {
             return color != null && Regex.IsMatch(color, "^#([a-fA-F0-9]{6})$");

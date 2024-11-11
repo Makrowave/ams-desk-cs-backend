@@ -2,6 +2,7 @@
 using ams_desk_cs_backend.LoginApp.Application.Interfaces;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data.Models;
+using ams_desk_cs_backend.Shared;
 using ams_desk_cs_backend.Shared.Results;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +54,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return new ServiceResult(ServiceStatus.BadRequest, "Nie udało się zmienić hasła");
         }
 
-        public async Task<ServiceResult<string>> Login(UserDto userDto)
+        public async Task<ServiceResult<string>> Login(UserDto userDto, string role)
         {
             var hash = Argon2.Hash(userDto.Password);
             if (UserExists(userDto.Username) && Argon2.Verify((
@@ -61,7 +62,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
                 userDto.Password))
             {
                 var user = await GetUserAsync(userDto.Username);
-                var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId);
+                var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, role);
                 return new ServiceResult<string> (ServiceStatus.Ok, String.Empty, token);
             }
             return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
@@ -72,8 +73,9 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             var parsedToken = ParseToken(token);
             return GenerateJwtToken(_accessTokenLength, 
                 parsedToken[JwtRegisteredClaimNames.Name], 
-                parsedToken[ClaimTypes.Version], 
-                Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]));
+                parsedToken[JwtApplicationClaimNames.Version], 
+                Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]),
+                parsedToken[JwtApplicationClaimNames.Role]);
         }
 
         private Dictionary<string, string> ParseToken(string token)
@@ -81,12 +83,13 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return _jwtHandler.ReadJwtToken(token).Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
         }
 
-        private string GenerateJwtToken(int minutes, string name, string version, int id)
+        private string GenerateJwtToken(int minutes, string name, string version, int id, string role)
         {
             var claims = new Claim[] {
                 new Claim(JwtRegisteredClaimNames.Name, name),
-                new Claim(ClaimTypes.Version, version),
-                new Claim(JwtRegisteredClaimNames.Sub, id.ToString())
+                new Claim(JwtApplicationClaimNames.Version, version),
+                new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
+                new Claim(JwtApplicationClaimNames.Role, role)
             };
             var signingCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(

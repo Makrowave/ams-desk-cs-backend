@@ -1,4 +1,5 @@
 ﻿using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
+using ams_desk_cs_backend.Shared;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,7 +18,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Authorization
             VersionRequirement requirement)
         {
             var nameClaim = context.User.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
-            var versionClaim = context.User.FindFirst(ClaimTypes.Version)?.Value;
+            var versionClaim = context.User.FindFirst(JwtApplicationClaimNames.Version)?.Value;
             var subClaim = context.User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
             string output = "\n";
             foreach (var claim in context.User.Claims)

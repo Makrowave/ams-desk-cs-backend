@@ -24,7 +24,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Authorization
                 context.Fail();
                 return;
             }
-            if (roleClaim != "admin")
+            if (roleClaim != "Admin")
             {
                 context.Fail();
                 return;

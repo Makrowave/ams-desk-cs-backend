@@ -37,7 +37,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 StatusId = status.StatusId,
                 StatusName = status.StatusName,
                 HexCode = status.HexCode,
-            }).ToListAsync();
+            }).OrderBy(status => status.StatusId).ToListAsync();
             return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
         }
 
@@ -50,7 +50,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                     StatusId = status.StatusId,
                     StatusName = status.StatusName,
                     HexCode = status.HexCode,
-                }).ToListAsync();
+                }).OrderBy(status => status.StatusId).ToListAsync();
             return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
         }
     }

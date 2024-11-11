@@ -36,5 +36,42 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
             }
             return Ok(result.Data);
         }
+        [HttpPost]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> AddColor(ColorDto color)
+        {
+            var result = await _colorsService.PostColor(color);
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return NotFound(result.Message);
+            }
+            return Ok();
+        }
+        [HttpPut("{id}")]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> UpdateColor(short id, ColorDto color)
+        {
+            var result = await _colorsService.UpdateColor(id, color);
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return NotFound(result.Message);
+            }
+            return Ok();
+        }
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> DeleteColor(short id)
+        {
+            var result = await _colorsService.DeleteColor(id);
+            if (result.Status == ServiceStatus.NotFound)
+            {
+                return NotFound(result.Message);
+            }
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok();
+        }
     }
 }

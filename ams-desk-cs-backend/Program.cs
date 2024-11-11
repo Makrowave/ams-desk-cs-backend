@@ -45,7 +45,8 @@ builder.Services.AddScoped<IPlacesService, PlaceService>();
 builder.Services.AddScoped<IModelsService, ModelsService>();
 
 //Bikes app validators
-builder.Services.AddScoped<IModelValidator, IncompleteModelValidator>();
+builder.Services.AddSingleton<IModelValidator, IncompleteModelValidator>();
+builder.Services.AddSingleton<ICommonValidator, CommonValidator>();
 
 //Auth
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -92,7 +93,11 @@ builder.Services.AddAuthentication(options =>
     {
         OnMessageReceived = context =>
         {
-            if (context.Request.Cookies.ContainsKey("refresh_token"))
+            if (context.Request.Cookies.ContainsKey("admin_token"))
+            {
+                context.Token = context.Request.Cookies["admin_token"];
+            }
+            else if (context.Request.Cookies.ContainsKey("refresh_token"))
             {
                 context.Token = context.Request.Cookies["refresh_token"];
             }
@@ -109,6 +114,21 @@ builder.Services.AddAuthorization(options =>
         policy.AddAuthenticationSchemes("AccessToken");
         policy.RequireAuthenticatedUser();
         policy.AddRequirements(new VersionRequirement());
+    });
+
+    options.AddPolicy("RefreshToken", policy =>
+    {
+        policy.AddAuthenticationSchemes("RefreshToken");
+        policy.RequireAuthenticatedUser();
+    });
+    // The policy shouldn't log out user when the admin token is invalidated or admin is logged in.
+    // It should do that to their admin permission, that's why so many policies.
+    options.AddPolicy("AdminAccessToken", policy =>
+    {
+        policy.AddAuthenticationSchemes("AccessToken");
+        policy.RequireAuthenticatedUser();
+        policy.AddRequirements(new VersionRequirement());
+        policy.AddRequirements(new AdminRequirement());
     });
 
     options.AddPolicy("RefreshToken", policy =>
