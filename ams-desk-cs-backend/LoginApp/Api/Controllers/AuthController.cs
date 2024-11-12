@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Isopoh.Cryptography.Argon2;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.LoginApp.Api.Dtos;
 using ams_desk_cs_backend.LoginApp.Application.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
-using ams_desk_cs_backend.LoginApp.Infrastructure.Data.Models;
 
 namespace ams_desk_cs_backend.LoginApp.Api.Controllers
 {
@@ -15,7 +11,6 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly string _role = "User";
         private readonly string _cookieName = "refresh_token";
 
         public AuthController(IAuthService authService)
@@ -26,26 +21,26 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserDto user)
         {
-            var result = await _authService.Login(user, _role);
-            if(result.Status == ServiceStatus.Ok)
+            var result = await _authService.Login(user);
+            if (result.Status == ServiceStatus.Ok)
             {
                 Response.Cookies.Append(_cookieName, result.Data!, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddHours(_authService.GetRefreshTokenLenght())
+                    Expires = DateTime.UtcNow.AddMinutes(_authService.GetRefreshTokenLenght())
                 });
                 return Ok();
             }
-            return Unauthorized(result.Message);
+            return BadRequest(result.Message);
         }
 
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         [HttpPost("Refresh")]
         public IActionResult Refresh()
         {
-            string token = Request.Cookies[_cookieName];
+            string? token = Request.Cookies[_cookieName];
             if (token == null)
             {
                 return Unauthorized("User not logged in");
@@ -66,13 +61,13 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         public async Task<IActionResult> ChangePassword(UserDto userDto)
         {
             var result = await _authService.ChangePassword(userDto);
-            if(result.Status == ServiceStatus.Ok)
+            if (result.Status == ServiceStatus.Ok)
             {
                 LogoutCookie();
                 return Ok();
             }
-            return BadRequest();
-            
+            return BadRequest(result.Message);
+
         }
 
         private void LogoutCookie()
@@ -82,7 +77,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddHours(-1)
+                Expires = DateTime.UtcNow.AddMinutes(-1)
             });
         }
     }

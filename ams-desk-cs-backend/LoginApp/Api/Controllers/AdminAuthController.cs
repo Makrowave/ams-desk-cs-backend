@@ -11,11 +11,10 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
     [ApiController]
     public class AdminAuthController : ControllerBase
     {
-        private readonly IAuthService _authService;
-        private readonly string _role = "Admin";
+        private readonly IAdminAuthService _authService;
         private readonly string _cookieName = "admin_token";
 
-        public AdminAuthController(IAuthService authService)
+        public AdminAuthController(IAdminAuthService authService)
         {
             _authService = authService;
         }
@@ -25,7 +24,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         public async Task<IActionResult> Login(UserDto user)
         {
-            var result = await _authService.Login(user, _role);
+            var result = await _authService.Login(user);
             if (result.Status == ServiceStatus.Ok)
             {
                 Response.Cookies.Append(_cookieName, result.Data!, new CookieOptions
@@ -33,18 +32,18 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
                     HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddHours(_authService.GetRefreshTokenLenght())
+                    Expires = DateTime.UtcNow.AddMinutes(_authService.GetRefreshTokenLenght())
                 });
                 return Ok();
             }
-            return Unauthorized(result.Message);
+            return BadRequest(result.Message);
         }
 
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         [HttpPost("Refresh")]
         public IActionResult Refresh()
         {
-            string token = Request.Cookies[_cookieName];
+            string? token = Request.Cookies[_cookieName];
             if (token == null)
             {
                 return Unauthorized("User not logged in");
@@ -70,8 +69,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
                 LogoutCookie();
                 return Ok();
             }
-            return BadRequest();
-
+            return BadRequest(result.Message);
         }
 
         private void LogoutCookie()
@@ -81,7 +79,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddHours(-1)
+                Expires = DateTime.UtcNow.AddMinutes(-1)
             });
         }
     }

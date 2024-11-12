@@ -14,14 +14,13 @@ using ams_desk_cs_backend.LoginApp.Application.Interfaces;
 using ams_desk_cs_backend.LoginApp.Application.Services;
 using ams_desk_cs_backend.LoginApp.Application.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 var builder = WebApplication.CreateBuilder(args);
 if (!builder.Environment.IsDevelopment())
 {
-  builder.Configuration.SetBasePath(AppContext.BaseDirectory)
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddEnvironmentVariables();
+    builder.Configuration.SetBasePath(AppContext.BaseDirectory)
+      .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddEnvironmentVariables();
 }
-    
+
 // Connect to DBs
 var connectionString = builder.Configuration["Bikes:ConnectionString"];
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<BikesDbContext>(options
@@ -50,6 +49,7 @@ builder.Services.AddSingleton<ICommonValidator, CommonValidator>();
 
 //Auth
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAdminAuthService, AdminAuthService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -148,7 +148,7 @@ builder.Services.AddCors(options =>
         options.AddPolicy(name: PolicyName,
             policy =>
             {
-                if(FrontEndURL != null)
+                if (FrontEndURL != null)
                 {
                     policy.WithOrigins([FrontEndURL])
                         .AllowAnyMethod()

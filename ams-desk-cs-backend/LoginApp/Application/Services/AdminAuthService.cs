@@ -1,4 +1,4 @@
-﻿using ams_desk_cs_backend.LoginApp.Api.Dtos;
+using ams_desk_cs_backend.LoginApp.Api.Dtos;
 using ams_desk_cs_backend.LoginApp.Application.Interfaces;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data.Models;
@@ -14,25 +14,25 @@ using System.Text;
 
 namespace ams_desk_cs_backend.LoginApp.Application.Services
 {
-    public class AuthService : IAuthService
+    public class AdminAuthService : IAdminAuthService
     {
         private readonly UserCredContext _context;
         private readonly string _issuer;
         private readonly string _audience;
         private readonly string _key;
-        private readonly string _role = "User";
+        private readonly string _role = "Admin";
         private readonly JwtSecurityTokenHandler _jwtHandler;
         public readonly int _accessTokenLength;
         public readonly int _refreshTokenLength;
-        public AuthService(UserCredContext context, IConfiguration configuration)
+        public AdminAuthService(UserCredContext context, IConfiguration configuration)
         {
             _context = context;
             _issuer = configuration["Login:JWT:Issuer"] ?? throw new ArgumentNullException(nameof(configuration));
             _audience = configuration["Login:JWT:Audience"] ?? throw new ArgumentNullException(nameof(configuration));
             _key = configuration["Login:JWT:Key"] ?? throw new ArgumentNullException(nameof(configuration));
-            _accessTokenLength = Int32.Parse(configuration["Login:User:AccessTokenLength"]
+            _accessTokenLength = Int32.Parse(configuration["Login:Admin:AccessTokenLength"]
                 ?? throw new ArgumentNullException(nameof(configuration)));
-            _refreshTokenLength = Int32.Parse(configuration["Login:User:RefreshTokenLength"]
+            _refreshTokenLength = Int32.Parse(configuration["Login:Admin:RefreshTokenLength"]
                 ?? throw new ArgumentNullException(nameof(configuration)));
             _jwtHandler = new JwtSecurityTokenHandler();
         }
@@ -48,11 +48,12 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
                 && userDto.Username == user.Username
                 && userDto.Password != null
                 && userDto.NewPassword != null
-                && Argon2.Verify(user.Hash, userDto.Password))
+                && user.IsAdmin
+                && user.AdminHash != null
+                && Argon2.Verify(user.AdminHash, userDto.Password))
             {
-
                 var hash = Argon2.Hash(userDto.NewPassword);
-                user.Hash = hash;
+                user.AdminHash = hash;
                 user.TokenVersion++;
                 await _context.SaveChangesAsync();
                 return new ServiceResult(ServiceStatus.Ok, String.Empty);
@@ -62,12 +63,16 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
 
         public async Task<ServiceResult<string>> Login(UserDto userDto)
         {
+            if (userDto.Password == null || userDto.Username == null)
+            {
+                return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
+            }
             var hash = Argon2.Hash(userDto.Password);
+            //Fetch user
             User user = (await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username))!;
-
-
-            if (user != null && Argon2.Verify(
-            user.Hash,
+            //Check password
+            if (user != null && user.IsAdmin && user.AdminHash != null && Argon2.Verify(
+            user.AdminHash,
             userDto.Password))
             {
                 var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role);
@@ -79,6 +84,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
 
         public string Refresh(string token)
         {
+            //If endpoint authorization passed - refresh based on old token
             var parsedToken = ParseToken(token);
             return GenerateJwtToken(_accessTokenLength,
                 parsedToken[JwtRegisteredClaimNames.Name],
@@ -86,7 +92,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
                 Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]),
                 parsedToken[JwtApplicationClaimNames.Role]);
         }
-
+        // Most of these are same as AuthService
         private Dictionary<string, string> ParseToken(string token)
         {
             return _jwtHandler.ReadJwtToken(token).Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
@@ -134,6 +140,11 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
         private async Task<User> GetUserAsync(string username)
         {
             return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+        }
+
+        public Task<ServiceResult> ChangeUserPassword(UserDto user)
+        {
+            throw new NotImplementedException();
         }
     }
 }
