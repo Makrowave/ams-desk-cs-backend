@@ -39,7 +39,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
             return BadRequest(result.Message);
         }
 
-        [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
+        [Authorize(Policy = "AdminRefreshToken", AuthenticationSchemes = "AdminRefreshToken")]
         [HttpPost("Refresh")]
         public IActionResult Refresh()
         {
@@ -51,7 +51,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
             return Ok(_authService.Refresh(token));
         }
 
-        [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
+        [Authorize(Policy = "AdminRefreshToken", AuthenticationSchemes = "AdminRefreshToken")]
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
@@ -59,7 +59,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
             return Ok();
         }
         //Finish this
-        [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
+        [Authorize(Policy = "AdminRefreshToken", AuthenticationSchemes = "AdminRefreshToken")]
         [HttpPost("ChangePassword")]
         public async Task<IActionResult> ChangePassword(UserDto userDto)
         {

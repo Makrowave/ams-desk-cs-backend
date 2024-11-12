@@ -75,36 +75,8 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero,
     };
     options.MapInboundClaims = false;
-}).AddJwtBearer("RefreshToken", options =>
-{
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-    {
-        ValidIssuer = builder.Configuration["Login:JWT:Issuer"],
-        ValidAudience = builder.Configuration["Login:JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Login:JWT:Key"]!)),
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ClockSkew = TimeSpan.Zero,
-    };
-    options.MapInboundClaims = false;
-    options.Events = new JwtBearerEvents
-    {
-        OnMessageReceived = context =>
-        {
-            if (context.Request.Cookies.ContainsKey("admin_token"))
-            {
-                context.Token = context.Request.Cookies["admin_token"];
-            }
-            else if (context.Request.Cookies.ContainsKey("refresh_token"))
-            {
-                context.Token = context.Request.Cookies["refresh_token"];
-            }
-            return Task.CompletedTask;
-        }
-    };
-});
+}).AddJwtBearerFromCookie("RefreshToken", "refresh_token", builder.Configuration)
+.AddJwtBearerFromCookie("AdminRefreshToken", "admin_token", builder.Configuration);
 
 // Authorization
 builder.Services.AddAuthorization(options =>
@@ -131,9 +103,9 @@ builder.Services.AddAuthorization(options =>
         policy.AddRequirements(new AdminRequirement());
     });
 
-    options.AddPolicy("RefreshToken", policy =>
+    options.AddPolicy("AdminRefreshToken", policy =>
     {
-        policy.AddAuthenticationSchemes("RefreshToken");
+        policy.AddAuthenticationSchemes("AdminRefreshToken");
         policy.RequireAuthenticatedUser();
     });
 });
