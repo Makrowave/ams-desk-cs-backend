@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
+﻿using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.BikeApp.Infrastructure.Data;
@@ -29,6 +27,7 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<Color> Colors { get; set; }
     public virtual DbSet<Category> Categories { get; set; }
     public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<WheelSize> WheelSizes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,10 +71,10 @@ public partial class BikesDbContext : DbContext
             entity.HasKey(e => e.ManufacturerId).HasName("manufacturer_pkey");
 
             entity.ToTable("manufacturers");
-
+            entity.Property(e => e.ManufacturerId).HasColumnName("manufacturer_id").ValueGeneratedOnAdd();
             entity.Property(e => e.ManufacturerId)
-                .ValueGeneratedNever()
-                .HasColumnName("manufacturer_id");
+                .HasColumnName("manufacturer_id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.ManufacturerName)
                 .HasMaxLength(20)
                 .HasColumnName("manufacturer_name");
@@ -107,7 +106,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ProductCode)
                 .HasMaxLength(30)
                 .HasColumnName("product_code");
-            entity.Property(e => e.WheelSize).HasColumnName("wheel_size");
+            entity.Property(e => e.WheelSizeId).HasColumnName("wheel_size");
             entity.Property(e => e.PrimaryColor).HasColumnType("CHAR(7)").HasColumnName("primary_color");
             entity.Property(e => e.SecondaryColor).HasColumnType("CHAR(7)").HasColumnName("secondary_color");
             entity.Property(e => e.Link)
@@ -125,6 +124,10 @@ public partial class BikesDbContext : DbContext
                 .HasForeignKey(d => d.ColorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("models_color_id_fkey");
+            entity.HasOne(d => d.WheelSize).WithMany(p => p.Models)
+                .HasForeignKey(d => d.WheelSizeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("wheel_size_fkey");
         });
 
         modelBuilder.Entity<Place>(entity =>
@@ -133,9 +136,10 @@ public partial class BikesDbContext : DbContext
 
             entity.ToTable("places");
 
+            entity.Property(e => e.PlaceId).HasColumnName("place_id").ValueGeneratedOnAdd();
             entity.Property(e => e.PlaceId)
-                .ValueGeneratedNever()
-                .HasColumnName("place_id");
+                .HasColumnName("place_id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.PlaceName)
                 .HasMaxLength(16)
                 .HasColumnName("place_name");
@@ -148,8 +152,8 @@ public partial class BikesDbContext : DbContext
             entity.ToTable("statuses");
 
             entity.Property(e => e.StatusId)
-                .ValueGeneratedNever()
-                .HasColumnName("status_id");
+                .HasColumnName("status_id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.StatusName)
                 .HasMaxLength(16)
                 .HasColumnName("status_name");
@@ -161,10 +165,12 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<Color>(entity =>
         {
             entity.HasKey(e => e.ColorId).HasName("colors_pkey");
+
             entity.ToTable("colors");
+
             entity.Property(e => e.ColorId)
-                .ValueGeneratedOnAdd()
-                .HasColumnName("color_id");
+                .HasColumnName("color_id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.ColorName)
                 .HasMaxLength(30)
                 .HasColumnName("color_name");
@@ -188,11 +194,20 @@ public partial class BikesDbContext : DbContext
             entity.HasKey(e => e.CategoryId).HasName("categories_pkey");
             entity.ToTable("categories");
             entity.Property(e => e.CategoryId)
-                .ValueGeneratedOnAdd()
-                .HasColumnName("category_id");
+                .HasColumnName("category_id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.CategoryName)
                 .HasMaxLength(30)
                 .HasColumnName("category_name");
+        });
+        OnModelCreatingPartial(modelBuilder);
+        modelBuilder.Entity<WheelSize>(entity =>
+        {
+            entity.HasKey(e => e.WheelSizeId).HasName("wheel_size_pkey");
+            entity.ToTable("wheel_sizes");
+            entity.Property(e => e.WheelSizeId)
+                .HasColumnName("wheel_size_id")
+                .ValueGeneratedNever();
         });
         OnModelCreatingPartial(modelBuilder);
     }

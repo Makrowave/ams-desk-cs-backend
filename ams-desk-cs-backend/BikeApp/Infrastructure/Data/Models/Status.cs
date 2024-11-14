@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
-namespace ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
+﻿namespace ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
 
 public partial class Status
 {

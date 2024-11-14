@@ -52,7 +52,7 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
         public async Task<IActionResult> UpdateColor(short id, ColorDto color)
         {
             var result = await _colorsService.UpdateColor(id, color);
-            if (result.Status == ServiceStatus.BadRequest)
+            if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }

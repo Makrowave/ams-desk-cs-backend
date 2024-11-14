@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
+using ams_desk_cs_backend.BikeApp.Application.Services;
 
 namespace ams_desk_cs_backend.BikeApp.Api.Controllers
 {
@@ -44,6 +45,43 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
                 return NotFound(result.Message);
             }
             return Ok(result.Data);
+        }
+        [HttpPost]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> AddStatus(StatusDto color)
+        {
+            var result = await _statusService.PostStatus(color);
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return NotFound(result.Message);
+            }
+            return Ok();
+        }
+        [HttpPut("{id}")]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> UpdateStatus(short id, StatusDto color)
+        {
+            var result = await _statusService.UpdateStatus(id, color);
+            if (result.Status == ServiceStatus.NotFound)
+            {
+                return NotFound(result.Message);
+            }
+            return Ok();
+        }
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> DeleteStatus(short id)
+        {
+            var result = await _statusService.DeleteStatus(id);
+            if (result.Status == ServiceStatus.NotFound)
+            {
+                return NotFound(result.Message);
+            }
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok();
         }
     }
 }

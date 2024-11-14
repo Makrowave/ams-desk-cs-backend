@@ -22,7 +22,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             var existingBike = await _context.Bikes.FindAsync(id);
             if (existingBike == null)
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Bike wasn't found");
+                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono roweru");
             }
             if(bike.ModelId.HasValue)
             {
@@ -57,7 +57,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 existingBike.AssembledBy = bike.AssembledBy.Value;
             }
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, "Saved changes");
+            return new ServiceResult(ServiceStatus.Ok, String.Empty);
         }
 
         public async Task<ServiceResult<IEnumerable<BikeSubRecordDto>>> GetBikes(int modelId, short placeId)

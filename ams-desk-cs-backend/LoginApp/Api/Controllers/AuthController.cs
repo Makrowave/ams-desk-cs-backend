@@ -37,7 +37,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         }
 
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
-        [HttpPost("Refresh")]
+        [HttpGet("Refresh")]
         public IActionResult Refresh()
         {
             string? token = Request.Cookies[_cookieName];

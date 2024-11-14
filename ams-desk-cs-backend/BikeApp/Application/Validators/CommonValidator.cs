@@ -7,12 +7,12 @@ namespace ams_desk_cs_backend.BikeApp.Application.Validators
     {
         public bool Validate16CharName(string name)
         {
-            return Regex.IsMatch(name, "/^[A-ZŻÓŁĆĘŚĄŹŃ][a-zżółćęśąźń]{1,15}$/");
+            return Regex.IsMatch(name, "^[A-ZŻÓŁĆĘŚĄŹŃ][a-zżółćęśąźń]{1,15}$");
         }
         
         public bool ValidateColor(string color)
         {
-            return Regex.IsMatch(color, "/^#[A-Fa-f0-9]{6}$/");
+            return Regex.IsMatch(color, "^#[A-Fa-f0-9]{6}$");
         }
     }
 }

@@ -5,11 +5,11 @@ namespace ams_desk_cs_backend.BikeApp.Application.Interfaces
 {
     public interface IColorsService
     {
-        Task<ServiceResult<IEnumerable<ColorDto>>> GetColors();
-        Task<ServiceResult<ColorDto>> GetColor(short id);
-        Task<ServiceResult> PostColor(ColorDto color);
-        Task<ServiceResult> UpdateColor(short id, ColorDto color);
-        Task<ServiceResult> DeleteColor(short id);
+        public Task<ServiceResult<IEnumerable<ColorDto>>> GetColors();
+        public Task<ServiceResult<ColorDto>> GetColor(short id);
+        public Task<ServiceResult> PostColor(ColorDto color);
+        public Task<ServiceResult> UpdateColor(short id, ColorDto color);
+        public Task<ServiceResult> DeleteColor(short id);
 
     }
 }

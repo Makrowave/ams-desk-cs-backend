@@ -49,13 +49,13 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
         }
         public async Task<ServiceResult> PostColor(ColorDto color)
         {
-            if (color.ColorName == null || _commonValidator.Validate16CharName(color.ColorName))
+            if (color.ColorName == null || !_commonValidator.Validate16CharName(color.ColorName))
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Zła nazwa koloru");
             }
-            if (color.HexCode == null || _commonValidator.ValidateColor(color.HexCode))
+            if (color.HexCode == null || !_commonValidator.ValidateColor(color.HexCode))
             {
-                return new ServiceResult(ServiceStatus.BadRequest, "Zła nazwa koloru");
+                return new ServiceResult(ServiceStatus.BadRequest, "Zły format koloru");
             }
             _context.Add(new Color
             {
@@ -70,7 +70,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             var existingColor = await _context.Colors.FindAsync(id);
             if(existingColor == null)
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono roweru");
+                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono koloru");
             }
             if(color.ColorName != null && _commonValidator.Validate16CharName(color.ColorName))
             {
@@ -81,7 +81,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 existingColor.HexCode = color.HexCode;
             }
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, "Saved changes");
+            return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
         public async Task<ServiceResult> DeleteColor(short id)
         {
@@ -101,7 +101,5 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 return new ServiceResult(ServiceStatus.BadRequest, "Kolor jest przypisany do modelu");
             }
         }
-
-        
     }
 }

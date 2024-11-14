@@ -15,7 +15,7 @@ public partial class Model
 
     public bool IsWoman { get; set; }
 
-    public short WheelSize { get; set; }
+    public short WheelSizeId { get; set; }
 
     public short ManufacturerId { get; set; }
     public short? ColorId { get; set; }
@@ -34,4 +34,5 @@ public partial class Model
     public virtual Manufacturer? Manufacturer { get; set; }
     public virtual Color? Color { get; set; }
     public virtual Category? Category { get; set; }
+    public virtual WheelSize? WheelSize { get; set; }
 }

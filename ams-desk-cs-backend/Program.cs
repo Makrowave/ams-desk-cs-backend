@@ -107,6 +107,7 @@ builder.Services.AddAuthorization(options =>
     {
         policy.AddAuthenticationSchemes("AdminRefreshToken");
         policy.RequireAuthenticatedUser();
+        policy.AddRequirements(new AdminRequirement());
     });
 });
 builder.Services.AddScoped<IAuthorizationHandler, VersionAuthorizationHandler>();

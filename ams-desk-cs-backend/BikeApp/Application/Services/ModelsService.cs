@@ -34,7 +34,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 ProductCode = modelDto.ProductCode,
                 EanCode = modelDto.EanCode,
                 FrameSize = modelDto.FrameSize!.Value,
-                WheelSize = modelDto.WheelSize!.Value,
+                WheelSizeId = modelDto.WheelSize!.Value,
                 ManufacturerId = modelDto.ManufacturerId!.Value,
                 ColorId = modelDto.ColorId!.Value,
                 CategoryId = modelDto.CategoryId!.Value,
@@ -72,7 +72,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                         r.mo.EanCode,
                         r.mo.ModelName,
                         r.mo.FrameSize,
-                        r.mo.WheelSize,
+                        r.mo.WheelSizeId,
                         r.mo.ManufacturerId,
                         r.mo.Price,
                         r.mo.IsWoman,
@@ -122,7 +122,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             if (filter.IsKids.HasValue && filter.IsKids.Value)
             {
                 bikes = bikes.Where(
-                    g => g.Key.WheelSize <= 24
+                    g => g.Key.WheelSizeId <= 24
                 );
             }
             if (filter.StatusId.HasValue)
@@ -147,7 +147,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             if (filter.WheelSize.HasValue)
             {
                 bikes = bikes.Where(
-                    g => g.Key.WheelSize == filter.WheelSize.Value
+                    g => g.Key.WheelSizeId == filter.WheelSize.Value
                 );
             }
             if (filter.FrameSize.HasValue)
@@ -173,7 +173,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                     EanCode = g.Key.EanCode,
                     ModelName = g.Key.ModelName,
                     FrameSize = g.Key.FrameSize,
-                    WheelSize = g.Key.WheelSize,
+                    WheelSize = g.Key.WheelSizeId,
                     ManufacturerId = g.Key.ManufacturerId,
                     Price = g.Key.Price,
                     IsWoman = g.Key.IsWoman,
@@ -255,7 +255,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 if (!_validator.ValidateWheelSize(model.WheelSize))
                     isValidated = false;
-                existingModel.WheelSize = model.WheelSize.Value;
+                existingModel.WheelSizeId = model.WheelSize.Value;
             }
             if (model.IsWoman.HasValue)
             {
