@@ -3,6 +3,7 @@
     public interface ICommonValidator
     {
         bool Validate16CharName(string name);
+        bool Validate16CharNameAnyCase(string name);
         bool ValidateColor(string name);
     }
 }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
-using ams_desk_cs_backend.BikeApp.Application.Services;
 
 namespace ams_desk_cs_backend.BikeApp.Api.Controllers
 {
@@ -40,7 +39,7 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
         public async Task<ActionResult<StatusDto>> GetStatus(short id)
         {
             var result = await _statusService.GetStatus(id);
-            if(result.Status == ServiceStatus.NotFound)
+            if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }

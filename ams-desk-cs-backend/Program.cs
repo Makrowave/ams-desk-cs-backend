@@ -42,6 +42,7 @@ builder.Services.AddScoped<IEmployeesService, EmployeesService>();
 builder.Services.AddScoped<IManufacturersService, ManufacturersService>();
 builder.Services.AddScoped<IPlacesService, PlaceService>();
 builder.Services.AddScoped<IModelsService, ModelsService>();
+builder.Services.AddScoped<IWheelSizesService, WheelSizesService>();
 
 //Bikes app validators
 builder.Services.AddSingleton<IModelValidator, IncompleteModelValidator>();

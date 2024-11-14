@@ -19,7 +19,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             _commonValidator = commonValidator;
         }
 
-        
+
 
         public async Task<ServiceResult<ColorDto>> GetColor(short id)
         {
@@ -28,24 +28,24 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 return new ServiceResult<ColorDto>(ServiceStatus.NotFound, "Nie znaleziono koloru", null);
             }
-            return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty, 
+            return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty,
                 new ColorDto
-                    {
-                        ColorId = existingColor.ColorId,
-                        ColorName = existingColor.ColorName,
-                        HexCode = existingColor.HexCode,
-                    });
+                {
+                    ColorId = existingColor.ColorId,
+                    ColorName = existingColor.ColorName,
+                    HexCode = existingColor.HexCode,
+                });
         }
 
         public async Task<ServiceResult<IEnumerable<ColorDto>>> GetColors()
         {
             var colors = await _context.Colors.OrderBy(c => c.ColorId).Select(color => new ColorDto
             {
-                ColorId = color.ColorId, 
-                ColorName = color.ColorName, 
+                ColorId = color.ColorId,
+                ColorName = color.ColorName,
                 HexCode = color.HexCode,
             }).ToListAsync();
-            return new ServiceResult<IEnumerable<ColorDto>> (ServiceStatus.Ok, string.Empty, colors);
+            return new ServiceResult<IEnumerable<ColorDto>>(ServiceStatus.Ok, string.Empty, colors);
         }
         public async Task<ServiceResult> PostColor(ColorDto color)
         {
@@ -68,11 +68,11 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
         public async Task<ServiceResult> UpdateColor(short id, ColorDto color)
         {
             var existingColor = await _context.Colors.FindAsync(id);
-            if(existingColor == null)
+            if (existingColor == null)
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono koloru");
             }
-            if(color.ColorName != null && _commonValidator.Validate16CharName(color.ColorName))
+            if (color.ColorName != null && _commonValidator.Validate16CharName(color.ColorName))
             {
                 existingColor.ColorName = color.ColorName;
             }
@@ -95,7 +95,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 _context.Colors.Remove(existingColor);
                 await _context.SaveChangesAsync();
                 return new ServiceResult(ServiceStatus.Ok, string.Empty);
-            } 
+            }
             catch (Exception ex)
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Kolor jest przypisany do modelu");
