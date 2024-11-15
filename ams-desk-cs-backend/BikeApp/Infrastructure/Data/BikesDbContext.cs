@@ -206,7 +206,7 @@ public partial class BikesDbContext : DbContext
             entity.HasKey(e => e.WheelSizeId).HasName("wheel_size_pkey");
             entity.ToTable("wheel_sizes");
             entity.Property(e => e.WheelSizeId)
-                .HasColumnName("wheel_size_id")
+                .HasColumnName("wheel_size")
                 .ValueGeneratedNever();
         });
         OnModelCreatingPartial(modelBuilder);

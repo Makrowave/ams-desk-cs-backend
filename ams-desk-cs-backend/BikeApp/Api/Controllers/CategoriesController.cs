@@ -20,6 +20,7 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
 
         // GET: api/Categories
         [HttpGet]
+        [Authorize(Policy = "AccessToken")]
         public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
         {
             var result = await _categoriesService.GetCategories();

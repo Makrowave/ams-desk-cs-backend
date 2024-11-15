@@ -24,7 +24,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 ManufacturerId = manufacter.ManufacturerId,
                 ManufacturerName = manufacter.ManufacturerName,
 
-            }).ToListAsync();
+            }).OrderBy(manufacturer => manufacturer.ManufacturerId).ToListAsync();
             return new ServiceResult<IEnumerable<ManufacturerDto>>(ServiceStatus.Ok, string.Empty, manufacturers);
         }
 

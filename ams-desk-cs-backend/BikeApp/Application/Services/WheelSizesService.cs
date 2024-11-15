@@ -1,15 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
+using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.BikeApp.Application.Services;
 
-[Authorize(Policy = "AccessToken")]
-[Route("api/[controller]")]
-[ApiController]
+
 public class WheelSizesService : IWheelSizesService
 {
     private readonly BikesDbContext _context;
@@ -19,17 +16,19 @@ public class WheelSizesService : IWheelSizesService
     }
     public async Task<ServiceResult<IEnumerable<short>>> GetWheelSizes()
     {
-        var wheelSizes = await _context.WheelSizes.Select(wheelSize => wheelSize.WheelSizeId).ToListAsync();
+        var wheelSizes = await _context.WheelSizes.Select(wheelSize => wheelSize.WheelSizeId).OrderBy(wheelSize => wheelSize).ToListAsync();
         return new ServiceResult<IEnumerable<short>>(ServiceStatus.Ok, string.Empty, wheelSizes);
     }
 
     public async Task<ServiceResult> PostWheelSize(short wheelSize)
     {
         var existingWheelSize = await _context.WheelSizes.FindAsync(wheelSize);
-        if (existingWheelSize != null)
+        if (existingWheelSize != null && wheelSize != 0)
         {
             return new ServiceResult(ServiceStatus.BadRequest, "Rozmiar koła już istnieje");
         }
+        _context.WheelSizes.Add(new WheelSize { WheelSizeId = wheelSize });
+        await _context.SaveChangesAsync();
         return new ServiceResult(ServiceStatus.Ok, string.Empty);
     }
     public async Task<ServiceResult> DeleteWheelSize(short wheelSize)
@@ -42,6 +41,7 @@ public class WheelSizesService : IWheelSizesService
                 return new ServiceResult(ServiceStatus.NotFound, "Rozmiar koła nie istnieje");
             }
             _context.WheelSizes.Remove(existingWheelSize);
+            await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
         catch (Exception ex)

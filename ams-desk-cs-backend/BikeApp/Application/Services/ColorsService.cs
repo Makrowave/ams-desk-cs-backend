@@ -44,7 +44,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 ColorId = color.ColorId,
                 ColorName = color.ColorName,
                 HexCode = color.HexCode,
-            }).ToListAsync();
+            }).OrderBy(color => color.ColorId).ToListAsync();
             return new ServiceResult<IEnumerable<ColorDto>>(ServiceStatus.Ok, string.Empty, colors);
         }
         public async Task<ServiceResult> PostColor(ColorDto color)

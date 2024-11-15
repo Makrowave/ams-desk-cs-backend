@@ -19,7 +19,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 EmployeeId = employee.EmployeeId,
                 EmployeeName = employee.EmployeeName,
-            }).ToListAsync();
+            }).OrderBy(employee => employee.EmployeeId).ToListAsync();
             return new ServiceResult<IEnumerable<EmployeeDto>>(ServiceStatus.Ok, string.Empty, employees);
         }
     }
