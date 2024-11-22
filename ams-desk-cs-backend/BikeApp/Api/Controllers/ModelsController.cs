@@ -58,5 +58,20 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
             }
             return NoContent();
         }
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> DeleteModel(int id)
+        {
+            var result = await _modelsService.DeleteModel(id);
+            if (result.Status == ServiceStatus.NotFound)
+            {
+                return NotFound(result.Message);
+            }
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return BadRequest(result.Message);
+            }
+            return NoContent();
+        }
     }
 }

@@ -156,6 +156,30 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                     g => g.Key.FrameSize == filter.FrameSize.Value
                 );
             }
+            if (filter.NoColor.HasValue && filter.NoColor.Value)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.PrimaryColor == null || g.Key.SecondaryColor == null
+                );
+            }
+            if (filter.NoColorGroup.HasValue && filter.NoColorGroup.Value)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ColorId == null
+                );
+            }
+            if (filter.NoEan.HasValue && filter.NoEan.Value)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.EanCode == null
+                );
+            }
+            if (filter.NoProductCode.HasValue && filter.NoProductCode.Value)
+            {
+                bikes = bikes.Where(
+                    g => g.Key.ProductCode == null
+                );
+            }
             if (filter.Name != null)
             {
                 //Find just first word in name so query returns less for later step (don't really know if it's optimal)
@@ -313,6 +337,25 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             }
             _context.SaveChanges();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
+        }
+
+        public async Task<ServiceResult> DeleteModel(int id)
+        {
+            try
+            {
+                var existingModel = await _context.Models.FindAsync(id);
+                if(existingModel == null) 
+                {
+                    return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono modelu");
+                }
+                _context.Models.Remove(existingModel);
+                await _context.SaveChangesAsync();
+                return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult(ServiceStatus.BadRequest, "Istnieją rowery przypisane to tego modelu");
+            }
         }
     }
 }

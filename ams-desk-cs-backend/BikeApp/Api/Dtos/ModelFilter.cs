@@ -17,5 +17,9 @@
         public int? ColorId { get; set; }
         public int? PlaceId { get; set; }
         public string? ProductCode { get; set; }
+        public bool? NoEan { get; set; }
+        public bool? NoProductCode { get; set; }
+        public bool? NoColor { get; set; }
+        public bool? NoColorGroup { get; set; }
     }
 }

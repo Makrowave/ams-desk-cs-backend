@@ -43,6 +43,8 @@ public partial class UserCredContext : DbContext
             entity.Property(e => e.AdminHash)
                 .HasMaxLength(64)
                 .HasColumnName("admin_hash");
+            entity.Property(e => e.EmployeeId)
+                .HasColumnName("employee_id");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -5,5 +5,7 @@
         bool Validate16CharName(string name);
         bool Validate16CharNameAnyCase(string name);
         bool ValidateColor(string name);
+        bool ValidateEmployeeName(string name);
+        bool ValidatePassword(string password);
     }
 }

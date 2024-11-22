@@ -1,5 +1,6 @@
 ﻿using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace ams_desk_cs_backend.BikeApp.Application.Validators
 {
@@ -18,6 +19,15 @@ namespace ams_desk_cs_backend.BikeApp.Application.Validators
         public bool ValidateColor(string color)
         {
             return Regex.IsMatch(color, "^#[A-Fa-f0-9]{6}$");
+        }
+
+        public bool ValidateEmployeeName(string name)
+        {
+            return Regex.IsMatch(name, "^[A-ZŻÓŁĆĘŚĄŹŃa-zżółćęśąźń .]{1,16}$");
+        }
+        public bool ValidatePassword(string password)
+        {
+            return Regex.IsMatch(password, "^[A-ZŻÓŁĆĘŚĄŹŃa-zżółćęśąźń0-9!@#$%^&*()]{8,}$");
         }
     }
 }

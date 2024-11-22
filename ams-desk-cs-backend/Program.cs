@@ -48,9 +48,10 @@ builder.Services.AddScoped<IWheelSizesService, WheelSizesService>();
 builder.Services.AddSingleton<IModelValidator, IncompleteModelValidator>();
 builder.Services.AddSingleton<ICommonValidator, CommonValidator>();
 
-//Auth
+//Auth app services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminAuthService, AdminAuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

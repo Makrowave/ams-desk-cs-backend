@@ -13,6 +13,5 @@ public partial class User
     public required int TokenVersion { get; set; }
     public required bool IsAdmin { get; set; }
     public string? AdminHash { get; set; }
-    
-
+    public short? EmployeeId { get; set; }
 }
