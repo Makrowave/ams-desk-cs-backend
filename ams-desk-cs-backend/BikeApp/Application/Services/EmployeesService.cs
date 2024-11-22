@@ -20,7 +20,8 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
 
         public async Task<ServiceResult<IEnumerable<EmployeeDto>>> GetEmployees()
         {
-            var employees = await _context.Employees.Select(employee => new EmployeeDto
+            var employees = await _context.Employees.OrderBy(employee => employee.EmployeesOrder)
+                .Select(employee => new EmployeeDto
             {
                 EmployeeId = employee.EmployeeId,
                 EmployeeName = employee.EmployeeName,
@@ -34,9 +35,11 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Zły format nazwy");
             }
+            var order = _context.Employees.Count() + 1;
             _context.Add(new Employee
             {
                 EmployeeName = employee.EmployeeName,
+                EmployeesOrder = (short)order,
             });
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);

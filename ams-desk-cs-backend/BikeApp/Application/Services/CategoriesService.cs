@@ -19,7 +19,8 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
         }
         public async Task<ServiceResult<IEnumerable<CategoryDto>>> GetCategories()
         {
-            var categories = await _context.Categories.Select(category => new CategoryDto
+            var categories = await _context.Categories.OrderBy(category => category.CategoriesOrder)
+                .Select(category => new CategoryDto
             {
                 CategoryId = category.CategoryId,
                 CategoryName = category.CategoryName,
@@ -33,9 +34,11 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Zła nazwa kategorii");
             }
+            var order = _context.Categories.Count() + 1;
             _context.Add(new Category
             {
                 CategoryName = category.CategoryName,
+                CategoriesOrder = (short)order
             });
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);

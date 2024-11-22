@@ -37,12 +37,13 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
 
         public async Task<ServiceResult<IEnumerable<StatusDto>>> GetStatuses()
         {
-            var statuses = await _context.Statuses.Select(status => new StatusDto
+            var statuses = await _context.Statuses.OrderBy(status => status.StatusesOrder)
+                .Select(status => new StatusDto
             {
                 StatusId = status.StatusId,
                 StatusName = status.StatusName,
                 HexCode = status.HexCode,
-            }).OrderBy(status => status.StatusId).ToListAsync();
+            }).ToListAsync();
             return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
         }
 
@@ -50,6 +51,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
         {
             var statuses = await _context.Statuses
                 .Where(status => status.StatusId != (short)BikeStatus.Sold)
+                .OrderBy(status => status.StatusesOrder)
                 .Select(status => new StatusDto
                 {
                     StatusId = status.StatusId,
@@ -69,10 +71,12 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Zły format koloru");
             }
+            var order = _context.Statuses.Count() + 1;
             _context.Add(new Status
             {
                 StatusName = status.StatusName,
                 HexCode = status.HexCode,
+                StatusesOrder = (short)order
             });
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);

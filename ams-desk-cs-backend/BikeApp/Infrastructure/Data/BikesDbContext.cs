@@ -78,6 +78,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ManufacturerName)
                 .HasMaxLength(20)
                 .HasColumnName("manufacturer_name");
+            entity.Property(e => e.ManufacturersOrder)
+                .HasColumnName("manufacturers_order");
         });
 
         modelBuilder.Entity<Model>(entity =>
@@ -143,6 +145,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.PlaceName)
                 .HasMaxLength(16)
                 .HasColumnName("place_name");
+            entity.Property(e => e.PlacesOrder)
+                .HasColumnName("places_order");
         });
 
         modelBuilder.Entity<Status>(entity =>
@@ -160,6 +164,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.HexCode)
                 .HasMaxLength(7)
                 .HasColumnName("hex_code");
+            entity.Property(e => e.StatusesOrder)
+                .HasColumnName("statuses_order");
         });
 
         modelBuilder.Entity<Color>(entity =>
@@ -177,6 +183,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.HexCode)
                 .HasMaxLength(7)
                 .HasColumnName("hex_code");
+            entity.Property(e => e.ColorsOrder)
+                .HasColumnName("colors_order");
         });
         modelBuilder.Entity<Employee>(entity =>
         {
@@ -188,6 +196,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.EmployeeName)
                 .HasMaxLength(30)
                 .HasColumnName("employee_name");
+            entity.Property(e => e.EmployeesOrder)
+                .HasColumnName("employees_order");
         });
         modelBuilder.Entity<Category>(entity =>
         {
@@ -199,6 +209,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.CategoryName)
                 .HasMaxLength(30)
                 .HasColumnName("category_name");
+            entity.Property(e => e.CategoriesOrder)
+                .HasColumnName("categories_order");
         });
         OnModelCreatingPartial(modelBuilder);
         modelBuilder.Entity<WheelSize>(entity =>

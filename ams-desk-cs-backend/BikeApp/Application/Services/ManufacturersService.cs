@@ -19,12 +19,13 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
         }
         public async Task<ServiceResult<IEnumerable<ManufacturerDto>>> GetManufacturers()
         {
-            var manufacturers = await _context.Manufacturers.Select(manufacter => new ManufacturerDto
+            var manufacturers = await _context.Manufacturers.OrderBy(manufacturer => manufacturer.ManufacturersOrder)
+                .Select(manufacter => new ManufacturerDto
             {
                 ManufacturerId = manufacter.ManufacturerId,
                 ManufacturerName = manufacter.ManufacturerName,
 
-            }).OrderBy(manufacturer => manufacturer.ManufacturerId).ToListAsync();
+            }).ToListAsync();
             return new ServiceResult<IEnumerable<ManufacturerDto>>(ServiceStatus.Ok, string.Empty, manufacturers);
         }
 
@@ -35,9 +36,11 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Zła nazwa producenta");
             }
+            var order = _context.Manufacturers.Count() + 1;
             _context.Add(new Manufacturer
             {
                 ManufacturerName = manufacturer.ManufacturerName,
+                ManufacturersOrder = (short)order
             });
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);

@@ -58,6 +58,18 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
             }
             return Ok();
         }
+        [HttpPut("ChangeOrder")]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> ChangeOrder(short first, short last)
+        {
+            var result = await _colorsService.ChangeOrder(first, last);
+            if (result.Status == ServiceStatus.NotFound)
+            {
+                return NotFound(result.Message);
+            }
+            return Ok();
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
         public async Task<IActionResult> DeleteColor(short id)

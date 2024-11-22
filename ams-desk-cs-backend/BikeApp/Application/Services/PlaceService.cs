@@ -15,7 +15,8 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
         }
         public async Task<ServiceResult<IEnumerable<PlaceDto>>> GetPlaces()
         {
-            var places = await _context.Places.Select(place => new PlaceDto
+            var places = await _context.Places.OrderBy(place => place.PlacesOrder)
+                .Select(place => new PlaceDto
             {
                 PlaceId = place.PlaceId,
                 PlaceName = place.PlaceName,
