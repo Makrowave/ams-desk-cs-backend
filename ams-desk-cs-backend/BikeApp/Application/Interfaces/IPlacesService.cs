@@ -6,5 +6,6 @@ namespace ams_desk_cs_backend.BikeApp.Application.Interfaces
     public interface IPlacesService
     {
         public Task<ServiceResult<IEnumerable<PlaceDto>>> GetPlaces();
+        public Task<ServiceResult> ChangeOrder(short firstId, short lastId);
     }
 }

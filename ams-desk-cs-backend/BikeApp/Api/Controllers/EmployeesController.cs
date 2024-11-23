@@ -49,6 +49,21 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
             }
             return Ok();
         }
+        [HttpPut("ChangeOrder")]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> ChangeOrder(short first, short last)
+        {
+            var result = await _employeesService.ChangeOrder(first, last);
+            if (result.Status == ServiceStatus.NotFound)
+            {
+                return NotFound(result.Message);
+            }
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok();
+        }
         [HttpDelete("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
         public async Task<IActionResult> DeleteCategory(short id)

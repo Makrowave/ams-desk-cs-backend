@@ -10,6 +10,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Interfaces
         public Task<ServiceResult<StatusDto>> GetStatus(short id);
         public Task<ServiceResult> PostStatus(StatusDto color);
         public Task<ServiceResult> UpdateStatus(short id, StatusDto color);
+        public Task<ServiceResult> ChangeOrder(short firstId, short lastId);
         public Task<ServiceResult> DeleteStatus(short id);
     }
 }

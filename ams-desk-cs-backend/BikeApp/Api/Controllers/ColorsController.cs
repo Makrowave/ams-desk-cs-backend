@@ -67,6 +67,10 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
             {
                 return NotFound(result.Message);
             }
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return BadRequest(result.Message);
+            }
             return Ok();
         }
 

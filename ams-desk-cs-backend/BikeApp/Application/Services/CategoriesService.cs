@@ -57,6 +57,24 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             }
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
+        
+        }
+        public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+        {
+            if (!_context.Categories.Any(category => (category.CategoryId == firstId || category.CategoryId == lastId)))
+            {
+                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            }
+            var categories = await _context.Categories.OrderBy(category => category.CategoriesOrder).ToListAsync();
+            var firstOrder = categories.FirstOrDefault(category => category.CategoryId == firstId)!.CategoriesOrder;
+            var lastOrder = categories.FirstOrDefault(category => category.CategoryId == lastId)!.CategoriesOrder;
+
+            var filteredCategories = 
+                categories.Where(category => category.CategoriesOrder >= firstOrder && category.CategoriesOrder <= lastOrder).ToList();
+            filteredCategories.ForEach(category => category.CategoriesOrder++);
+            filteredCategories.Last().CategoriesOrder = firstOrder;
+            await _context.SaveChangesAsync();
+            return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
         public async Task<ServiceResult> DeleteCategory(short id)
         {

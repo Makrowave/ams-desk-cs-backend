@@ -60,6 +60,22 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                 }).OrderBy(status => status.StatusId).ToListAsync();
             return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
         }
+        public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+        {
+            if (!_context.Statuses.Any(status => (status.StatusId == firstId || status.StatusId == lastId)))
+            {
+                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            }
+            var statusese = await _context.Statuses.OrderBy(status => status.StatusesOrder).ToListAsync();
+            var firstOrder = statusese.FirstOrDefault(status => status.StatusId == firstId)!.StatusesOrder;
+            var lastOrder = statusese.FirstOrDefault(status => status.StatusId == lastId)!.StatusesOrder;
+
+            var filteredStatuses = statusese.Where(status => status.StatusesOrder >= firstOrder && status.StatusesOrder <= lastOrder).ToList();
+            filteredStatuses.ForEach(status => status.StatusesOrder++);
+            filteredStatuses.Last().StatusesOrder = firstOrder;
+            await _context.SaveChangesAsync();
+            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+        }
 
         public async Task<ServiceResult> PostStatus(StatusDto status)
         {

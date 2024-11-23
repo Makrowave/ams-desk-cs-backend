@@ -61,6 +61,23 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
+        public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+        {
+            if (!_context.Manufacturers.Any(manufacturer => (manufacturer.ManufacturerId == firstId || manufacturer.ManufacturerId == lastId)))
+            {
+                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            }
+            var manufacturers = await _context.Manufacturers.OrderBy(manufacturer => manufacturer.ManufacturersOrder).ToListAsync();
+            var firstOrder = manufacturers.FirstOrDefault(manufacturer => manufacturer.ManufacturerId == firstId)!.ManufacturersOrder;
+            var lastOrder = manufacturers.FirstOrDefault(manufacturer => manufacturer.ManufacturerId == lastId)!.ManufacturersOrder;
+
+            var filteredManufacturers = 
+                manufacturers.Where(manufacturer => manufacturer.ManufacturersOrder >= firstOrder && manufacturer.ManufacturersOrder <= lastOrder).ToList();
+            filteredManufacturers.ForEach(manufacturer => manufacturer.ManufacturersOrder++);
+            filteredManufacturers.Last().ManufacturersOrder = firstOrder;
+            await _context.SaveChangesAsync();
+            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+        }
         public async Task<ServiceResult> DeleteManufacturer(short id)
         {
             try

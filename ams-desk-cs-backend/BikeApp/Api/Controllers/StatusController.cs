@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
+using ams_desk_cs_backend.BikeApp.Application.Services;
 
 namespace ams_desk_cs_backend.BikeApp.Api.Controllers
 {
@@ -64,6 +65,21 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
             if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
+            }
+            return Ok();
+        }
+        [HttpPut("ChangeOrder")]
+        [Authorize(Policy = "AdminAccessToken")]
+        public async Task<IActionResult> ChangeOrder(short first, short last)
+        {
+            var result = await _statusService.ChangeOrder(first, last);
+            if (result.Status == ServiceStatus.NotFound)
+            {
+                return NotFound(result.Message);
+            }
+            if (result.Status == ServiceStatus.BadRequest)
+            {
+                return BadRequest(result.Message);
             }
             return Ok();
         }

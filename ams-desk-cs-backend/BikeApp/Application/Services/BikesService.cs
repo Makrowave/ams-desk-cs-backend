@@ -92,7 +92,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                     g => g.st.DefaultIfEmpty(),
                     (g, st) => new { g.bi, g.pl, st }
                 )
-                .OrderBy(g => g.st.StatusId).ThenBy(g => g.pl.PlaceId)
+                .OrderBy(g => g.st.StatusesOrder).ThenBy(g => g.pl.PlaceId)
                 .GroupJoin(
                     _context.Employees,
                     g => g.bi.AssembledBy,

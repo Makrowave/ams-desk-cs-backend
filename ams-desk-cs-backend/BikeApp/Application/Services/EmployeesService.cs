@@ -25,7 +25,7 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 EmployeeId = employee.EmployeeId,
                 EmployeeName = employee.EmployeeName,
-            }).OrderBy(employee => employee.EmployeeId).ToListAsync();
+            }).ToListAsync();
             return new ServiceResult<IEnumerable<EmployeeDto>>(ServiceStatus.Ok, string.Empty, employees);
         }
 
@@ -56,6 +56,22 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 existingEmployee.EmployeeName = employee.EmployeeName;
             }
+            await _context.SaveChangesAsync();
+            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+        }
+        public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+        {
+            if (!_context.Employees.Any(employee => (employee.EmployeeId == firstId || employee.EmployeeId == lastId)))
+            {
+                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            }
+            var employees = await _context.Employees.OrderBy(employee => employee.EmployeesOrder).ToListAsync();
+            var firstOrder = employees.FirstOrDefault(employee => employee.EmployeeId == firstId)!.EmployeesOrder;
+            var lastOrder = employees.FirstOrDefault(employee => employee.EmployeeId == lastId)!.EmployeesOrder;
+
+            var filteredEmployees = employees.Where(employee => employee.EmployeesOrder >= firstOrder && employee.EmployeesOrder <= lastOrder).ToList();
+            filteredEmployees.ForEach(employee => employee.EmployeesOrder++);
+            filteredEmployees.Last().EmployeesOrder = firstOrder;
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
