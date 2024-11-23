@@ -63,7 +63,6 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
             var result = await _authService.ChangePassword(userDto);
             if (result.Status == ServiceStatus.Ok)
             {
-                LogoutCookie();
                 return Ok();
             }
             return BadRequest(result.Message);
