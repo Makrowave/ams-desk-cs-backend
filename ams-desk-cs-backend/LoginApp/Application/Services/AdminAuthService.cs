@@ -61,7 +61,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return new ServiceResult(ServiceStatus.BadRequest, "Nie udało się zmienić hasła");
         }
 
-        public async Task<ServiceResult<string>> Login(UserDto userDto)
+        public async Task<ServiceResult<string>> Login(UserDto userDto, bool mobile)
         {
             if (userDto.Password == null || userDto.Username == null)
             {

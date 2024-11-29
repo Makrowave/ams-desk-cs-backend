@@ -60,7 +60,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return new ServiceResult(ServiceStatus.BadRequest, "Nie udało się zmienić hasła");
         }
 
-        public async Task<ServiceResult<string>> Login(UserDto userDto)
+        public async Task<ServiceResult<string>> Login(UserDto userDto, bool mobile)
         {
             var hash = Argon2.Hash(userDto.Password);
             User user = (await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username))!;
@@ -70,7 +70,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             user.Hash,
             userDto.Password))
             {
-                var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role);
+                var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role, mobile);
                 return new ServiceResult<string>(ServiceStatus.Ok, String.Empty, token);
             }
 
@@ -84,7 +84,8 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
                 parsedToken[JwtRegisteredClaimNames.Name],
                 parsedToken[JwtApplicationClaimNames.Version],
                 Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]),
-                parsedToken[JwtApplicationClaimNames.Role]);
+                parsedToken[JwtApplicationClaimNames.Role], 
+                false);
         }
 
         private Dictionary<string, string> ParseToken(string token)
@@ -92,7 +93,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return _jwtHandler.ReadJwtToken(token).Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
         }
 
-        private string GenerateJwtToken(int minutes, string name, string version, int id, string role)
+        private string GenerateJwtToken(int minutes, string name, string version, int id, string role, bool mobileRefresh)
         {
             var claims = new Claim[] {
                 new Claim(JwtRegisteredClaimNames.Name, name),
@@ -100,6 +101,10 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
                 new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
                 new Claim(JwtApplicationClaimNames.Role, role)
             };
+            if (mobileRefresh)
+            {
+                claims = [.. claims, new Claim(JwtApplicationClaimNames.Mobile, "true")];
+            }
             var signingCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(_key)),

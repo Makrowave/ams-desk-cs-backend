@@ -24,7 +24,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         public async Task<IActionResult> Login(UserDto user)
         {
-            var result = await _authService.Login(user);
+            var result = await _authService.Login(user, false);
             if (result.Status == ServiceStatus.Ok)
             {
                 Response.Cookies.Append(_cookieName, result.Data!, new CookieOptions
