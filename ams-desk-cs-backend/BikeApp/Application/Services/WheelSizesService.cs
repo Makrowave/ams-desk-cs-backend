@@ -1,3 +1,4 @@
+using ams_desk_cs_backend.BikeApp.Api.Dtos;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
@@ -14,10 +15,11 @@ public class WheelSizesService : IWheelSizesService
     {
         _context = context;
     }
-    public async Task<ServiceResult<IEnumerable<short>>> GetWheelSizes()
+    public async Task<ServiceResult<IEnumerable<WheelSizeDto>>> GetWheelSizes()
     {
         var wheelSizes = await _context.WheelSizes.Select(wheelSize => wheelSize.WheelSizeId).OrderBy(wheelSize => wheelSize).ToListAsync();
-        return new ServiceResult<IEnumerable<short>>(ServiceStatus.Ok, string.Empty, wheelSizes);
+        var wheelSizesDto = wheelSizes.Select(value => new WheelSizeDto { Key = value, Value = value });
+        return new ServiceResult<IEnumerable<WheelSizeDto>>(ServiceStatus.Ok, string.Empty, wheelSizesDto);
     }
 
     public async Task<ServiceResult> PostWheelSize(short wheelSize)
