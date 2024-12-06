@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
-using ams_desk_cs_backend.BikeApp.Application.Services;
 
 namespace ams_desk_cs_backend.BikeApp.Api.Controllers
 {
@@ -28,10 +27,10 @@ namespace ams_desk_cs_backend.BikeApp.Api.Controllers
         }
 
         // GET: api/Status/NotSold
-        [HttpGet("NotSold")]
-        public async Task<ActionResult<IEnumerable<StatusDto>>> GetStatusesNotSold()
+        [HttpGet("Excluded")]
+        public async Task<ActionResult<IEnumerable<StatusDto>>> GetStatusesExcluded([FromQuery] int[] exclude)
         {
-            var result = await _statusService.GetStatusesNotSold();
+            var result = await _statusService.GetStatusesExcluded(exclude);
             return Ok(result.Data);
         }
 

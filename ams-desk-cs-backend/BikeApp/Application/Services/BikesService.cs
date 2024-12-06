@@ -104,9 +104,8 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                     (g, emp) => new BikeSubRecordDto
                     {
                         Id = g.bi.BikeId,
-                        Place = g.pl!.PlaceName,
-                        Status = g.st!.StatusName,
-                        StatusId = g.st.StatusId,
+                        Place = g.bi.PlaceId,
+                        StatusId = g.bi.StatusId,
                         AssembledBy = emp != null ? emp.EmployeeName : "Brak"
                     }
                 ).ToListAsync();

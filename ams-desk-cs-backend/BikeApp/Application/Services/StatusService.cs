@@ -47,10 +47,10 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
         }
 
-        public async Task<ServiceResult<IEnumerable<StatusDto>>> GetStatusesNotSold()
+        public async Task<ServiceResult<IEnumerable<StatusDto>>> GetStatusesExcluded(int[] excludedStatuses)
         {
             var statuses = await _context.Statuses
-                .Where(status => status.StatusId != (short)BikeStatus.Sold)
+                .Where(status => !excludedStatuses.Any(s => s == status.StatusId))
                 .OrderBy(status => status.StatusesOrder)
                 .Select(status => new StatusDto
                 {
