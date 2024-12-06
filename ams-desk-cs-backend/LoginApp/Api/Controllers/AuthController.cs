@@ -45,7 +45,12 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
             {
                 return Unauthorized("User not logged in");
             }
-            return Ok(_authService.Refresh(token));
+            var result = _authService.Refresh(token);
+            if(result.Status == ServiceStatus.Unauthorized)
+            {
+                return Unauthorized(result.Message);
+            }
+            return Ok(result.Data);
         }
 
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]

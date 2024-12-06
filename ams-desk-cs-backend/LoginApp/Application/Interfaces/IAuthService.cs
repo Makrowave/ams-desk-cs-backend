@@ -6,7 +6,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Interfaces
     public interface IAuthService
     {
         public Task<ServiceResult<string>> Login(UserDto user, bool mobile);
-        public string Refresh(string token);
+        public ServiceResult<string> Refresh(string token);
         public Task<ServiceResult> ChangePassword(UserDto user);
         public int GetAccessTokenLenght();
         public int GetRefreshTokenLenght();

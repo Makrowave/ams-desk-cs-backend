@@ -70,22 +70,31 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             user.Hash,
             userDto.Password))
             {
-                var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role, mobile);
-                return new ServiceResult<string>(ServiceStatus.Ok, String.Empty, token);
+                string id = user.EmployeeId.ToString() ?? "DesktopOnly";
+                var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role, id, mobile);
+                return new ServiceResult<string>(ServiceStatus.Ok, string.Empty, token);
             }
 
             return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
         }
 
-        public string Refresh(string token)
+        public ServiceResult<string> Refresh(string token)
         {
             var parsedToken = ParseToken(token);
-            return GenerateJwtToken(_accessTokenLength,
-                parsedToken[JwtRegisteredClaimNames.Name],
-                parsedToken[JwtApplicationClaimNames.Version],
-                Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]),
-                parsedToken[JwtApplicationClaimNames.Role], 
-                false);
+            try
+            {
+                return new ServiceResult<string>(ServiceStatus.Ok, string.Empty, GenerateJwtToken(_accessTokenLength,
+                    parsedToken[JwtRegisteredClaimNames.Name],
+                    parsedToken[JwtApplicationClaimNames.Version],
+                    Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]),
+                    parsedToken[JwtApplicationClaimNames.Role],
+                    parsedToken[JwtApplicationClaimNames.Employee],
+                    false));            
+            }
+            catch(Exception ex)
+            {
+                return new ServiceResult<string>(ServiceStatus.Unauthorized, "Old token version", string.Empty);
+            }
         }
 
         private Dictionary<string, string> ParseToken(string token)
@@ -93,13 +102,14 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return _jwtHandler.ReadJwtToken(token).Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
         }
 
-        private string GenerateJwtToken(int minutes, string name, string version, int id, string role, bool mobileRefresh)
+        private string GenerateJwtToken(int minutes, string name, string version, int id, string role, string employeeId, bool mobileRefresh)
         {
             var claims = new Claim[] {
                 new Claim(JwtRegisteredClaimNames.Name, name),
                 new Claim(JwtApplicationClaimNames.Version, version),
                 new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
-                new Claim(JwtApplicationClaimNames.Role, role)
+                new Claim(JwtApplicationClaimNames.Role, role),
+                new Claim(JwtApplicationClaimNames.Employee, employeeId)
             };
             if (mobileRefresh)
             {

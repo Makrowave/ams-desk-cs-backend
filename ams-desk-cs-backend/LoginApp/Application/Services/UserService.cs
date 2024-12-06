@@ -73,6 +73,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
         public async Task<ServiceResult> ChangeUser(short id, UserDto user)
         {
             var existingUser = await _userCredContext.Users.FindAsync(id);
+            bool hasChanged = false;
             if(existingUser == null)
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Konto nie istnieje");
@@ -80,11 +81,12 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             if (user.Username != null && _commonValidator.ValidateEmployeeName(user.Username))
             {
                 existingUser.Username = user.Username;
+                hasChanged = true;
             }
             if (user.Password != null && _commonValidator.ValidatePassword(user.Password))
             {
                 existingUser.Hash = Argon2.Hash(user.Password);
-                existingUser.TokenVersion++;
+                hasChanged = true;
             }
             if (user.EmployeeId != null)
             {
@@ -93,6 +95,11 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
                     return new ServiceResult(ServiceStatus.NotFound, "Pracownik nie istnieje");
                 }
                 existingUser.EmployeeId = user.EmployeeId;
+                hasChanged = true;
+            }
+            if(hasChanged)
+            {
+                existingUser.TokenVersion++;
             }
             try
             {

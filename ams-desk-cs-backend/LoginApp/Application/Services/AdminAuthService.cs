@@ -82,17 +82,23 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
         }
 
-        public string Refresh(string token)
+        public ServiceResult<string> Refresh(string token)
         {
-            //If endpoint authorization passed - refresh based on old token
             var parsedToken = ParseToken(token);
-            return GenerateJwtToken(_accessTokenLength,
-                parsedToken[JwtRegisteredClaimNames.Name],
-                parsedToken[JwtApplicationClaimNames.Version],
-                Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]),
-                parsedToken[JwtApplicationClaimNames.Role]);
+            try
+            {
+                return new ServiceResult<string>(ServiceStatus.Ok, string.Empty, GenerateJwtToken(_accessTokenLength,
+                    parsedToken[JwtRegisteredClaimNames.Name],
+                    parsedToken[JwtApplicationClaimNames.Version],
+                    Int32.Parse(parsedToken[JwtRegisteredClaimNames.Sub]),
+                    parsedToken[JwtApplicationClaimNames.Role]));
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult<string>(ServiceStatus.Unauthorized, "Old token version", string.Empty);
+            }
         }
-        // Most of these are same as AuthService
+                // Most of these are same as AuthService
         private Dictionary<string, string> ParseToken(string token)
         {
             return _jwtHandler.ReadJwtToken(token).Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
