@@ -93,22 +93,17 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
                     (g, st) => new { g.bi, g.pl, st }
                 )
                 .OrderBy(g => g.st.StatusesOrder).ThenBy(g => g.pl.PlaceId)
-                .GroupJoin(
-                    _context.Employees,
-                    g => g.bi.AssembledBy,
-                    emp => emp.EmployeeId,
-                    (g, emp) => new { g.bi, g.pl, g.st, emp }
-                )
-                .SelectMany(
-                    g => g.emp.DefaultIfEmpty(),
-                    (g, emp) => new BikeSubRecordDto
+                .Select(
+                    g => new BikeSubRecordDto
                     {
                         Id = g.bi.BikeId,
                         Place = g.bi.PlaceId,
                         StatusId = g.bi.StatusId,
-                        AssembledBy = emp != null ? emp.EmployeeName : "Brak"
+                        AssembledBy = g.bi.AssembledBy
                     }
-                ).ToListAsync();
+                )
+                
+                .ToListAsync();
             return new ServiceResult<IEnumerable<BikeSubRecordDto>>(ServiceStatus.Ok, string.Empty, bikes);
         }
 
