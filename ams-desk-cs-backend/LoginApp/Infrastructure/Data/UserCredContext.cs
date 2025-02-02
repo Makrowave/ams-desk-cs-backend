@@ -31,7 +31,7 @@ public partial class UserCredContext : DbContext
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.Hash)
-                .HasMaxLength(64)
+                .HasMaxLength(120)
                 .HasColumnName("hash");
             entity.Property(e => e.Username)
                 .HasMaxLength(32)
@@ -41,7 +41,7 @@ public partial class UserCredContext : DbContext
             entity.Property(e => e.IsAdmin)
                 .HasColumnName("is_admin");
             entity.Property(e => e.AdminHash)
-                .HasMaxLength(64)
+                .HasMaxLength(120)
                 .HasColumnName("admin_hash");
             entity.Property(e => e.EmployeeId)
                 .HasColumnName("employee_id");
