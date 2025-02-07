@@ -1,22 +1,18 @@
 ﻿using ams_desk_cs_backend.BikeApp.Application.Interfaces;
-using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace ams_desk_cs_backend.BikeApp.Application.Services
 {
     public class ColorsService : IColorsService
     {
         private readonly BikesDbContext _context;
-        private readonly ICommonValidator _commonValidator;
-        public ColorsService(BikesDbContext dbContext, ICommonValidator commonValidator)
+        public ColorsService(BikesDbContext dbContext)
         {
             _context = dbContext;
-            _commonValidator = commonValidator;
         }
 
 
@@ -49,14 +45,6 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
         }
         public async Task<ServiceResult> PostColor(ColorDto color)
         {
-            if (color.ColorName == null || !_commonValidator.Validate16CharName(color.ColorName))
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Zła nazwa koloru");
-            }
-            if (color.HexCode == null || !_commonValidator.ValidateColor(color.HexCode))
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Zły format koloru");
-            }
             var order = _context.Colors.Count() + 1;
             _context.Add(new Color
             {
@@ -67,21 +55,16 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
-        public async Task<ServiceResult> UpdateColor(short id, ColorDto color)
+        public async Task<ServiceResult> UpdateColor(short id, ColorDto newColor)
         {
-            var existingColor = await _context.Colors.FindAsync(id);
-            if (existingColor == null)
+            var oldColor = await _context.Colors.FindAsync(id);
+            if (oldColor == null)
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono koloru");
             }
-            if (color.ColorName != null && _commonValidator.Validate16CharName(color.ColorName))
-            {
-                existingColor.ColorName = color.ColorName;
-            }
-            if (color.HexCode != null && _commonValidator.ValidateColor(color.HexCode))
-            {
-                existingColor.HexCode = color.HexCode;
-            }
+
+            oldColor.ColorName = newColor.ColorName;
+            oldColor.HexCode = newColor.HexCode;
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }

@@ -1,5 +1,4 @@
 ﻿using ams_desk_cs_backend.BikeApp.Application.Interfaces;
-using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
@@ -11,11 +10,9 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
     public class CategoriesService : ICategoriesService
     {
         private readonly BikesDbContext _context;
-        private readonly ICommonValidator _commonValidator;
-        public CategoriesService(BikesDbContext bikesDbContext, ICommonValidator commonValidator) 
+        public CategoriesService(BikesDbContext bikesDbContext) 
         {
             _context = bikesDbContext;
-            _commonValidator = commonValidator;
         }
         public async Task<ServiceResult<IEnumerable<CategoryDto>>> GetCategories()
         {
@@ -30,10 +27,6 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
 
         public async Task<ServiceResult> PostCategory(CategoryDto category)
         {
-            if (category.CategoryName == null || !_commonValidator.Validate16CharName(category.CategoryName))
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Zła nazwa kategorii");
-            }
             var order = _context.Categories.Count() + 1;
             _context.Add(new Category
             {
@@ -44,17 +37,15 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
 
-        public async Task<ServiceResult> UpdateCategory(short id, CategoryDto category)
+        public async Task<ServiceResult> UpdateCategory(short id, CategoryDto newCategory)
         {
-            var existingCategory = await _context.Categories.FindAsync(id);
-            if (existingCategory == null)
+            var oldCategory = await _context.Categories.FindAsync(id);
+            if (oldCategory == null)
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono kategorii");
             }
-            if (category.CategoryName != null && _commonValidator.Validate16CharName(category.CategoryName))
-            {
-                existingCategory.CategoryName = category.CategoryName;
-            }
+
+            oldCategory.CategoryName = newCategory.CategoryName;
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         

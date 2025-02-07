@@ -1,7 +1,4 @@
-﻿using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
-using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
-using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
+﻿using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
 using ams_desk_cs_backend.LoginApp.Api.Dtos;
 using ams_desk_cs_backend.LoginApp.Application.Interfaces;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
@@ -16,12 +13,10 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
     {
         private readonly BikesDbContext _bikesDbContext;
         private readonly UserCredContext _userCredContext;
-        private readonly ICommonValidator _commonValidator;
-        public UserService(BikesDbContext bikesDbContext, UserCredContext userCredContext, ICommonValidator commonValidator)
+        public UserService(BikesDbContext bikesDbContext, UserCredContext userCredContext)
         {
             _bikesDbContext = bikesDbContext;
             _userCredContext = userCredContext;
-            _commonValidator = commonValidator;
         }
 
         public async Task<ServiceResult<IEnumerable<UserDto>>> GetUsers()
@@ -38,19 +33,6 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
 
         public async Task<ServiceResult> PostUser(UserDto user)
         {
-            
-            if (user.Username == null || !_commonValidator.ValidateEmployeeName(user.Username))
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Zła nazwa użytkownika");
-            }
-            if (user.Password == null || !_commonValidator.ValidatePassword(user.Password))
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Złe hasło");
-            }
-            if (user.EmployeeId != null && !await EmployeeExists(user.EmployeeId.Value))
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Pracownik nie istnieje");
-            }
             _userCredContext.Add(new User
             {
                 Username = user.Username,
@@ -70,36 +52,29 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
  
         }
-        public async Task<ServiceResult> ChangeUser(short id, UserDto user)
+        public async Task<ServiceResult> ChangeUser(short id, UserDto newUser)
         {
-            var existingUser = await _userCredContext.Users.FindAsync(id);
+            var oldUser = await _userCredContext.Users.FindAsync(id);
             bool hasChanged = false;
-            if(existingUser == null)
+            if(oldUser == null)
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Konto nie istnieje");
             }
-            if (user.Username != null && _commonValidator.ValidateEmployeeName(user.Username))
+            oldUser.Username = newUser.Username;
+            oldUser.Hash = Argon2.Hash(newUser.Password);
+
+            if (newUser.EmployeeId != null)
             {
-                existingUser.Username = user.Username;
-                hasChanged = true;
-            }
-            if (user.Password != null && _commonValidator.ValidatePassword(user.Password))
-            {
-                existingUser.Hash = Argon2.Hash(user.Password);
-                hasChanged = true;
-            }
-            if (user.EmployeeId != null)
-            {
-                if (!await EmployeeExists(user.EmployeeId.Value))
+                if (!await EmployeeExists(newUser.EmployeeId.Value))
                 {
                     return new ServiceResult(ServiceStatus.NotFound, "Pracownik nie istnieje");
                 }
-                existingUser.EmployeeId = user.EmployeeId;
+                oldUser.EmployeeId = newUser.EmployeeId;
                 hasChanged = true;
             }
             if(hasChanged)
             {
-                existingUser.TokenVersion++;
+                oldUser.TokenVersion++;
             }
             try
             {

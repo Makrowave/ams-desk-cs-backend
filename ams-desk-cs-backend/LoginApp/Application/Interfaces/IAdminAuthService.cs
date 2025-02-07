@@ -5,6 +5,6 @@ namespace ams_desk_cs_backend.LoginApp.Application.Interfaces
 {
     public interface IAdminAuthService : IAuthService
     {
-        public Task<ServiceResult> ChangeUserPassword(UserDto user);
+        public Task<ServiceResult> ChangeUserPassword(ChangePasswordDto user);
     }
 }

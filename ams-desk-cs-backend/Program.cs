@@ -2,8 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Configuration;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
-using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
-using ams_desk_cs_backend.BikeApp.Application.Validators;
 using ams_desk_cs_backend.LoginApp.Infrastructure.Data;
 using ams_desk_cs_backend.Shared.Extensions;
 var builder = WebApplication.CreateBuilder(args);
@@ -25,10 +23,6 @@ builder.Services.AddEntityFrameworkNpgsql().AddDbContext<UserCredContext>(option
 // Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(o => { o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; });
-
-//Bikes app validators
-builder.Services.AddSingleton<IModelValidator, IncompleteModelValidator>();
-builder.Services.AddSingleton<ICommonValidator, CommonValidator>();
 
 builder.AddBikeServices();
 builder.AddAuthServices();

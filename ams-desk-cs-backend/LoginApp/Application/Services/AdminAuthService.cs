@@ -37,7 +37,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             _jwtHandler = new JwtSecurityTokenHandler();
         }
 
-        public async Task<ServiceResult> ChangePassword(UserDto userDto)
+        public async Task<ServiceResult> ChangePassword(ChangePasswordDto userDto)
         {
             User? user = null;
             if (userDto.Username != null)
@@ -61,12 +61,8 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return new ServiceResult(ServiceStatus.BadRequest, "Nie udało się zmienić hasła");
         }
 
-        public async Task<ServiceResult<string>> Login(UserDto userDto, bool mobile)
+        public async Task<ServiceResult<string>> Login(LoginDto userDto, bool mobile)
         {
-            if (userDto.Password == null || userDto.Username == null)
-            {
-                return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
-            }
             var hash = Argon2.Hash(userDto.Password);
             //Fetch user
             User user = (await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username))!;
@@ -148,7 +144,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
         }
 
-        public Task<ServiceResult> ChangeUserPassword(UserDto user)
+        public Task<ServiceResult> ChangeUserPassword(ChangePasswordDto user)
         {
             throw new NotImplementedException();
         }

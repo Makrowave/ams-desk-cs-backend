@@ -37,7 +37,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             _jwtHandler = new JwtSecurityTokenHandler();
         }
 
-        public async Task<ServiceResult> ChangePassword(UserDto userDto)
+        public async Task<ServiceResult> ChangePassword(ChangePasswordDto userDto)
         {
             User? user = null;
             if (userDto.Username != null)
@@ -46,8 +46,6 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             }
             if (user != null
                 && userDto.Username == user.Username
-                && userDto.Password != null
-                && userDto.NewPassword != null
                 && Argon2.Verify(user.Hash, userDto.Password))
             {
 
@@ -60,7 +58,7 @@ namespace ams_desk_cs_backend.LoginApp.Application.Services
             return new ServiceResult(ServiceStatus.BadRequest, "Nie udało się zmienić hasła");
         }
 
-        public async Task<ServiceResult<string>> Login(UserDto userDto, bool mobile)
+        public async Task<ServiceResult<string>> Login(LoginDto userDto, bool mobile)
         {
             var hash = Argon2.Hash(userDto.Password);
             User user = (await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username))!;

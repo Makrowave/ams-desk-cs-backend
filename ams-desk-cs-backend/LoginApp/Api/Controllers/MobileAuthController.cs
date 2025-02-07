@@ -19,7 +19,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(UserDto user)
+        public async Task<IActionResult> Login(LoginDto user)
         {
             var result = await _authService.Login(user, true);
             if (result.Status == ServiceStatus.Ok)

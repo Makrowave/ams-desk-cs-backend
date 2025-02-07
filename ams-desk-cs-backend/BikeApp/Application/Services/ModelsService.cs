@@ -1,48 +1,40 @@
 ﻿using ams_desk_cs_backend.BikeApp.Api.Dtos;
 using ams_desk_cs_backend.BikeApp.Application.Interfaces;
-using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Enums;
 using ams_desk_cs_backend.Shared.Results;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Xml.Linq;
 
 namespace ams_desk_cs_backend.BikeApp.Application.Services
 {
     public class ModelsService : IModelsService
     {
         private readonly BikesDbContext _context;
-        private readonly IModelValidator _validator;
-        public ModelsService(BikesDbContext context, IModelValidator validator)
+        public ModelsService(BikesDbContext context)
         {
             _context = context;
-            _validator = validator;
         }
 
         public async Task<ServiceResult> AddModel(ModelDto modelDto)
         {
-            if(!_validator.ValidateModel(modelDto)) {
-                return new ServiceResult(ServiceStatus.BadRequest, "Dane nie przeszły walidacji");
-            }
             var model = new Model
             {
-                ModelName = modelDto.ModelName!,
+                ModelName = modelDto.ModelName,
                 ProductCode = modelDto.ProductCode,
                 EanCode = modelDto.EanCode,
-                FrameSize = modelDto.FrameSize!.Value,
-                WheelSizeId = modelDto.WheelSize!.Value,
-                ManufacturerId = modelDto.ManufacturerId!.Value,
-                ColorId = modelDto.ColorId!.Value,
-                CategoryId = modelDto.CategoryId!.Value,
+                FrameSize = modelDto.FrameSize,
+                WheelSizeId = modelDto.WheelSize,
+                ManufacturerId = modelDto.ManufacturerId,
+                ColorId = modelDto.ColorId,
+                CategoryId = modelDto.CategoryId,
                 PrimaryColor = modelDto.PrimaryColor,
                 SecondaryColor = modelDto.SecondaryColor,
-                Price = modelDto.Price!.Value,
-                IsElectric = modelDto.IsElectric!.Value,
-                IsWoman = modelDto.IsWoman!.Value,
+                Price = modelDto.Price,
+                IsElectric = modelDto.IsElectric,
+                IsWoman = modelDto.IsWoman,
                 InsertionDate = DateOnly.FromDateTime(DateTime.Today)
             };
             _context.Add(model);
@@ -242,99 +234,29 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             return new ServiceResult<IEnumerable<ModelRecordDto>>(ServiceStatus.Ok, string.Empty, result);
         }
 
-        public async Task<ServiceResult> UpdateModel(int id, ModelDto model)
+        public async Task<ServiceResult> UpdateModel(int id, ModelDto newModel)
         {
-            var existingModel = await _context.Models.FindAsync(id);
-            bool isValidated = true;
-            if (existingModel == null)
+            var oldModel = await _context.Models.FindAsync(id);
+            if (oldModel == null)
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono roweru");
             }
-            //these 2 ommited for now - maybe should make IncompleteModelsService.cs or sth
-            if (model.ProductCode != null)
-            {
-                if (!_validator.ValidateProductCode(model.ProductCode))
-                    isValidated = false;
-                existingModel.ProductCode = model.ProductCode;
-            }
-            if (model.EanCode != null)
-            {
-                if (!_validator.ValidateEanCode(model.EanCode))
-                    isValidated = false;
-                existingModel.EanCode = model.EanCode;
-            }
-            if (model.ModelName != null)
-            {
-                if (!_validator.ValidateModelName(model.ModelName))
-                    isValidated = false;
-                existingModel.ModelName = model.ModelName;
-            }
-            if (model.FrameSize.HasValue)
-            {
-                if (!_validator.ValidateFrameSize(model.FrameSize))
-                    isValidated = false;
-                existingModel.FrameSize = model.FrameSize.Value;
-            }
-            if (model.WheelSize.HasValue)
-            {
-                if (!_validator.ValidateWheelSize(model.WheelSize))
-                    isValidated = false;
-                existingModel.WheelSizeId = model.WheelSize.Value;
-            }
-            if (model.IsWoman.HasValue)
-            {
-                existingModel.IsWoman = model.IsWoman.Value;
-            }
-            if (model.ManufacturerId.HasValue)
-            {
-                if (!_context.Manufacturers.Any(m => m.ManufacturerId == model.ManufacturerId))
-                    isValidated = false;
-                existingModel.ManufacturerId = model.ManufacturerId.Value;
-            }
-            if (model.ColorId.HasValue)
-            {
-                if (!_context.Colors.Any(c => c.ColorId == model.ColorId))
-                    isValidated = false;
-                existingModel.ColorId = model.ColorId.Value;
-            }
-            if (model.CategoryId.HasValue)
-            {
-                if(!_context.Categories.Any(c => c.CategoryId == model.CategoryId))
-                    isValidated = false;
-                existingModel.CategoryId = model.CategoryId.Value;
-            }
-            if (model.PrimaryColor != null)
-            {
-                if (!_validator.ValidateColor(model.PrimaryColor))
-                    isValidated = false;
-                existingModel.PrimaryColor = model.PrimaryColor;
-            }
-            if (model.SecondaryColor != null)
-            {
-                if (!_validator.ValidateColor(model.SecondaryColor))
-                    isValidated = false;
-                existingModel.SecondaryColor = model.SecondaryColor;
-            }
-            if (model.Price.HasValue)
-            {
-                if (!_validator.ValidatePrice(model.Price))
-                    isValidated = false;
-                existingModel.Price = model.Price.Value;
-            }
-            if (model.IsElectric.HasValue)
-            {
-                existingModel.IsElectric = model.IsElectric.Value;
-            }
-            if (model.Link != null)
-            {
-                if (!_validator.ValidateLink(model.Link))
-                    isValidated = false;
-                existingModel.Link = model.Link;
-            }
-            if(!isValidated)
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Dane nie przeszły walidacji");
-            }
+
+            oldModel.ProductCode = newModel.ProductCode;
+            oldModel.EanCode = newModel.EanCode;
+            oldModel.ModelName = newModel.ModelName;
+            oldModel.FrameSize = newModel.FrameSize;
+            oldModel.WheelSizeId = newModel.WheelSize;
+            oldModel.IsWoman = newModel.IsWoman;
+            oldModel.ManufacturerId = newModel.ManufacturerId;
+            oldModel.ColorId = newModel.ColorId;
+            oldModel.CategoryId = newModel.CategoryId;
+            oldModel.PrimaryColor = newModel.PrimaryColor;
+            oldModel.SecondaryColor = newModel.SecondaryColor;
+            oldModel.Price = newModel.Price;
+            oldModel.IsElectric = newModel.IsElectric;
+            oldModel.Link = newModel.Link;
+
             _context.SaveChanges();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }

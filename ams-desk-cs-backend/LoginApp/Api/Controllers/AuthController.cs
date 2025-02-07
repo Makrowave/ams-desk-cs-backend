@@ -19,7 +19,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(UserDto user)
+        public async Task<IActionResult> Login(LoginDto user)
         {
             var result = await _authService.Login(user, false);
             if (result.Status == ServiceStatus.Ok)
@@ -63,7 +63,7 @@ namespace ams_desk_cs_backend.LoginApp.Api.Controllers
         //Finish this
         [Authorize(Policy = "RefreshToken", AuthenticationSchemes = "RefreshToken")]
         [HttpPost("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(UserDto userDto)
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto userDto)
         {
             var result = await _authService.ChangePassword(userDto);
             if (result.Status == ServiceStatus.Ok)

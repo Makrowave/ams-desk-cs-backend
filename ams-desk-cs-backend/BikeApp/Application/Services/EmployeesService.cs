@@ -1,5 +1,4 @@
 ﻿using ams_desk_cs_backend.BikeApp.Application.Interfaces;
-using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
@@ -11,11 +10,9 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
     public class EmployeesService : IEmployeesService
     {
         private readonly BikesDbContext _context;
-        private readonly ICommonValidator _commonValidator;
-        public EmployeesService(BikesDbContext context, ICommonValidator commonValidator)
+        public EmployeesService(BikesDbContext context)
         {
             _context = context;
-            _commonValidator = commonValidator;
         }
 
         public async Task<ServiceResult<IEnumerable<EmployeeDto>>> GetEmployees()
@@ -31,10 +28,6 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
 
         public async Task<ServiceResult> PostEmployee(EmployeeDto employee)
         {
-            if (employee.EmployeeName == null || !_commonValidator.ValidateEmployeeName(employee.EmployeeName))
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Zły format nazwy");
-            }
             var order = _context.Employees.Count() + 1;
             _context.Add(new Employee
             {
@@ -52,10 +45,8 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono pracownika");
             }
-            if (employee.EmployeeName != null && _commonValidator.ValidateEmployeeName(employee.EmployeeName))
-            {
-                existingEmployee.EmployeeName = employee.EmployeeName;
-            }
+
+            existingEmployee.EmployeeName = employee.EmployeeName;
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }

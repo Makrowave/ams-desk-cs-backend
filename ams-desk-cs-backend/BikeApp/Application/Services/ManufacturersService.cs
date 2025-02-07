@@ -1,5 +1,4 @@
 ﻿using ams_desk_cs_backend.BikeApp.Application.Interfaces;
-using ams_desk_cs_backend.BikeApp.Application.Interfaces.Validators;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data;
 using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
@@ -11,11 +10,9 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
     public class ManufacturersService : IManufacturersService
     {
         private readonly BikesDbContext _context;
-        private readonly ICommonValidator _commonValidator;
-        public ManufacturersService(BikesDbContext context, ICommonValidator commonValidator)
+        public ManufacturersService(BikesDbContext context)
         {
             _context = context;
-            _commonValidator = commonValidator;
         }
         public async Task<ServiceResult<IEnumerable<ManufacturerDto>>> GetManufacturers()
         {
@@ -31,11 +28,6 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
 
         public async Task<ServiceResult> PostManufacturer(ManufacturerDto manufacturer)
         {
-            if (manufacturer.ManufacturerName == null ||
-                !_commonValidator.Validate16CharNameAnyCase(manufacturer.ManufacturerName))
-            {
-                return new ServiceResult(ServiceStatus.BadRequest, "Zła nazwa producenta");
-            }
             var order = _context.Manufacturers.Count() + 1;
             _context.Add(new Manufacturer
             {
@@ -46,18 +38,15 @@ namespace ams_desk_cs_backend.BikeApp.Application.Services
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
 
-        public async Task<ServiceResult> UpdateManufacturer(short id, ManufacturerDto manufacturer)
+        public async Task<ServiceResult> UpdateManufacturer(short id, ManufacturerDto newManufacturer)
         {
-            var existingManufacturer = await _context.Manufacturers.FindAsync(id);
-            if (existingManufacturer == null)
+            var oldManufacturer = await _context.Manufacturers.FindAsync(id);
+            if (oldManufacturer == null)
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono producenta");
             }
-            if (manufacturer.ManufacturerName != null &&
-                _commonValidator.Validate16CharNameAnyCase(manufacturer.ManufacturerName))
-            {
-                existingManufacturer.ManufacturerName = manufacturer.ManufacturerName;
-            }
+
+            oldManufacturer.ManufacturerName = newManufacturer.ManufacturerName;
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
