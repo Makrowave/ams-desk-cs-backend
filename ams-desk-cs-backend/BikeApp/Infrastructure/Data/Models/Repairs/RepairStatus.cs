@@ -4,6 +4,7 @@
     {
         public short RepairStatusId { get; set; }
         public string Name { get; set; } = null!;
+        public string Color { get; set; } = null!;
         public virtual ICollection<Repair> Repairs { get; set; } = [];
     }
 }

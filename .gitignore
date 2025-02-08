@@ -3,3 +3,4 @@ ams-desk-cs-backend/DBSettings.cs
 /ams-desk-cs-backend/obj/
 /ams-desk-cs-backend/bin/
 /ams-desk-cs-backend/appsettings.json
+ams-desk-cs-backend/Migrations/*

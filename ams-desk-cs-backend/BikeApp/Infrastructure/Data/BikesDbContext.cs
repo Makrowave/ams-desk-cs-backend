@@ -1,4 +1,5 @@
 ﻿using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models;
+using ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models.Repairs;
 using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.BikeApp.Infrastructure.Data;
@@ -28,6 +29,15 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<Category> Categories { get; set; }
     public virtual DbSet<Employee> Employees { get; set; }
     public virtual DbSet<WheelSize> WheelSizes { get; set; }
+    //Repairs
+    public virtual DbSet<Part> Parts { get; set; }
+    public virtual DbSet<PartCategory> PartCategories { get; set; }
+    public virtual DbSet<PartUsed> PartsUsed { get; set; }
+    public virtual DbSet<Repair> Repairs { get; set; }
+    public virtual DbSet<RepairStatus> RepairStatuses { get; set; }
+    public virtual DbSet<Service> Services { get; set; }
+    public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
+    public virtual DbSet<ServiceDone> ServicesDone { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,21 +58,22 @@ public partial class BikesDbContext : DbContext
 
             entity.HasOne(d => d.Model).WithMany(p => p.Bikes)
                 .HasForeignKey(d => d.ModelId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("bikes_model_id_fkey");
 
             entity.HasOne(d => d.Place).WithMany(p => p.Bikes)
                 .HasForeignKey(d => d.PlaceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("bikes_place_id_fkey");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Bikes)
                 .HasForeignKey(d => d.StatusId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("bikes_status_id_fkey");
+
             entity.HasOne(d => d.Employee).WithMany(p => p.Bikes)
                 .HasForeignKey(d => d.AssembledBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("bikes_assembled_by_fkey");
         });
 
@@ -116,19 +127,19 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("link");
             entity.HasOne(d => d.Manufacturer).WithMany(p => p.Models)
                 .HasForeignKey(d => d.ManufacturerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("models_manufacturer_id_fkey");
             entity.HasOne(d => d.Category).WithMany(p => p.Models)
                 .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("models_category_id_fkey");
             entity.HasOne(d => d.Color).WithMany(p => p.Models)
                 .HasForeignKey(d => d.ColorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("models_color_id_fkey");
             entity.HasOne(d => d.WheelSize).WithMany(p => p.Models)
                 .HasForeignKey(d => d.WheelSizeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("wheel_size_fkey");
         });
 
@@ -166,6 +177,8 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("hex_code");
             entity.Property(e => e.StatusesOrder)
                 .HasColumnName("statuses_order");
+
+            entity.HasIndex(e => e.StatusName).IsUnique();
         });
 
         modelBuilder.Entity<Color>(entity =>
@@ -185,6 +198,8 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("hex_code");
             entity.Property(e => e.ColorsOrder)
                 .HasColumnName("colors_order");
+
+            entity.HasIndex(e => e.ColorName).IsUnique();
         });
         modelBuilder.Entity<Employee>(entity =>
         {
@@ -198,6 +213,8 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("employee_name");
             entity.Property(e => e.EmployeesOrder)
                 .HasColumnName("employees_order");
+
+            entity.HasIndex(e => e.EmployeeName).IsUnique();
         });
         modelBuilder.Entity<Category>(entity =>
         {
@@ -211,8 +228,9 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("category_name");
             entity.Property(e => e.CategoriesOrder)
                 .HasColumnName("categories_order");
+
+            entity.HasIndex(e => e.CategoryName).IsUnique();
         });
-        OnModelCreatingPartial(modelBuilder);
         modelBuilder.Entity<WheelSize>(entity =>
         {
             entity.HasKey(e => e.WheelSizeId).HasName("wheel_size_pkey");
@@ -221,6 +239,187 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("wheel_size")
                 .ValueGeneratedNever();
         });
+        //Repairs
+        modelBuilder.Entity<Part>(entity =>
+        {
+            entity.HasKey(e => e.PartId).HasName("part_pkey");
+            entity.ToTable("parts");
+            entity.Property(e => e.PartId)
+                .HasColumnName("part_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.PartName)
+                .HasColumnName("part_name")
+                .ValueGeneratedOnAdd()
+                .HasMaxLength(40);
+            entity.Property(e => e.PartCategoryId)
+                .HasColumnName("part_category_id");
+            entity.Property(e => e.Price)
+                .HasColumnName("part_price");
+            entity.HasOne(d => d.PartCategory).WithMany(p => p.Parts)
+                .HasForeignKey(d => d.PartCategoryId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("part_category_fkey");
+
+            //Here I don't want index since parts won't be standardized ATM
+        });
+        modelBuilder.Entity<PartCategory>(entity =>
+        {
+            entity.HasKey(e => e.PartCategoryId).HasName("part_category_pkey");
+            entity.ToTable("part_categories");
+            entity.Property(e => e.PartCategoryId)
+                .HasColumnName("part_category_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.PartCategoryName)
+                .HasColumnName("part_name")
+                .ValueGeneratedOnAdd()
+                .HasMaxLength(30);
+
+            entity.HasIndex(e => e.PartCategoryName).IsUnique();
+        });
+        modelBuilder.Entity<PartUsed>(entity =>
+        {
+            entity.HasKey(e => e.PartUsedId).HasName("part_used_pkey");
+            entity.ToTable("parts_used");
+            entity.Property(e => e.PartUsedId)
+                .HasColumnName("part_used_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.PartId)
+                .HasColumnName("part_id");
+            entity.Property(e => e.RepairId)
+                .HasColumnName("repair_id");
+
+            entity.HasOne(d => d.Part).WithMany(p => p.PartsUsed)
+                .HasForeignKey(d => d.PartId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("part_fkey");
+            entity.HasOne(d => d.Repair).WithMany(p => p.Parts)
+                .HasForeignKey(d => d.RepairId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("repair_part_used_fkey");
+        });
+
+
+        modelBuilder.Entity<Service>(entity =>
+        {
+            entity.HasKey(e => e.ServiceId).HasName("service_pkey");
+            entity.ToTable("services");
+            entity.Property(e => e.ServiceId)
+                .HasColumnName("service_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.ServiceName)
+                .HasColumnName("service_name")
+                .ValueGeneratedOnAdd()
+                .HasMaxLength(40);
+            entity.Property(e => e.ServiceCategoryId)
+                .HasColumnName("service_category_id");
+
+            entity.HasOne(d => d.ServiceCategory).WithMany(p => p.Services)
+                .HasForeignKey(d => d.ServiceCategoryId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("service_category_fkey");
+            entity.HasIndex(e => e.ServiceName).IsUnique();
+        });
+        modelBuilder.Entity<ServiceCategory>(entity =>
+        {
+            entity.HasKey(e => e.ServiceCategoryId).HasName("service_category_pkey");
+            entity.ToTable("service_categories");
+            entity.Property(e => e.ServiceCategoryId)
+                .HasColumnName("service_category_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.ServiceCategoryName)
+                .HasColumnName("service_name")
+                .ValueGeneratedOnAdd()
+                .HasMaxLength(30);
+            entity.HasIndex(e => e.ServiceCategoryName).IsUnique();
+        });
+        modelBuilder.Entity<ServiceDone>(entity =>
+        {
+            entity.HasKey(e => e.ServiceDoneId).HasName("service_used_pkey");
+            entity.ToTable("services_done");
+            entity.Property(e => e.ServiceDoneId)
+                .HasColumnName("service_done_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.ServiceId)
+                .HasColumnName("service_id");
+            entity.Property(e => e.RepairId)
+                .HasColumnName("repair_id");
+
+            entity.HasOne(d => d.Service).WithMany(p => p.ServicesDone)
+                .HasForeignKey(d => d.ServiceId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("service_fkey");
+            entity.HasOne(d => d.Repair).WithMany(p => p.Services)
+                .HasForeignKey(d => d.RepairId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("repair_service_done_fkey");
+        });
+
+        modelBuilder.Entity<RepairStatus>(entity =>
+        {
+            entity.HasKey(e => e.RepairStatusId).HasName("repair_status_pkey");
+            entity.ToTable("repair_statuses");
+            entity.Property(e => e.RepairStatusId)
+                .HasColumnName("repair_status_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.Name)
+                .HasColumnName("repair_status_name")
+                .HasMaxLength(30);
+            entity.Property(e => e.Color)
+                .HasColumnName("color")
+                .HasMaxLength(7);
+            entity.HasIndex(e => e.Name).IsUnique();
+        });
+
+
+        modelBuilder.Entity<Repair>(entity =>
+        {
+            entity.HasKey(e => e.RepairId).HasName("repair_pkey");
+            entity.ToTable("repairs");
+            entity.Property(e => e.RepairId)
+                .HasColumnName("repair_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.PhoneNumber)
+                .HasColumnName("phone_number")
+                .HasMaxLength(9);
+            entity.Property(e => e.BikeName)
+                .HasColumnName("bike_name")
+                .HasMaxLength(40);
+            entity.Property(e => e.Issue)
+                .HasColumnName("issue")
+                .HasMaxLength(200);
+            entity.Property(e => e.ArrivalDate)
+                .HasColumnName("arrival_date");
+            entity.Property(e => e.CollectionDate)
+                .HasColumnName("collection_date");
+            entity.Property(e => e.RepairEmployeeId)
+                .HasColumnName("repair_employee_id");
+            entity.Property(e => e.CollectionEmployeeId)
+                .HasColumnName("collection_employee_id");
+            entity.Property(e => e.Discount)
+                .HasColumnName("discount");
+            entity.Property(e => e.StatusId)
+                .HasColumnName("status_id");
+            entity.Property(e => e.Note)
+                .HasColumnName("note")
+                .HasMaxLength(400);
+
+            entity.HasOne(d => d.CollectionEmployee).WithMany(p => p.CollectionRepairs)
+                .HasForeignKey(d => d.CollectionEmployeeId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("collection_employee_fkey");
+
+
+            entity.HasOne(d => d.RepairEmployee).WithMany(p => p.RepairRepairs)
+                .HasForeignKey(d => d.RepairEmployeeId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("repair_employee_fkey");
+
+            entity.HasOne(d => d.Status).WithMany(p => p.Repairs)
+                .HasForeignKey(d => d.StatusId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("repair_status_fkey");
+        });
+
         OnModelCreatingPartial(modelBuilder);
     }
 

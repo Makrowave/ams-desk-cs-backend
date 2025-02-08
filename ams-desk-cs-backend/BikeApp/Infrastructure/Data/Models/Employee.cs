@@ -8,6 +8,7 @@ namespace ams_desk_cs_backend.BikeApp.Infrastructure.Data.Models
         public required string EmployeeName { get; set; }
         public required short EmployeesOrder { get; set; }
         public ICollection<Bike> Bikes { get; set; } = [];
-        public ICollection<Repair> Repairs { get; set; } = [];
+        public ICollection<Repair> RepairRepairs { get; set; } = [];
+        public ICollection<Repair> CollectionRepairs { get; set; } = [];
     }
 }
