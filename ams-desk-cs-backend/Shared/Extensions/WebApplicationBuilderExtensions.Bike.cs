@@ -1,5 +1,5 @@
-﻿using ams_desk_cs_backend.BikeApp.Application.Interfaces;
-using ams_desk_cs_backend.BikeApp.Application.Services;
+﻿using ams_desk_cs_backend.BikeApp.Interfaces;
+using ams_desk_cs_backend.BikeApp.Services;
 
 namespace ams_desk_cs_backend.Shared.Extensions
 {

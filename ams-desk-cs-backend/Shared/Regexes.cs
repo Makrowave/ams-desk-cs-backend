@@ -10,7 +10,7 @@ namespace ams_desk_cs_backend.Shared
         public const string EmployeeName = "^[A-ZŻÓŁĆĘŚĄŹŃa-zżółćęśąźń .]{1,16}$";
         public const string Password = "^[A-ZŻÓŁĆĘŚĄŹŃa-zżółćęśąźń0-9!@#$%^&*()]{8,}$";
         public const string EanCode = "^[0-9]{13}$";
-        public const string Link = "^http://|https://*";
+        public const string Link = "^(http:\\/\\/.+)|(https:\\/\\/.+)";
         public const string ModelName = "^[a-zA-Z0-9żźćńółęąśŻŹĆĄŚĘŁÓŃ. _\\-]{4,50}$";
         public const string ProductCode = "^[a-zA-Z0-9_\\-]{4,30}$";
     }

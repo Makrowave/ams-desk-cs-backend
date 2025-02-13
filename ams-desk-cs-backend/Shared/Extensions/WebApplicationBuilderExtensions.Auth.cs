@@ -1,6 +1,6 @@
-﻿using ams_desk_cs_backend.LoginApp.Application.Authorization;
-using ams_desk_cs_backend.LoginApp.Application.Interfaces;
-using ams_desk_cs_backend.LoginApp.Application.Services;
+﻿using ams_desk_cs_backend.LoginApp.Authorization;
+using ams_desk_cs_backend.LoginApp.Interfaces;
+using ams_desk_cs_backend.LoginApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
