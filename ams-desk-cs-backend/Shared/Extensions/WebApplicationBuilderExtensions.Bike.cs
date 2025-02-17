@@ -16,6 +16,7 @@ namespace ams_desk_cs_backend.Shared.Extensions
             builder.Services.AddScoped<IPlacesService, PlaceService>();
             builder.Services.AddScoped<IModelsService, ModelsService>();
             builder.Services.AddScoped<IWheelSizesService, WheelSizesService>();
+            builder.Services.AddScoped<IRepairsService, RepairsService>();
             return builder;
         }
     }

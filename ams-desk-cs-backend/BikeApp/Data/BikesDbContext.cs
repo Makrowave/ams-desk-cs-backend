@@ -255,10 +255,18 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("part_category_id");
             entity.Property(e => e.Price)
                 .HasColumnName("part_price");
+            entity.Property(e => e.UnitId)
+                .HasColumnName("unit_id");
+
             entity.HasOne(d => d.PartCategory).WithMany(p => p.Parts)
                 .HasForeignKey(d => d.PartCategoryId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("part_category_fkey");
+
+            entity.HasOne(d => d.Unit).WithMany(p => p.Parts)
+                .HasForeignKey(d => d.UnitId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("part_unit_fkey");
 
             //Here I don't want index since parts won't be standardized ATM
         });
@@ -287,7 +295,8 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("part_id");
             entity.Property(e => e.RepairId)
                 .HasColumnName("repair_id");
-
+            entity.Property(e => e.Amount)
+                .HasColumnName("amount");
             entity.HasOne(d => d.Part).WithMany(p => p.PartsUsed)
                 .HasForeignKey(d => d.PartId)
                 .OnDelete(DeleteBehavior.Restrict)
@@ -399,6 +408,8 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("discount");
             entity.Property(e => e.StatusId)
                 .HasColumnName("status_id");
+            entity.Property(e => e.PlaceId)
+                .HasColumnName("place_id");
             entity.Property(e => e.Note)
                 .HasColumnName("note")
                 .HasMaxLength(400);
@@ -407,7 +418,6 @@ public partial class BikesDbContext : DbContext
                 .HasForeignKey(d => d.CollectionEmployeeId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("collection_employee_fkey");
-
 
             entity.HasOne(d => d.RepairEmployee).WithMany(p => p.RepairRepairs)
                 .HasForeignKey(d => d.RepairEmployeeId)
@@ -418,7 +428,27 @@ public partial class BikesDbContext : DbContext
                 .HasForeignKey(d => d.StatusId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("repair_status_fkey");
+
+            entity.HasOne(d => d.Place).WithMany(p => p.Repairs)
+                .HasForeignKey(d => d.PlaceId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("repair_places_fkey");
+
         });
+
+        modelBuilder.Entity<RepairStatus>().HasData([
+            new RepairStatus {RepairStatusId = 1, Color = "#FFA500", Name = "Przyjęte"},
+            new RepairStatus {RepairStatusId = 2, Color = "#27a8be", Name = "Reklamacja"},
+            new RepairStatus {RepairStatusId = 3, Color = "#fff0c2", Name = "W trakcie"},
+            new RepairStatus {RepairStatusId = 4, Color = "#a6e1f7", Name = "Oczekuje na części"},
+            new RepairStatus {RepairStatusId = 5, Color = "#c8e6c9", Name = "Zakończone"},
+            ]);
+
+        modelBuilder.Entity<Unit>().HasData([
+            new Unit {UnitId = 1, IsDiscrete = true, UnitName = "szt."},
+            new Unit {UnitId = 2, IsDiscrete = false, UnitName = "m"},
+            new Unit {UnitId = 3, IsDiscrete = false, UnitName = "cm"},
+            ]);
 
         OnModelCreatingPartial(modelBuilder);
     }

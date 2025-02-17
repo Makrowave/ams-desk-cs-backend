@@ -1,34 +1,40 @@
-﻿using ams_desk_cs_backend.BikeApp.Data.Models;
+﻿using ams_desk_cs_backend.BikeApp.Data.Models.Repairs;
+using ams_desk_cs_backend.Shared;
+using System.ComponentModel.DataAnnotations;
 
-namespace ams_desk_cs_backend.BikeApp.Data.Models.Repairs
+namespace ams_desk_cs_backend.BikeApp.Dtos.Repairs
 {
-    public class Repair
+    public class RepairDto
     {
-        //Arrival - when client leaves bike at the shop
-        //Collection - when client collects bike
-        //Repair Employee - employee that did most repairs on bike. If other employee did some job - use notes
-        //Collection Employee - employee that returned bike to the client
+        [Required]
         public int RepairId { get; set; }
+        [Required]
         public string PhoneNumber { get; set; } = null!;
+        [Required]
         public string BikeName { get; set; } = null!;
+        [Required]
+        [RegularExpression(Regexes.PolishText)]
+        [MaxLength(200)]
         public string Issue { get; set; } = null!;
+        [Required]
         public DateOnly ArrivalDate { get; set; }
         public DateOnly? CollectionDate { get; set; }
         public short? RepairEmployeeId { get; set; }
         public short? CollectionEmployeeId { get; set; }
+        [Required]
+        [Range(0, float.MaxValue)]
         public float Discount { get; set; } = 0;
+        [Required]
+        [Range(0, float.MaxValue)]
         public float AdditionalCosts { get; set; } = 0;
+        [Required]
         public short StatusId { get; set; }
+        [Required]
         public short PlaceId { get; set; }
+        [RegularExpression(Regexes.PolishText)]
+        [MaxLength(400)]
         public string? Note { get; set; }
-
-        //Relations
-        public virtual RepairStatus? Status { get; set; }
-        public virtual Employee? CollectionEmployee { get; set; }
-        public virtual Employee? RepairEmployee { get; set; }
-        public virtual Place? Place { get; set; }
         public virtual ICollection<ServiceDone> Services { get; set; } = [];
         public virtual ICollection<PartUsed> Parts { get; set; } = [];
-
     }
 }

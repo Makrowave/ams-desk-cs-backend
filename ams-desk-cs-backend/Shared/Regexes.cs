@@ -13,5 +13,8 @@ namespace ams_desk_cs_backend.Shared
         public const string Link = "^(http:\\/\\/.+)|(https:\\/\\/.+)";
         public const string ModelName = "^[a-zA-Z0-9żźćńółęąśŻŹĆĄŚĘŁÓŃ. _\\-]{4,50}$";
         public const string ProductCode = "^[a-zA-Z0-9_\\-]{4,30}$";
+        public const string PhoneNumber = "^[0-9]{9}$";
+        public const string PolishText = "^[A-Za-ząęćłńóśżźĄĘĆŁŃÓŚŻŹ0-9.,;:!?\"'()\\- ]+$";
+
     }
 }
