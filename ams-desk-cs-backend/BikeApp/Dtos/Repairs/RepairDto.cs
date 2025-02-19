@@ -34,6 +34,10 @@ namespace ams_desk_cs_backend.BikeApp.Dtos.Repairs
         [RegularExpression(Regexes.PolishText)]
         [MaxLength(400)]
         public string? Note { get; set; }
+        public RepairStatus? Status { get; set; }
+        //Names without validation because they only come from backend - they don't return
+        public string? RepairEmployeeName { get; set; }
+        public string? CollectionEmployeeName { get; set; }
         public virtual ICollection<ServiceDone> Services { get; set; } = [];
         public virtual ICollection<PartUsed> Parts { get; set; } = [];
     }

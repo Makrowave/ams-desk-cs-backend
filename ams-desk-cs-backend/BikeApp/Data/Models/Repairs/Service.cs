@@ -9,7 +9,7 @@ namespace ams_desk_cs_backend.BikeApp.Data.Models.Repairs
         public short ServiceId { get; set; }
         [Required]
         [RegularExpression(Regexes.PolishText)]
-        [MaxLength(16)]
+        [MaxLength(40)]
         public string ServiceName { get; set; } = null!;
         [Required]
         [Range(0, float.MaxValue)]

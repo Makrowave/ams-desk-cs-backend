@@ -41,7 +41,13 @@ namespace ams_desk_cs_backend.BikeApp.Services
         {
             var repair = await _context.Repairs.Where(repair => repair.RepairId == id)
                 .Include(repair => repair.Parts)
+                .ThenInclude(part => part.Part)
+                .ThenInclude(part => part!.Unit)
                 .Include(repair => repair.Services)
+                .ThenInclude(service => service.Service)
+                .Include(repair => repair.Status)
+                .Include(repair => repair.CollectionEmployee)
+                .Include(repair => repair.RepairEmployee)
                 .FirstOrDefaultAsync();
             if (repair == null)
             {
@@ -64,6 +70,10 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 Note = repair.Note,
                 Services = repair.Services,
                 Parts = repair.Parts,
+                Status = repair.Status,
+                RepairEmployeeName = repair.RepairEmployee?.EmployeeName,
+                CollectionEmployeeName = repair.CollectionEmployee?.EmployeeName
+
             };
             return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, repairDto);
         }
@@ -81,9 +91,9 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 {
                     Id = repair.RepairId,
                     PhoneNumber = repair.PhoneNumber,
+                    BikeName = repair.BikeName,
                     Date = repair.ArrivalDate,
-                    StatusId = repair.StatusId,
-                    StatusName = repair.Status!.Name,
+                    Status = repair.Status!,
                     PlaceId = repair.PlaceId,
                     PlaceName = repair.Place!.PlaceName,
                 }).OrderByDescending(repair => repair.Id).ToListAsync();
@@ -118,34 +128,23 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var deletedServices = oldRepair.Services.Except(newRepair.Services);
             var addedServices = newRepair.Services.Except(oldRepair.Services);
             _context.ServicesDone.RemoveRange(deletedServices);
+            foreach(var service in addedServices)
+            {
+                service.ServiceDoneId = 0;
+            }
             _context.ServicesDone.AddRange(addedServices);
 
             //Handle new parts:
             var deletedParts = oldRepair.Parts.Except(newRepair.Parts);
             var addedParts = newRepair.Parts.Except(oldRepair.Parts);
-
             _context.PartsUsed.RemoveRange(deletedParts);
-
-            //Handle adding parts:
-
-            var allParts = await _context.Parts.ToListAsync();
-
-            foreach(var partUsed in addedParts)
+            foreach (var part in addedParts)
             {
-                var part = partUsed.Part;
-                if(part == null) continue;
-                //If part already exists but somebody inserted a duplicate by accident 
-                if(allParts.Any(p => p.PartName == part.PartName && p.Price == part.Price && p.PartCategoryId == part.PartCategoryId && p.UnitId == part.UnitId))
-                {
-                    part.PartId = partUsed.PartId;
-                }
-                else
-                {
-                    //Add a part if it didn't exist before - id is generated
-                    _context.Parts.Add(part);
-                }
+                part.PartUsedId = 0;
             }
             _context.PartsUsed.AddRange(addedParts);
+
+
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }

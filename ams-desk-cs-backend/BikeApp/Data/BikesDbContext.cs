@@ -38,6 +38,7 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
     public virtual DbSet<ServiceDone> ServicesDone { get; set; }
+    public virtual DbSet<Unit> Units { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -315,6 +316,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ServiceId)
                 .HasColumnName("service_id")
                 .ValueGeneratedOnAdd();
+            entity.Property(e => e.Price)
+                .HasColumnName("price");
             entity.Property(e => e.ServiceName)
                 .HasColumnName("service_name")
                 .ValueGeneratedOnAdd()
@@ -436,12 +439,25 @@ public partial class BikesDbContext : DbContext
 
         });
 
-        modelBuilder.Entity<RepairStatus>().HasData([
-            new RepairStatus {RepairStatusId = 1, Color = "#FFA500", Name = "Przyjęte"},
+        modelBuilder.Entity<Unit>(entity =>
+        {
+            entity.HasKey(e => e.UnitId).HasName("unit");
+            entity.ToTable("units");
+            entity.Property(e => e.UnitId)
+                .HasColumnName("unit_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.UnitName)
+                .HasColumnName("unit_name");
+        });
+
+            modelBuilder.Entity<RepairStatus>().HasData([
+            new RepairStatus {RepairStatusId = 1, Color = "#FFA500", Name = "Przyjęto"},
             new RepairStatus {RepairStatusId = 2, Color = "#27a8be", Name = "Reklamacja"},
             new RepairStatus {RepairStatusId = 3, Color = "#fff0c2", Name = "W trakcie"},
             new RepairStatus {RepairStatusId = 4, Color = "#a6e1f7", Name = "Oczekuje na części"},
-            new RepairStatus {RepairStatusId = 5, Color = "#c8e6c9", Name = "Zakończone"},
+            new RepairStatus {RepairStatusId = 5, Color = "#c8e6c9", Name = "Zakończono"},
+            new RepairStatus {RepairStatusId = 6, Color = "#82e085", Name = "Powiadomiono"},
+            new RepairStatus {RepairStatusId = 7, Color = "#32fc39", Name = "Wydano"},
             ]);
 
         modelBuilder.Entity<Unit>().HasData([
