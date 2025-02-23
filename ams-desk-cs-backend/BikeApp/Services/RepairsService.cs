@@ -1,16 +1,10 @@
 ﻿using ams_desk_cs_backend.BikeApp.Data;
-using ams_desk_cs_backend.BikeApp.Data.Models;
 using ams_desk_cs_backend.BikeApp.Data.Models.Repairs;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.BikeApp.Dtos.Repairs;
 using ams_desk_cs_backend.BikeApp.Interfaces;
-using ams_desk_cs_backend.Migrations;
 using ams_desk_cs_backend.Shared.Results;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
-using System.IO;
-using System.Linq;
 
 namespace ams_desk_cs_backend.BikeApp.Services
 {
