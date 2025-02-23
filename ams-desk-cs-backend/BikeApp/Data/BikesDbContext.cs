@@ -415,7 +415,7 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("place_id");
             entity.Property(e => e.Note)
                 .HasColumnName("note")
-                .HasMaxLength(400);
+                .HasMaxLength(1000);
 
             entity.HasOne(d => d.CollectionEmployee).WithMany(p => p.CollectionRepairs)
                 .HasForeignKey(d => d.CollectionEmployeeId)
@@ -458,6 +458,7 @@ public partial class BikesDbContext : DbContext
             new RepairStatus {RepairStatusId = 5, Color = "#c8e6c9", Name = "Zakończono"},
             new RepairStatus {RepairStatusId = 6, Color = "#82e085", Name = "Powiadomiono"},
             new RepairStatus {RepairStatusId = 7, Color = "#32fc39", Name = "Wydano"},
+            new RepairStatus {RepairStatusId = 8, Color = "#54afff", Name = "Kontakt z klientem"},
             ]);
 
         modelBuilder.Entity<Unit>().HasData([

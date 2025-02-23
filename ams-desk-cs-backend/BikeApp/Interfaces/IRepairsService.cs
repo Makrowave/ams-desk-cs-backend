@@ -8,6 +8,8 @@ namespace ams_desk_cs_backend.BikeApp.Interfaces
         public Task<ServiceResult<IEnumerable<ShortRepairDto>>> GetRepairs(short place, short[] excludedStatuses);
         public Task<ServiceResult<RepairDto>> GetRepair(int id);
         public Task<ServiceResult<int>> CreateRepair(NewRepairDto newRepair);
-        public Task<ServiceResult> UpdateRepair(int id, RepairDto newRepair);
+        public Task<ServiceResult<RepairDto>> UpdateRepair(int id, RepairDto newRepair);
+        public Task<ServiceResult<RepairDto>> UpdateStatus(int id, short statusId);
+        public Task<ServiceResult<RepairDto>> UpdateEmployee(int id, short employeeId, bool collection);
     }
 }

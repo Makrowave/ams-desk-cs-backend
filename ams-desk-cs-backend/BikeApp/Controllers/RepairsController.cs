@@ -44,7 +44,7 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRepair(int id, RepairDto newRepair)
+        public async Task<ActionResult<RepairDto>> UpdateRepair(int id, RepairDto newRepair)
         {
             if(!ModelState.IsValid)
             {
@@ -55,7 +55,45 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
+        }
+
+        [HttpPut("Status/{id}")]
+        public async Task<ActionResult<RepairDto>> UpdateRepairStatus(int id, short statusId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _repairsService.UpdateStatus(id, statusId);
+            switch(result.Status)
+            {
+                case ServiceStatus.NotFound:
+                    return NotFound(result.Message);
+                case ServiceStatus.Ok:
+                    return Ok(result.Data);
+                default:
+                    return BadRequest(result.Message);
+            }
+        }
+
+        [HttpPut("Employee/{id}")]
+        public async Task<ActionResult<RepairDto>> UpdateRepairEmployee(int id, short employeeId, bool collection)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _repairsService.UpdateEmployee(id, employeeId, collection);
+            switch (result.Status)
+            {
+                case ServiceStatus.NotFound:
+                    return NotFound(result.Message);
+                case ServiceStatus.Ok:
+                    return Ok(result.Data);
+                default:
+                    return BadRequest(result.Message);
+            }
         }
     }
 }

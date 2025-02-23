@@ -6,6 +6,37 @@ namespace ams_desk_cs_backend.BikeApp.Dtos.Repairs
 {
     public class RepairDto
     {
+        public RepairDto() { }
+        public RepairDto(Repair repair)
+        {
+            RepairId = repair.RepairId;
+            PhoneNumber = repair.PhoneNumber;
+            BikeName = repair.BikeName;
+            Issue = repair.Issue;
+            ArrivalDate = repair.ArrivalDate;
+            CollectionDate = repair.CollectionDate;
+            RepairEmployeeId = repair.RepairEmployeeId;
+            CollectionEmployeeId = repair.CollectionEmployeeId;
+            Discount = repair.Discount;
+            AdditionalCosts = repair.AdditionalCosts;
+            StatusId = (short)repair.StatusId;
+            PlaceId = repair.PlaceId;
+            Note = repair.Note;
+            Status = repair.Status;
+            RepairEmployeeName = repair.RepairEmployee?.EmployeeName;
+            CollectionEmployeeName = repair.CollectionEmployee?.EmployeeName;
+            Services = repair.Services;
+            Parts = repair.Parts;
+            foreach (var service in Services)
+            {
+                service.Repair = null;
+            }
+            foreach (var part in Parts)
+            {
+                part.Repair = null;
+            }
+            Status?.Repairs?.Clear();
+        }
         [Required]
         public int RepairId { get; set; }
         [Required]
@@ -32,7 +63,7 @@ namespace ams_desk_cs_backend.BikeApp.Dtos.Repairs
         [Required]
         public short PlaceId { get; set; }
         [RegularExpression(Regexes.PolishText)]
-        [MaxLength(400)]
+        [MaxLength(1000)]
         public string? Note { get; set; }
         public RepairStatus? Status { get; set; }
         //Names without validation because they only come from backend - they don't return
