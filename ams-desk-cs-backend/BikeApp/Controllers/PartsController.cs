@@ -19,7 +19,7 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         public async Task<ActionResult<IEnumerable<Part>>> GetParts() 
         {
             var result = await _partsService.GetParts();
-            return Ok(result);
+            return Ok(result.Data);
         }
     }
 }

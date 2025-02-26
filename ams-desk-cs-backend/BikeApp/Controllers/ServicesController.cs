@@ -19,7 +19,7 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         public async Task<ActionResult<IEnumerable<Service>>> GetServices() 
         {
             var result = await _servicesService.GetServices();
-            return Ok(result);
+            return Ok(result.Data);
         }
     }
 }
