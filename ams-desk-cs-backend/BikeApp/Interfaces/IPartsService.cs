@@ -6,5 +6,6 @@ namespace ams_desk_cs_backend.BikeApp.Interfaces
     public interface IPartsService
     {
         public abstract Task<ServiceResult<IEnumerable<Part>>> GetParts();
+        public abstract Task<ServiceResult> AddPart(Part part);
     }
 }

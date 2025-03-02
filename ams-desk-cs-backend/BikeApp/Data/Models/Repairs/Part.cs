@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ams_desk_cs_backend.Shared;
+using System.ComponentModel.DataAnnotations;
 
 namespace ams_desk_cs_backend.BikeApp.Data.Models.Repairs
 {
@@ -7,6 +8,9 @@ namespace ams_desk_cs_backend.BikeApp.Data.Models.Repairs
         [Required]
         public int PartId { get; set; }
         [Required]
+        [MaxLength(40)]
+        [MinLength(1)]
+        [RegularExpression(Regexes.PolishText)]
         public string PartName { get; set; } = null!;
         [Required]
         [Range(0,float.MaxValue)]

@@ -21,5 +21,12 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             var result = await _partsService.GetParts();
             return Ok(result.Data);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddPart(Part part)
+        {
+            await _partsService.AddPart(part);
+            return Ok();
+        }
     }
 }

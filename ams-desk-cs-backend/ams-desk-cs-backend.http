@@ -1,6 +1,1 @@
 @ams_desk_cs_backend_HostAddress = http://localhost:5001
-
-GET {{ams_desk_cs_backend_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
