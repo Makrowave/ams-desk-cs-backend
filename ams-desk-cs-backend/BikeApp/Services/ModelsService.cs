@@ -44,171 +44,153 @@ namespace ams_desk_cs_backend.BikeApp.Services
 
         public async Task<ServiceResult<IEnumerable<ModelRecordDto>>> GetModelRecords(ModelFilter filter)
         {
-            var bikes = _context.Models
-            .GroupJoin(
-                    _context.Bikes.Where(bi => bi.StatusId != (short)BikeStatus.Sold &&
-                        (filter.PlaceId == 0 || bi.PlaceId == filter.PlaceId)),
-                    mo => mo.ModelId,
-                    bi => bi.ModelId,
-                    (mo, bi) => new { mo, bi }
-                )
-                .SelectMany(
-                    r => r.bi.DefaultIfEmpty(),
-                    (r, bi) => new { r.mo, bi }
-                )
-                .GroupBy(
-                    r => new
-                    {
-                        r.mo.ModelId,
-                        r.mo.ProductCode,
-                        r.mo.EanCode,
-                        r.mo.ModelName,
-                        r.mo.FrameSize,
-                        r.mo.WheelSizeId,
-                        r.mo.ManufacturerId,
-                        r.mo.Price,
-                        r.mo.IsWoman,
-                        r.mo.IsElectric,
-                        r.mo.CategoryId,
-                        r.mo.ColorId,
-                        r.mo.PrimaryColor,
-                        r.mo.SecondaryColor,
-                        r.mo.Link,
-                    }
+            var models = _context.Models.Include(model => model.Bikes
+                .Where(bi =>
+                    bi.StatusId != (short)BikeStatus.Sold
+                    && (filter.PlaceId == 0 || bi.PlaceId == filter.PlaceId)))
+                .Where(
+                    model => model.Price >= filter.MinPrice!.Value && model.Price <= filter.MaxPrice!.Value
                 );
-            //Should be always supplied in my case
-            bikes = bikes.Where(
-                g => g.Key.Price >= filter.MinPrice!.Value && g.Key.Price <= filter.MaxPrice!.Value
-            );
 
             if (filter.CategoryId.HasValue)
             {
-                bikes = bikes.Where(
-                    g => g.Key.CategoryId == filter.CategoryId.Value
+                models = models.Where(
+                    model => model.CategoryId == filter.CategoryId.Value
                 );
             }
             if (!filter.ProductCode.IsNullOrEmpty())
             {
-                bikes = bikes.Where(
-                    g => g.Key.ProductCode != null && g.Key.ProductCode.Contains(filter.ProductCode!)
+                models = models.Where(
+                    model => model.ProductCode != null && model.ProductCode.Contains(filter.ProductCode!)
                 );
             }
             if (filter.ColorId.HasValue)
             {
-                bikes = bikes.Where(
-                    g => g.Key.ColorId == filter.ColorId
+                models = models.Where(
+                    model => model.ColorId == filter.ColorId
                 );
             }
             if (filter.Avaible.HasValue && filter.Avaible.Value)
             {
-                bikes = bikes.Where(
-                    g => g.Count(r => r.bi != null) > 0
+                models = models.Where(
+                    model => model.Bikes.Any()
                 );
             }
             if (filter.IsWoman.HasValue)
             {
-                bikes = bikes.Where(
-                     g => g.Key.IsWoman == filter.IsWoman.Value
+                models = models.Where(
+                     model => model.IsWoman == filter.IsWoman.Value
                 );
             }
             if (filter.IsKids.HasValue && filter.IsKids.Value)
             {
-                bikes = bikes.Where(
-                    g => g.Key.WheelSizeId <= 24
+                models = models.Where(
+                    model => model.WheelSizeId <= 24
                 );
             }
             if (filter.StatusId.HasValue)
             {
-                bikes = bikes.Where(
-                    g => g.Count(r => r.bi != null && r.bi.StatusId == filter.StatusId) > 0
+                models = models.Where(
+                    model => model.Bikes.Count(bike => bike.StatusId == filter.StatusId) > 0
+                    
+                // model => model.Bikes.Count(bike => bike != null && bike.StatusId == filter.StatusId) > 0
                 );
             }
             //All bikes or only electric
             if (filter.Electric.HasValue && filter.Electric.Value)
             {
-                bikes = bikes.Where(
-                    g => g.Key.IsElectric == true
+                models = models.Where(
+                    model => model.IsElectric == true
                 );
             }
             if (filter.ManufacturerId.HasValue)
             {
-                bikes = bikes.Where(
-                    g => g.Key.ManufacturerId == filter.ManufacturerId.Value
+                models = models.Where(
+                    model => model.ManufacturerId == filter.ManufacturerId.Value
                 );
             }
             if (filter.WheelSize.HasValue)
             {
-                bikes = bikes.Where(
-                    g => g.Key.WheelSizeId == filter.WheelSize.Value
+                models = models.Where(
+                    model => model.WheelSizeId == filter.WheelSize.Value
                 );
             }
             if (filter.FrameSize.HasValue)
             {
-                bikes = bikes.Where(
-                    g => g.Key.FrameSize == filter.FrameSize.Value
+                models = models.Where(
+                    model => model.FrameSize == filter.FrameSize.Value
                 );
             }
             if (filter.NoColor.HasValue && filter.NoColor.Value)
             {
-                bikes = bikes.Where(
-                    g => g.Key.PrimaryColor == null || g.Key.SecondaryColor == null
+                models = models.Where(
+                    model => model.PrimaryColor == null || model.SecondaryColor == null
                 );
             }
             if (filter.NoColorGroup.HasValue && filter.NoColorGroup.Value)
             {
-                bikes = bikes.Where(
-                    g => g.Key.ColorId == null
+                models = models.Where(
+                    model => model.ColorId == null
                 );
             }
             if (filter.NoEan.HasValue && filter.NoEan.Value)
             {
-                bikes = bikes.Where(
-                    g => g.Key.EanCode == null
+                models = models.Where(
+                    model => model.EanCode == null
                 );
             }
             if (filter.NoProductCode.HasValue && filter.NoProductCode.Value)
             {
-                bikes = bikes.Where(
-                    g => g.Key.ProductCode == null
+                models = models.Where(
+                    model => model.ProductCode == null
                 );
             }
             if (filter.Name != null)
             {
                 //Find just first word in name so query returns less for later step (don't really know if it's optimal)
                 var words = filter.Name.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                bikes = bikes.Where(
-                    g => g.Key.ModelName.ToLower().Contains(words[0])
+                models = models.Where(
+                    model => model.ModelName.ToLower().Contains(words[0])
                 );
             }
+            
+            var places = await _context.Places.OrderBy(place => place.PlaceId).ToListAsync();
+            var selectedModels = await models.ToListAsync();
 
-            var result = await bikes.OrderBy(g => g.Key.ModelId)
-                .Select(g => new ModelRecordDto
+            var result = selectedModels.OrderBy(model => model.ModelId)
+                .Select(model => new ModelRecordDto
                 {
-                    ModelId = g.Key.ModelId,
-                    ProductCode = g.Key.ProductCode,
-                    EanCode = g.Key.EanCode,
-                    ModelName = g.Key.ModelName,
-                    FrameSize = g.Key.FrameSize,
-                    WheelSize = g.Key.WheelSizeId,
-                    ManufacturerId = g.Key.ManufacturerId,
-                    Price = g.Key.Price,
-                    IsWoman = g.Key.IsWoman,
-                    IsElectric = g.Key.IsElectric,
-                    PrimaryColor = g.Key.PrimaryColor,
-                    SecondaryColor = g.Key.SecondaryColor,
-                    CategoryId = g.Key.CategoryId,
-                    ColorId = g.Key.ColorId,
-                    Link = g.Key.Link,
-                    BikeCount = g.Count(r => r.bi != null),
-                    PlaceBikeCount = g.Where(r => r.bi != null)
-                                        .GroupBy(r => new { r.bi!.PlaceId })
-                                        .Select(d => new PlaceBikeCountDto
-                                        {
-                                            PlaceId = d.Key.PlaceId,
-                                            Count = d.Count()
-                                        })
+                    ModelId = model.ModelId,
+                    ProductCode = model.ProductCode,
+                    EanCode = model.EanCode,
+                    ModelName = model.ModelName,
+                    FrameSize = model.FrameSize,
+                    WheelSize = model.WheelSizeId,
+                    ManufacturerId = model.ManufacturerId,
+                    Price = model.Price,
+                    IsWoman = model.IsWoman,
+                    IsElectric = model.IsElectric,
+                    PrimaryColor = model.PrimaryColor,
+                    SecondaryColor = model.SecondaryColor,
+                    CategoryId = model.CategoryId,
+                    ColorId = model.ColorId,
+                    Link = model.Link,
+                    BikeCount = model.Bikes.Count(),
+                    PlaceBikeCount = places.Select(
+                            place => new PlaceBikeCountDto
+                            {
+                                PlaceId = place.PlaceId,
+                                Count = model.Bikes.Count(bike => bike.PlaceId == place.PlaceId),
+                                IsAvailable = model.Bikes.Any(bike => bike.PlaceId == place.PlaceId
+                                                                      && bike.StatusId == (short)BikeStatus.Assembled),
 
-                }).ToListAsync();
+                            }
+                        )
+                        .OrderBy(place => place.PlaceId)
+                        .ToList()
+
+                }).ToList();
+            
             //Checks for words from input string in model name in order but with gaps
             //For example input "Bike XL blue" will match with "Bike 4.0 XL blue" and "...Bike XL blue 4.0..."
             //but not with "Bike 4.0 blue XL"
