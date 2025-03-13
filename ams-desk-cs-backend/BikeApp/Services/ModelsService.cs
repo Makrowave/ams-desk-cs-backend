@@ -262,6 +262,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var result = await _context.Models
                 .Where(model => model.Favorite)
                 .Where(model => model.Bikes.Count <= 3)
+                .OrderBy(model => model.Bikes.Count)
                 .Include(model => model.Bikes.Where(bike => bike.StatusId != (short)BikeStatus.Sold))
                 .Include(model => model.Manufacturer)
                 .Select(model => new FavoriteModelDto(model))
