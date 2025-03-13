@@ -46,7 +46,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
         public async Task<ServiceResult<IEnumerable<StatusDto>>> GetStatusesExcluded(int[] excludedStatuses)
         {
             var statuses = await _context.Statuses
-                .Where(status => !excludedStatuses.Any(s => s == status.StatusId))
+                .Where(status => excludedStatuses.All(s => s != status.StatusId))
                 .OrderBy(status => status.StatusesOrder)
                 .Select(status => new StatusDto
                 {

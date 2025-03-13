@@ -13,6 +13,8 @@ namespace ams_desk_cs_backend.BikeApp.Data.Models.Repairs
         [Required]
         [Range(0, int.MaxValue)]
         public float Amount { get; set; }
+        // Price it was sold for - won't change if Part's price changes
+        public float Price { get; set; }
         public Part? Part { get; set; }
         public Repair? Repair { get; set; }
     }

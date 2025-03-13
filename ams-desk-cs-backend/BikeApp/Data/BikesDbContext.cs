@@ -298,6 +298,8 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("repair_id");
             entity.Property(e => e.Amount)
                 .HasColumnName("amount");
+            entity.Property(e => e.Price)
+                .HasColumnName("price");
             entity.HasOne(d => d.Part).WithMany(p => p.PartsUsed)
                 .HasForeignKey(d => d.PartId)
                 .OnDelete(DeleteBehavior.Restrict)
@@ -355,6 +357,8 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("service_id");
             entity.Property(e => e.RepairId)
                 .HasColumnName("repair_id");
+            entity.Property(e => e.Price)
+                .HasColumnName("price");
 
             entity.HasOne(d => d.Service).WithMany(p => p.ServicesDone)
                 .HasForeignKey(d => d.ServiceId)

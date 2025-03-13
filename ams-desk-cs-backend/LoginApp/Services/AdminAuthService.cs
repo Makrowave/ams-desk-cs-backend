@@ -63,7 +63,6 @@ namespace ams_desk_cs_backend.LoginApp.Services
 
         public async Task<ServiceResult<string>> Login(LoginDto userDto, bool mobile)
         {
-            var hash = Argon2.Hash(userDto.Password);
             //Fetch user
             User user = (await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username))!;
             //Check password

@@ -32,5 +32,18 @@
             Message = message;
             Data = data;
         }
+        
+        public static ServiceResult<T> NotFound(string message)
+        {
+            return new ServiceResult<T>(ServiceStatus.NotFound, message, default);
+        }
+        public static ServiceResult<T> BadRequest(string message)
+        {
+            return new ServiceResult<T>(ServiceStatus.BadRequest, message, default);
+        }
+        public static ServiceResult<T> Unautorized(string message)
+        {
+            return new ServiceResult<T>(ServiceStatus.Unauthorized, message, default);
+        }
     }
 }

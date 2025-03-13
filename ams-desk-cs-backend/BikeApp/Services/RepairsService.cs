@@ -107,22 +107,26 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var oldRepair = await GetRepairFromDbAsync(id);
             if (oldRepair == null)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, "Nie znaleziono zgłoszenia.", null);
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, 
+                    "Nie znaleziono zgłoszenia.", null);
             }
 
             if ((RepairStatuses)statusId == RepairStatuses.Pending)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, "Nie można zmienić statusu na oczekujący", null);
+                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                    "Nie można zmienić statusu na oczekujący", null);
             }
 
             if (oldRepair.StatusId == (short)RepairStatuses.Collected)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, "Nie można edytować ukończonego zgłoszenia", null);
+                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                    "Nie można edytować ukończonego zgłoszenia", null);
             }
 
             if(await _context.RepairStatuses.FindAsync(statusId) == null)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, "Nie znaleziono statusu.", null);
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, 
+                    "Nie znaleziono statusu.", null);
             }
 
             if((RepairStatuses)statusId == RepairStatuses.Collected)
@@ -143,21 +147,25 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var oldRepair = await GetRepairFromDbAsync(id);
             if (oldRepair == null)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, "Nie znaleziono zgłoszenia.", null);
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, 
+                    "Nie znaleziono zgłoszenia.", null);
             }
             if (await _context.Employees.FindAsync(employeeId) == null)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, "Nie znaleziono pracownika.", null);
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, 
+                    "Nie znaleziono pracownika.", null);
             }
             var status = oldRepair.StatusId;
 
             if (status == (short)RepairStatuses.Collected) 
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, "Nie można edytować ukończonego zgłoszenia", null);
+                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                    "Nie można edytować ukończonego zgłoszenia", null);
             }
-            if (status == (short)RepairStatuses.Collected)
+            if (status == (short)RepairStatuses.Pending)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, "Nie można zmienić pracownika przy nierozpoczętym zgłoszeniu", null);
+                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                    "Nie można zmienić pracownika przy nierozpoczętym zgłoszeniu", null);
             }
             if (collection)
             {
@@ -167,7 +175,8 @@ namespace ams_desk_cs_backend.BikeApp.Services
             {
                 if(status == (short)RepairStatuses.Finished || status == (short)RepairStatuses.Notified)
                 {
-                    return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, "Nie można zmienić pracownika przy ukończonym zgłoszeniu", null);
+                    return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                        "Nie można zmienić pracownika przy ukończonym zgłoszeniu", null);
                 }
                 oldRepair.RepairEmployeeId = employeeId;
             }
