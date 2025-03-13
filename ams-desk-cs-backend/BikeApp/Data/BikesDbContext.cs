@@ -117,6 +117,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ColorId).HasColumnName("color_id");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Price).HasColumnName("price");
+            entity.Property(e => e.Favorite).HasColumnName("favorite");
             entity.Property(e => e.ProductCode)
                 .HasMaxLength(30)
                 .HasColumnName("product_code");

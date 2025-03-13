@@ -158,37 +158,20 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var selectedModels = await models.ToListAsync();
 
             var result = selectedModels.OrderBy(model => model.ModelId)
-                .Select(model => new ModelRecordDto
+                .Select(model =>
                 {
-                    ModelId = model.ModelId,
-                    ProductCode = model.ProductCode,
-                    EanCode = model.EanCode,
-                    ModelName = model.ModelName,
-                    FrameSize = model.FrameSize,
-                    WheelSize = model.WheelSizeId,
-                    ManufacturerId = model.ManufacturerId,
-                    Price = model.Price,
-                    IsWoman = model.IsWoman,
-                    IsElectric = model.IsElectric,
-                    PrimaryColor = model.PrimaryColor,
-                    SecondaryColor = model.SecondaryColor,
-                    CategoryId = model.CategoryId,
-                    ColorId = model.ColorId,
-                    Link = model.Link,
-                    BikeCount = model.Bikes.Count(),
-                    PlaceBikeCount = places.Select(
+                    var placeBikeCount = places.Select(
                             place => new PlaceBikeCountDto
                             {
                                 PlaceId = place.PlaceId,
                                 Count = model.Bikes.Count(bike => bike.PlaceId == place.PlaceId),
                                 IsAvailable = model.Bikes.Any(bike => bike.PlaceId == place.PlaceId
                                                                       && bike.StatusId == (short)BikeStatus.Assembled),
-
                             }
                         )
                         .OrderBy(place => place.PlaceId)
-                        .ToList()
-
+                        .ToList();
+                    return new ModelRecordDto(model, model.Bikes.Count(), placeBikeCount);
                 }).ToList();
             
             //Checks for words from input string in model name in order but with gaps
@@ -260,6 +243,30 @@ namespace ams_desk_cs_backend.BikeApp.Services
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Istnieją rowery przypisane to tego modelu");
             }
+        }
+
+        public async Task<ServiceResult<bool>> SetFavorite(int id, bool favorite)
+        {
+            var model = await _context.Models.FindAsync(id);
+            if (model == null)
+            {
+                return ServiceResult<bool>.NotFound("Nie znaleziono modelu");
+            }
+            model.Favorite = favorite;
+            await _context.SaveChangesAsync();
+            return new ServiceResult<bool>(ServiceStatus.Ok,string.Empty, model.Favorite);
+        }
+
+        public async Task<ServiceResult<IEnumerable<FavoriteModelDto>>> GetLowFavorites()
+        {
+            var result = await _context.Models
+                .Where(model => model.Favorite)
+                .Where(model => model.Bikes.Count <= 3)
+                .Include(model => model.Bikes.Where(bike => bike.StatusId != (short)BikeStatus.Sold))
+                .Include(model => model.Manufacturer)
+                .Select(model => new FavoriteModelDto(model))
+                .ToListAsync();
+            return new ServiceResult<IEnumerable<FavoriteModelDto>>(ServiceStatus.Ok, string.Empty, result);
         }
     }
 }

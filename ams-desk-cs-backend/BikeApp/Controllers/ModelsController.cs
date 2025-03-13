@@ -70,5 +70,23 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             }
             return NoContent();
         }
+
+        [HttpPut("favorite/{id}")]
+        public async Task<ActionResult<bool>> SetFavorite(int id, [FromQuery]bool favorite)
+        {
+            var result = await _modelsService.SetFavorite(id, favorite);
+            if (result.Status == ServiceStatus.NotFound)
+            {
+                return NotFound(result.Message);
+            }
+
+            return Ok(result.Data);
+        }
+
+        [HttpGet("favorite")]
+        public async Task<ActionResult<IEnumerable<FavoriteModelDto>>> GetLowFavorites()
+        {
+            return Ok((await _modelsService.GetLowFavorites()).Data);
+        }
     }
 }
