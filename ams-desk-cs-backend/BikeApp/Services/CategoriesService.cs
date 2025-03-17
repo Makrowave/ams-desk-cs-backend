@@ -25,29 +25,40 @@ namespace ams_desk_cs_backend.BikeApp.Services
             return new ServiceResult<IEnumerable<CategoryDto>>(ServiceStatus.Ok, string.Empty, categories);
         }
 
-        public async Task<ServiceResult> PostCategory(CategoryDto category)
+        public async Task<ServiceResult<CategoryDto>> PostCategory(CategoryDto categoryDto)
         {
             var order = _context.Categories.Count() + 1;
-            _context.Add(new Category
+            var category = new Category
             {
-                CategoryName = category.CategoryName,
+                CategoryName = categoryDto.CategoryName,
                 CategoriesOrder = (short)order
-            });
+            };
+            _context.Add(category);
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new CategoryDto()
+            {
+                CategoryId = category.CategoryId,
+                CategoryName = category.CategoryName,
+            };
+            return new ServiceResult<CategoryDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
-        public async Task<ServiceResult> UpdateCategory(short id, CategoryDto newCategory)
+        public async Task<ServiceResult<CategoryDto>> UpdateCategory(short id, CategoryDto newCategory)
         {
             var oldCategory = await _context.Categories.FindAsync(id);
             if (oldCategory == null)
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono kategorii");
+                return ServiceResult<CategoryDto>.NotFound("Nie znaleziono kategorii");
             }
 
             oldCategory.CategoryName = newCategory.CategoryName;
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new CategoryDto
+            {
+                CategoryId = oldCategory.CategoryId,
+                CategoryName = oldCategory.CategoryName,
+            };
+            return new ServiceResult<CategoryDto>(ServiceStatus.Ok, string.Empty, result);
 
         }
         public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)

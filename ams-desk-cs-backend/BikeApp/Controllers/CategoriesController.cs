@@ -28,25 +28,25 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         }
         [HttpPost]
         [Authorize(Policy = "AdminAccessToken")]
-        public async Task<IActionResult> AddCategory(CategoryDto category)
+        public async Task<ActionResult<CategoryDto>> AddCategory(CategoryDto category)
         {
             var result = await _categoriesService.PostCategory(category);
             if (result.Status == ServiceStatus.BadRequest)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
         [HttpPut("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
-        public async Task<IActionResult> UpdateCategory(short id, CategoryDto category)
+        public async Task<ActionResult<CategoryDto>> UpdateCategory(short id, CategoryDto category)
         {
             var result = await _categoriesService.UpdateCategory(id, category);
             if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
         [HttpPut("ChangeOrder")]
         [Authorize(Policy = "AdminAccessToken")]

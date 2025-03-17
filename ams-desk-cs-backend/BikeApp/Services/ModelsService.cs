@@ -18,7 +18,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
             _context = context;
         }
 
-        public async Task<ServiceResult> AddModel(ModelDto modelDto)
+        public async Task<ServiceResult<ModelRecordDto>> AddModel(ModelDto modelDto)
         {
             var model = new Model
             {
@@ -39,7 +39,8 @@ namespace ams_desk_cs_backend.BikeApp.Services
             };
             _context.Add(model);
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new ModelRecordDto(model, 0, []);
+            return new ServiceResult<ModelRecordDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
         public async Task<ServiceResult<IEnumerable<ModelRecordDto>>> GetModelRecords(ModelFilter filter)
@@ -199,12 +200,12 @@ namespace ams_desk_cs_backend.BikeApp.Services
             return new ServiceResult<IEnumerable<ModelRecordDto>>(ServiceStatus.Ok, string.Empty, result);
         }
 
-        public async Task<ServiceResult> UpdateModel(int id, ModelDto newModel)
+        public async Task<ServiceResult<ModelRecordDto>> UpdateModel(int id, ModelDto newModel)
         {
             var oldModel = await _context.Models.FindAsync(id);
             if (oldModel == null)
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono roweru");
+                return ServiceResult<ModelRecordDto>.NotFound("Nie znaleziono roweru");
             }
 
             oldModel.ProductCode = newModel.ProductCode;
@@ -222,8 +223,9 @@ namespace ams_desk_cs_backend.BikeApp.Services
             oldModel.IsElectric = newModel.IsElectric;
             oldModel.Link = newModel.Link;
 
-            _context.SaveChanges();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            await _context.SaveChangesAsync();
+            var result = new ModelRecordDto(oldModel, 0, []);
+            return new ServiceResult<ModelRecordDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
         public async Task<ServiceResult> DeleteModel(int id)

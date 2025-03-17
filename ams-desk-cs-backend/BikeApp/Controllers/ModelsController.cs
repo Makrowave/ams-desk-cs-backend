@@ -29,18 +29,18 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostModel(ModelDto model)
+        public async Task<ActionResult<ModelRecordDto>> PostModel(ModelDto model)
         {
             var result = await _modelsService.AddModel(model);
             if (result.Status == ServiceStatus.BadRequest)
             {
                 return BadRequest(result.Message);
             }
-            return NoContent();
+            return Ok(result.Data);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateModel(int id, ModelDto model)
+        public async Task<ActionResult<ModelRecordDto>> UpdateModel(int id, ModelDto model)
         {
             var result = await _modelsService.UpdateModel(id, model);
             if (result.Status == ServiceStatus.NotFound)
@@ -51,7 +51,7 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             {
                 return BadRequest(result.Message);
             }
-            return NoContent();
+            return Ok(result.Data);
 
         }
 
