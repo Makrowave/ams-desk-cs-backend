@@ -71,11 +71,11 @@ namespace ams_desk_cs_backend.BikeApp.Services
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
 
-        public async Task<ServiceResult> PostService(Service service)
+        public async Task<ServiceResult<Service>> PostService(Service service)
         {
             _context.Services.Add(service);
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            return new ServiceResult<Service>(ServiceStatus.Ok, string.Empty, service);
         }
     }
 }

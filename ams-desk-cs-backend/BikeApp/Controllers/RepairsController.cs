@@ -2,7 +2,6 @@
 using ams_desk_cs_backend.BikeApp.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ams_desk_cs_backend.BikeApp.Controllers
@@ -13,14 +12,16 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
     public class RepairsController : ControllerBase
     {
         private readonly IRepairsService _repairsService;
+
         public RepairsController(IRepairsService repairsService)
         {
             _repairsService = repairsService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ShortRepairDto>>> GetRepairs(short place, [FromQuery] short[] excluded) 
-        { 
+        public async Task<ActionResult<IEnumerable<ShortRepairDto>>> GetRepairs(short place,
+            [FromQuery] short[] excluded)
+        {
             var result = await _repairsService.GetRepairs(place, excluded);
             return Ok(result.Data);
         }
@@ -29,10 +30,11 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         public async Task<ActionResult<RepairDto>> GetRepair(short id)
         {
             var result = await _repairsService.GetRepair(id);
-            if(result.Status == ServiceStatus.NotFound)
+            if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }
+
             return Ok(result.Data);
         }
 
@@ -46,15 +48,17 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<RepairDto>> UpdateRepair(int id, RepairDto newRepair)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
             var result = await _repairsService.UpdateRepair(id, newRepair);
-            if(result.Status == ServiceStatus.NotFound)
+            if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }
+
             return Ok(result.Data);
         }
 
@@ -65,8 +69,9 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             var result = await _repairsService.UpdateStatus(id, statusId);
-            switch(result.Status)
+            switch (result.Status)
             {
                 case ServiceStatus.NotFound:
                     return NotFound(result.Message);
@@ -84,6 +89,7 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             var result = await _repairsService.UpdateEmployee(id, employeeId, collection);
             switch (result.Status)
             {

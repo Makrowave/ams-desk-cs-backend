@@ -4,6 +4,7 @@ using ams_desk_cs_backend.BikeApp.Data.Models;
 using ams_desk_cs_backend.BikeApp.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.EntityFrameworkCore;
+using Exception = System.Exception;
 
 namespace ams_desk_cs_backend.BikeApp.Services
 {
@@ -22,7 +23,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var existingColor = await _context.Colors.FindAsync(id);
             if (existingColor == null)
             {
-                return new ServiceResult<ColorDto>(ServiceStatus.NotFound, "Nie znaleziono koloru", null);
+                return ServiceResult<ColorDto>.NotFound("Nie znaleziono koloru");
             }
             return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty,
                 new ColorDto
@@ -43,37 +44,50 @@ namespace ams_desk_cs_backend.BikeApp.Services
             }).ToListAsync();
             return new ServiceResult<IEnumerable<ColorDto>>(ServiceStatus.Ok, string.Empty, colors);
         }
-        public async Task<ServiceResult> PostColor(ColorDto color)
+        public async Task<ServiceResult<ColorDto>> PostColor(ColorDto colorDto)
         {
             var order = _context.Colors.Count() + 1;
-            _context.Add(new Color
+            var color = new Color
             {
+                ColorName = colorDto.ColorName,
+                HexCode = colorDto.HexCode,
+                ColorsOrder = (short)order
+            };
+            _context.Add(color);
+            await _context.SaveChangesAsync();
+            var result = new ColorDto
+            {
+                ColorId = color.ColorId,
                 ColorName = color.ColorName,
                 HexCode = color.HexCode,
-                ColorsOrder = (short)order
-            });
-            await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            };
+            return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty, result);
         }
-        public async Task<ServiceResult> UpdateColor(short id, ColorDto newColor)
+        public async Task<ServiceResult<ColorDto>> UpdateColor(short id, ColorDto newColor)
         {
             var oldColor = await _context.Colors.FindAsync(id);
             if (oldColor == null)
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono koloru");
+                return ServiceResult<ColorDto>.NotFound("Nie znaleziono koloru");
             }
 
             oldColor.ColorName = newColor.ColorName;
             oldColor.HexCode = newColor.HexCode;
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new ColorDto
+            {
+                ColorId = oldColor.ColorId,
+                ColorName = oldColor.ColorName,
+                HexCode = oldColor.HexCode,
+            };
+            return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
         public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
         {
             if (!_context.Colors.Any(color => color.ColorId == firstId || color.ColorId == lastId))
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+                return ServiceResult<ColorDto>.NotFound("Nie znaleziono zamienianych elementów");
             }
             var colors = await _context.Colors.OrderBy(color => color.ColorsOrder).ToListAsync();
             var firstOrder = colors.FirstOrDefault(color => color.ColorId == firstId)!.ColorsOrder;
@@ -93,7 +107,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 var existingColor = await _context.Colors.FindAsync(id);
                 if (existingColor == null)
                 {
-                    return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono koloru");
+                    return ServiceResult<ColorDto>.NotFound("Nie znaleziono koloru");
                 }
                 _context.Colors.Remove(existingColor);
                 await _context.SaveChangesAsync();

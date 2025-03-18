@@ -11,10 +11,12 @@ namespace ams_desk_cs_backend.BikeApp.Services
     public class RepairsService : IRepairsService
     {
         private readonly BikesDbContext _context;
+
         public RepairsService(BikesDbContext context)
         {
             _context = context;
         }
+
         public async Task<ServiceResult<int>> CreateRepair(NewRepairDto newRepair)
         {
             var repair = new Repair
@@ -39,33 +41,33 @@ namespace ams_desk_cs_backend.BikeApp.Services
             {
                 return new ServiceResult<RepairDto>(ServiceStatus.NotFound, "Nie znaleziono zgłoszenia.", null);
             }
+
             var repairDto = new RepairDto(repair);
             return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, repairDto);
         }
 
         public async Task<ServiceResult<IEnumerable<ShortRepairDto>>> GetRepairs(short place, short[] excludedStatuses)
         {
-
             var repairs = await _context.Repairs
                 .Where(repair => repair.PlaceId == place || place == 0)
                 .Where(repair => !excludedStatuses.Any(status => status == (short)repair.StatusId))
                 .Include(repair => repair.Place)
                 .Include(repair => repair.Status)
                 .Select(
-                (repair) => new ShortRepairDto
-                {
-                    Id = repair.RepairId,
-                    PhoneNumber = repair.PhoneNumber,
-                    BikeName = repair.BikeName,
-                    Date = repair.ArrivalDate,
-                    Status = repair.Status!,
-                    PlaceId = repair.PlaceId,
-                    PlaceName = repair.Place!.PlaceName,
-                }).OrderByDescending(repair => repair.Id).ToListAsync();
+                    (repair) => new ShortRepairDto
+                    {
+                        Id = repair.RepairId,
+                        PhoneNumber = repair.PhoneNumber,
+                        BikeName = repair.BikeName,
+                        Date = repair.ArrivalDate,
+                        Status = repair.Status!,
+                        PlaceId = repair.PlaceId,
+                        PlaceName = repair.Place!.PlaceName,
+                    }).OrderByDescending(repair => repair.Id).ToListAsync();
             return new ServiceResult<IEnumerable<ShortRepairDto>>(ServiceStatus.Ok, string.Empty, repairs);
         }
 
-        
+
         //Does not update statusId, collectionEmployeeId, repairEmployeeId and dates
         public async Task<ServiceResult<RepairDto>> UpdateRepair(int id, RepairDto newRepair)
         {
@@ -74,6 +76,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
             {
                 return new ServiceResult<RepairDto>(ServiceStatus.NotFound, "Nie znaleziono zgłoszenia.", null);
             }
+
             oldRepair.PhoneNumber = newRepair.PhoneNumber;
             oldRepair.BikeName = newRepair.BikeName;
             oldRepair.Issue = newRepair.Issue;
@@ -84,14 +87,16 @@ namespace ams_desk_cs_backend.BikeApp.Services
 
             //Handle new services:
             //Select services that are in the old one but are not in new one
-            var deletedServices = oldRepair.Services.Where(service => !newRepair.Services.Select(s => s.ServiceDoneId).Contains(service.ServiceDoneId));
+            var deletedServices = oldRepair.Services.Where(service =>
+                !newRepair.Services.Select(s => s.ServiceDoneId).Contains(service.ServiceDoneId));
             var addedServices = newRepair.Services.Where(s => s.ServiceDoneId == 0);
             _context.ServicesDone.RemoveRange(deletedServices);
             _context.ServicesDone.AddRange(addedServices);
 
             //Handle new parts:
             //Same as services
-            var deletedParts = oldRepair.Parts.Where(part => !newRepair.Parts.Select(p => p.PartUsedId).Contains(part.PartUsedId));
+            var deletedParts = oldRepair.Parts.Where(part =>
+                !newRepair.Parts.Select(p => p.PartUsedId).Contains(part.PartUsedId));
             var addedParts = newRepair.Parts.Where(p => p.PartUsedId == 0);
             _context.PartsUsed.RemoveRange(deletedParts);
             _context.PartsUsed.AddRange(addedParts);
@@ -107,29 +112,29 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var oldRepair = await GetRepairFromDbAsync(id);
             if (oldRepair == null)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, 
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
                     "Nie znaleziono zgłoszenia.", null);
             }
 
             if ((RepairStatuses)statusId == RepairStatuses.Pending)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest,
                     "Nie można zmienić statusu na oczekujący", null);
             }
 
             if (oldRepair.StatusId == (short)RepairStatuses.Collected)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest,
                     "Nie można edytować ukończonego zgłoszenia", null);
             }
 
-            if(await _context.RepairStatuses.FindAsync(statusId) == null)
+            if (await _context.RepairStatuses.FindAsync(statusId) == null)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, 
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
                     "Nie znaleziono statusu.", null);
             }
 
-            if((RepairStatuses)statusId == RepairStatuses.Collected)
+            if ((RepairStatuses)statusId == RepairStatuses.Collected)
             {
                 oldRepair.CollectionDate = DateOnly.FromDateTime(DateTime.Now);
             }
@@ -140,6 +145,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var result = new RepairDto(oldRepair);
             return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, result);
         }
+
         //When finishing repair - this has to be performed before status change
         //When starting repair - this has to be performed after status change
         public async Task<ServiceResult<RepairDto>> UpdateEmployee(int id, short employeeId, bool collection)
@@ -147,39 +153,45 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var oldRepair = await GetRepairFromDbAsync(id);
             if (oldRepair == null)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, 
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
                     "Nie znaleziono zgłoszenia.", null);
             }
+
             if (await _context.Employees.FindAsync(employeeId) == null)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.NotFound, 
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
                     "Nie znaleziono pracownika.", null);
             }
+
             var status = oldRepair.StatusId;
 
-            if (status == (short)RepairStatuses.Collected) 
+            if (status == (short)RepairStatuses.Collected)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest,
                     "Nie można edytować ukończonego zgłoszenia", null);
             }
+
             if (status == (short)RepairStatuses.Pending)
             {
-                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                return new ServiceResult<RepairDto>(ServiceStatus.BadRequest,
                     "Nie można zmienić pracownika przy nierozpoczętym zgłoszeniu", null);
             }
+
             if (collection)
             {
                 oldRepair.CollectionEmployeeId = employeeId;
-            } 
+            }
             else
             {
-                if(status == (short)RepairStatuses.Finished || status == (short)RepairStatuses.Notified)
+                if (status == (short)RepairStatuses.Finished || status == (short)RepairStatuses.Notified)
                 {
-                    return new ServiceResult<RepairDto>(ServiceStatus.BadRequest, 
+                    return new ServiceResult<RepairDto>(ServiceStatus.BadRequest,
                         "Nie można zmienić pracownika przy ukończonym zgłoszeniu", null);
                 }
+
                 oldRepair.RepairEmployeeId = employeeId;
             }
+
             await _context.SaveChangesAsync();
             var result = new RepairDto(oldRepair);
             return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, result);

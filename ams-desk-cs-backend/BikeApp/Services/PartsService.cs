@@ -14,11 +14,11 @@ namespace ams_desk_cs_backend.BikeApp.Services
             _context = context;
         }
 
-        public async Task<ServiceResult> AddPart(Part part)
+        public async Task<ServiceResult<Part>> AddPart(Part part)
         {
             _context.Parts.Add(part);
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            return new ServiceResult<Part>(ServiceStatus.Ok, string.Empty, part);
         }
 
         public async Task<ServiceResult<IEnumerable<Part>>> GetParts()

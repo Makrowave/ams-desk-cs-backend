@@ -42,8 +42,8 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         [Authorize(Policy = "AdminAccessToken")]
         public async Task<ActionResult<Service>> PostService(Service service)
         {
-            await _servicesService.PostService(service);
-            return Ok();
+            var result = await _servicesService.PostService(service);
+            return Ok(result.Data);
         }
         [HttpGet("categories")]
         public async Task<ActionResult<IEnumerable<ServiceCategoryDto>>> GetServiceCategories()

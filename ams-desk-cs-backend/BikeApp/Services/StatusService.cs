@@ -73,31 +73,42 @@ namespace ams_desk_cs_backend.BikeApp.Services
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
 
-        public async Task<ServiceResult> PostStatus(StatusDto status)
+        public async Task<ServiceResult<StatusDto>> PostStatus(StatusDto statusDto)
         {
             var order = _context.Statuses.Count() + 1;
-            _context.Add(new Status
+            var status = new Status
             {
-                StatusName = status.StatusName,
-                HexCode = status.HexCode,
+                StatusName = statusDto.StatusName,
+                HexCode = statusDto.HexCode,
                 StatusesOrder = (short)order
-            });
+            };
+            _context.Add(status);
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new StatusDto
+            {
+                StatusId = status.StatusId,
+                StatusName = status.StatusName,
+            };
+            return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
-        public async Task<ServiceResult> UpdateStatus(short id, StatusDto newStatus)
+        public async Task<ServiceResult<StatusDto>> UpdateStatus(short id, StatusDto newStatus)
         {
             var oldStatus = await _context.Statuses.FindAsync(id);
             if (oldStatus == null)
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono statusu");
+                return ServiceResult<StatusDto>.NotFound("Nie znaleziono statusu");
             }
 
             oldStatus.StatusName = newStatus.StatusName;
             oldStatus.HexCode = newStatus.HexCode;
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new StatusDto
+            {
+                StatusId = oldStatus.StatusId,
+                StatusName = oldStatus.StatusName,
+            };
+            return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
         public async Task<ServiceResult> DeleteStatus(short id)

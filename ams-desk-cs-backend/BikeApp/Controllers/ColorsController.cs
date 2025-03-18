@@ -38,25 +38,25 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         }
         [HttpPost]
         [Authorize(Policy = "AdminAccessToken")]
-        public async Task<IActionResult> AddColor(ColorDto color)
+        public async Task<ActionResult<ColorDto>> AddColor(ColorDto color)
         {
             var result = await _colorsService.PostColor(color);
             if (result.Status == ServiceStatus.BadRequest)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
         [HttpPut("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
-        public async Task<IActionResult> UpdateColor(short id, ColorDto color)
+        public async Task<ActionResult<ColorDto> >UpdateColor(short id, ColorDto color)
         {
             var result = await _colorsService.UpdateColor(id, color);
             if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
         [HttpPut("ChangeOrder")]
         [Authorize(Policy = "AdminAccessToken")]

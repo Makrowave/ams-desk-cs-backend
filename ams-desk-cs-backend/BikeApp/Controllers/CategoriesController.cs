@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
-using ams_desk_cs_backend.BikeApp.Services;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.BikeApp.Interfaces;

@@ -35,27 +35,27 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         // PUT: api/Bikes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBike(int id, BikeDto bike)
+        public async Task<ActionResult<BikeSubRecordDto>> PutBike(int id, BikeDto bike)
         {
             var result = await _bikesService.PutBike(id, bike);
             if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
 
         // POST: api/Bikes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<IActionResult> PostBike(BikeDto bike)
+        public async Task<ActionResult<BikeSubRecordDto>> PostBike(BikeDto bike)
         {
             var result = await _bikesService.PostBike(bike);
             if (result.Status == ServiceStatus.BadRequest)
             {
                 return BadRequest(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
         // DELETE: api/Bikes/5
         [HttpDelete("{id}")]

@@ -17,28 +17,20 @@ namespace ams_desk_cs_backend.BikeApp.Services
             _context = dbContext;
         }
 
-        public async Task<ServiceResult> PutBike(int id, BikeDto bike)
+        public async Task<ServiceResult<BikeSubRecordDto>> PutBike(int id, BikeDto bike)
         {
             var existingBike = await _context.Bikes.FindAsync(id);
             if (existingBike == null)
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono roweru");
+                return ServiceResult<BikeSubRecordDto>.NotFound("Nie znaleziono roweru");
             }
-            if (bike.ModelId.HasValue)
+            if (await _context.Places.FindAsync(bike.PlaceId) == null)
             {
-                existingBike.ModelId = bike.ModelId.Value;
+                
             }
-            if (bike.PlaceId.HasValue)
+            if (await _context.Statuses.FindAsync(bike.StatusId) == null)
             {
-                existingBike.PlaceId = bike.PlaceId.Value;
-            }
-            if (bike.StatusId.HasValue)
-            {
-                existingBike.StatusId = bike.StatusId.Value;
-                if (bike.StatusId.Value == (short)BikeStatus.Sold && !bike.SaleDate.HasValue)
-                {
-                    existingBike.SaleDate = DateOnly.FromDateTime(DateTime.Today);
-                }
+                
             }
             if (bike.InsertionDate.HasValue)
             {
@@ -57,18 +49,25 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 existingBike.AssembledBy = bike.AssembledBy.Value;
             }
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new BikeSubRecordDto
+            {
+                Id = id,
+                Place = existingBike.PlaceId,
+                StatusId = existingBike.StatusId,
+                AssembledBy = existingBike.AssembledBy,
+            };
+            return new ServiceResult<BikeSubRecordDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
         public async Task<ServiceResult<IEnumerable<BikeSubRecordDto>>> GetBikes(int modelId, short placeId)
         {
-            if (_context.Models.Find(modelId) == null)
+            if (await _context.Models.FindAsync(modelId) == null)
             {
-                return new ServiceResult<IEnumerable<BikeSubRecordDto>>(ServiceStatus.NotFound, "Nie znaleziono modelu", null);
+                return ServiceResult<IEnumerable<BikeSubRecordDto>>.NotFound("Nie znaleziono modelu");
             }
-            if (_context.Places.Find(placeId) == null && placeId != 0)
+            if (placeId != 0 && await _context.Places.FindAsync(placeId) == null)
             {
-                return new ServiceResult<IEnumerable<BikeSubRecordDto>>(ServiceStatus.NotFound, "Nie znaleziono miejsca", null);
+                return ServiceResult<IEnumerable<BikeSubRecordDto>>.NotFound("Nie znaleziono miejsca");
             }
             var bikes = await _context.Bikes
                 .Where(bi => bi.ModelId == modelId && bi.StatusId != (short)BikeStatus.Sold && (placeId == 0 || bi.PlaceId == placeId))
@@ -119,19 +118,19 @@ namespace ams_desk_cs_backend.BikeApp.Services
             return new ServiceResult(ServiceStatus.NoContent, string.Empty);
         }
 
-        public async Task<ServiceResult> PostBike(BikeDto bikeDto)
+        public async Task<ServiceResult<BikeSubRecordDto>> PostBike(BikeDto bikeDto)
         {
             if (!bikeDto.PlaceId.HasValue)
             {
-                return new ServiceResult(ServiceStatus.BadRequest, "Brak miejsca");
+                return ServiceResult<BikeSubRecordDto>.NotFound("Brak miejsca");
             }
             if (!bikeDto.ModelId.HasValue)
             {
-                return new ServiceResult(ServiceStatus.BadRequest, "Brak modelu");
+                return ServiceResult<BikeSubRecordDto>.NotFound("Brak modelu");
             }
             if (!bikeDto.StatusId.HasValue)
             {
-                return new ServiceResult(ServiceStatus.BadRequest, "Brak statusu");
+                return ServiceResult<BikeSubRecordDto>.NotFound( "Brak statusu");
             }
             var bike = new Bike
             {
@@ -142,7 +141,14 @@ namespace ams_desk_cs_backend.BikeApp.Services
             };
             _context.Add(bike);
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new BikeSubRecordDto
+            {
+                Id = bike.BikeId,
+                Place = bike.PlaceId,
+                StatusId = bike.StatusId,
+                AssembledBy = bike.AssembledBy,
+            };
+            return new ServiceResult<BikeSubRecordDto>(ServiceStatus.Ok, string.Empty, result);
         }
     }
 }

@@ -10,10 +10,12 @@ namespace ams_desk_cs_backend.BikeApp.Services
     public class ManufacturersService : IManufacturersService
     {
         private readonly BikesDbContext _context;
+
         public ManufacturersService(BikesDbContext context)
         {
             _context = context;
         }
+
         public async Task<ServiceResult<IEnumerable<ManufacturerDto>>> GetManufacturers()
         {
             var manufacturers = await _context.Manufacturers.OrderBy(manufacturer => manufacturer.ManufacturersOrder)
@@ -21,52 +23,75 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 {
                     ManufacturerId = manufacter.ManufacturerId,
                     ManufacturerName = manufacter.ManufacturerName,
-
                 }).ToListAsync();
             return new ServiceResult<IEnumerable<ManufacturerDto>>(ServiceStatus.Ok, string.Empty, manufacturers);
         }
 
-        public async Task<ServiceResult> PostManufacturer(ManufacturerDto manufacturer)
+        public async Task<ServiceResult<ManufacturerDto>> PostManufacturer(ManufacturerDto manufacturerDto)
         {
             var order = _context.Manufacturers.Count() + 1;
-            _context.Add(new Manufacturer
+            var manufacturer = new Manufacturer
             {
-                ManufacturerName = manufacturer.ManufacturerName,
+                ManufacturerName = manufacturerDto.ManufacturerName,
                 ManufacturersOrder = (short)order
-            });
+            };
+            _context.Add(manufacturer);
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new ManufacturerDto
+            {
+                ManufacturerId = manufacturer.ManufacturerId,
+                ManufacturerName = manufacturerDto.ManufacturerName,
+            };
+            return new ServiceResult<ManufacturerDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
-        public async Task<ServiceResult> UpdateManufacturer(short id, ManufacturerDto newManufacturer)
+        public async Task<ServiceResult<ManufacturerDto>> UpdateManufacturer(short id, ManufacturerDto newManufacturer)
         {
             var oldManufacturer = await _context.Manufacturers.FindAsync(id);
             if (oldManufacturer == null)
             {
-                return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono producenta");
+                return ServiceResult<ManufacturerDto>.NotFound("Nie znaleziono producenta");
             }
 
             oldManufacturer.ManufacturerName = newManufacturer.ManufacturerName;
             await _context.SaveChangesAsync();
-            return new ServiceResult(ServiceStatus.Ok, string.Empty);
+            var result = new ManufacturerDto
+            {
+                ManufacturerId = oldManufacturer.ManufacturerId,
+                ManufacturerName = oldManufacturer.ManufacturerName,
+            };
+            return new ServiceResult<ManufacturerDto>(ServiceStatus.Ok, string.Empty, result);
         }
+
         public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
         {
-            if (!_context.Manufacturers.Any(manufacturer => manufacturer.ManufacturerId == firstId || manufacturer.ManufacturerId == lastId))
+            if (!_context.Manufacturers.Any(manufacturer =>
+                    manufacturer.ManufacturerId == firstId 
+                    || manufacturer.ManufacturerId == lastId))
             {
                 return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
             }
-            var manufacturers = await _context.Manufacturers.OrderBy(manufacturer => manufacturer.ManufacturersOrder).ToListAsync();
-            var firstOrder = manufacturers.FirstOrDefault(manufacturer => manufacturer.ManufacturerId == firstId)!.ManufacturersOrder;
-            var lastOrder = manufacturers.FirstOrDefault(manufacturer => manufacturer.ManufacturerId == lastId)!.ManufacturersOrder;
+
+            var manufacturers = await _context.Manufacturers
+                .OrderBy(manufacturer => manufacturer.ManufacturersOrder)
+                .ToListAsync();
+            var firstOrder = manufacturers.
+                FirstOrDefault(manufacturer => manufacturer.ManufacturerId == firstId)!
+                .ManufacturersOrder;
+            var lastOrder = manufacturers
+                .FirstOrDefault(manufacturer => manufacturer.ManufacturerId == lastId)!
+                .ManufacturersOrder;
 
             var filteredManufacturers =
-                manufacturers.Where(manufacturer => manufacturer.ManufacturersOrder >= firstOrder && manufacturer.ManufacturersOrder <= lastOrder).ToList();
+                manufacturers.Where(manufacturer =>
+                        manufacturer.ManufacturersOrder >= firstOrder && manufacturer.ManufacturersOrder <= lastOrder)
+                    .ToList();
             filteredManufacturers.ForEach(manufacturer => manufacturer.ManufacturersOrder++);
             filteredManufacturers.Last().ManufacturersOrder = firstOrder;
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
+
         public async Task<ServiceResult> DeleteManufacturer(short id)
         {
             try
@@ -76,6 +101,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 {
                     return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono producenta");
                 }
+
                 _context.Manufacturers.Remove(existingManufacturer);
                 await _context.SaveChangesAsync();
                 return new ServiceResult(ServiceStatus.Ok, string.Empty);

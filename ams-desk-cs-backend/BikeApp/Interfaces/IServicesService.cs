@@ -10,6 +10,6 @@ namespace ams_desk_cs_backend.BikeApp.Interfaces
         public Task<ServiceResult<IEnumerable<ServiceCategoryDto>>> GetServiceCategories();
         public Task<ServiceResult<Service>> PutService(short id, Service service);
         public Task<ServiceResult> DeleteService(short id);
-        public Task<ServiceResult> PostService(Service service);
+        public Task<ServiceResult<Service>> PostService(Service service);
     }
 }

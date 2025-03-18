@@ -36,7 +36,7 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             {
                 return BadRequest(result.Message);
             }
-            return Ok();
+            return Ok(wheelSize);
         }
         [HttpDelete("{id}")]
         [Authorize(Policy = "AdminAccessToken")]

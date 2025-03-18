@@ -12,6 +12,7 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
     public class ManufacturersController : ControllerBase
     {
         private readonly IManufacturersService _manufacturersService;
+
         public ManufacturersController(IManufacturersService manufacturersService)
         {
             _manufacturersService = manufacturersService;
@@ -25,27 +26,32 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             var result = await _manufacturersService.GetManufacturers();
             return Ok(result.Data);
         }
+
         [HttpPost]
-        public async Task<IActionResult> AddManufacturer(ManufacturerDto manufacturer)
+        public async Task<ActionResult<ManufacturerDto>> AddManufacturer(ManufacturerDto manufacturer)
         {
             var result = await _manufacturersService.PostManufacturer(manufacturer);
             if (result.Status == ServiceStatus.BadRequest)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+
+            return Ok(result.Data);
         }
+
         [HttpPut("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
-        public async Task<IActionResult> UpdateManufacturer(short id, ManufacturerDto manufacturer)
+        public async Task<ActionResult<ManufacturerDto>> UpdateManufacturer(short id, ManufacturerDto manufacturer)
         {
             var result = await _manufacturersService.UpdateManufacturer(id, manufacturer);
             if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+
+            return Ok(result.Data);
         }
+
         [HttpPut("ChangeOrder")]
         [Authorize(Policy = "AdminAccessToken")]
         public async Task<IActionResult> ChangeOrder(short first, short last)
@@ -55,12 +61,15 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             {
                 return NotFound(result.Message);
             }
+
             if (result.Status == ServiceStatus.BadRequest)
             {
                 return BadRequest(result.Message);
             }
+
             return Ok();
         }
+
         [HttpDelete("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
         public async Task<IActionResult> DeleteManufacturer(short id)
@@ -70,10 +79,12 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             {
                 return NotFound(result.Message);
             }
+
             if (result.Status == ServiceStatus.BadRequest)
             {
                 return BadRequest(result.Message);
             }
+
             return Ok();
         }
     }

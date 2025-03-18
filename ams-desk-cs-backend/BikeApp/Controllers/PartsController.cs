@@ -25,10 +25,10 @@ public class PartsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddPart(Part part)
+    public async Task<ActionResult<Part>> AddPart(Part part)
     {
-        await _partsService.AddPart(part);
-        return Ok();
+        var result = await _partsService.AddPart(part);
+        return Ok(result.Data);
     }
 
     [HttpPut("{id}")]

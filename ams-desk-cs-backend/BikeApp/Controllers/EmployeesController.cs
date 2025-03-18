@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
 using ams_desk_cs_backend.Shared.Results;
 using ams_desk_cs_backend.BikeApp.Interfaces;
-using ams_desk_cs_backend.BikeApp.Data.Models;
 
 namespace ams_desk_cs_backend.BikeApp.Controllers
 {
@@ -21,32 +20,32 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
 
         // GET: api/Employees
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployees()
         {
             var result = await _employeesService.GetEmployees();
             return Ok(result.Data);
         }
         [HttpPost]
         [Authorize(Policy = "AdminAccessToken")]
-        public async Task<IActionResult> AddCategory(EmployeeDto employee)
+        public async Task<ActionResult<EmployeeDto>> AddEmployee(EmployeeDto employee)
         {
             var result = await _employeesService.PostEmployee(employee);
             if (result.Status == ServiceStatus.BadRequest)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
         [HttpPut("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
-        public async Task<IActionResult> UpdateCategory(short id, EmployeeDto employee)
+        public async Task<ActionResult<EmployeeDto>> UpdateEmployee(short id, EmployeeDto employee)
         {
             var result = await _employeesService.UpdateEmployee(id, employee);
             if (result.Status == ServiceStatus.NotFound)
             {
                 return NotFound(result.Message);
             }
-            return Ok();
+            return Ok(result.Data);
         }
         [HttpPut("ChangeOrder")]
         [Authorize(Policy = "AdminAccessToken")]
@@ -65,7 +64,7 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
         }
         [HttpDelete("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
-        public async Task<IActionResult> DeleteCategory(short id)
+        public async Task<IActionResult> DeleteEmployee(short id)
         {
             var result = await _employeesService.DeleteEmployee(id);
             if (result.Status == ServiceStatus.NotFound)
