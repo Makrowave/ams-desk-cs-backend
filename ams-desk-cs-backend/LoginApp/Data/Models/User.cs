@@ -6,6 +6,7 @@ namespace ams_desk_cs_backend.LoginApp.Data.Models;
 
 public partial class User
 {
+    public User() {}
     public User(string username, string password)
     {
         Username = username;
@@ -20,8 +21,8 @@ public partial class User
     }
     public short UserId { get; set; }
 
-    public string Username { get; set; }
-    public string Hash { get; private set; }
+    public string Username { get; set; } = null!;
+    public string Hash { get; private set; } = null!;
     public int TokenVersion { get; set; }
     public bool IsAdmin { get; set; }
     public string? AdminHash { get; private set; }

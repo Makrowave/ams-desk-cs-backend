@@ -27,7 +27,7 @@ public partial class UserCredContext : DbContext
 
             entity.HasIndex(e => e.Username, "users_username_key").IsUnique();
 
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id").ValueGeneratedOnAdd();
             entity.Property(e => e.Hash)
                 .HasMaxLength(120)
                 .HasColumnName("hash");
@@ -45,9 +45,10 @@ public partial class UserCredContext : DbContext
                 .HasColumnName("employee_id");
         });
 
-        var defaultPass = "administrator";
+        const string defaultPass = "administrator";
         var admin = new User("admin", defaultPass)
         {
+            UserId = -1,
             IsAdmin = true,
         };
         admin.SetAdminPassword(defaultPass);
