@@ -500,6 +500,46 @@ public partial class BikesDbContext : DbContext
             new ServiceCategory() {ServiceCategoryId = 14, ServiceCategoryName = "Rower i inne"},
         ]);
 
+        modelBuilder.Entity<Color>().HasData([
+            new Color() {ColorId = 1, ColorName = "Biały", HexCode = "#ffffff", ColorsOrder = 1},
+            new Color() {ColorId = 2, ColorName = "Szary", HexCode = "#7b8285", ColorsOrder = 2},
+            new Color() {ColorId = 3, ColorName = "Czarny", HexCode = "#000000", ColorsOrder = 3},
+            new Color() {ColorId = 4, ColorName = "Różowy", HexCode = "#f542ef", ColorsOrder = 4},
+            new Color() {ColorId = 5, ColorName = "Czerwony", HexCode = "#f54242", ColorsOrder = 5},
+            new Color() {ColorId = 6, ColorName = "Pomarańczowy", HexCode = "#f57d1b", ColorsOrder = 6},
+            new Color() {ColorId = 7, ColorName = "Żółty", HexCode = "#f5d41b", ColorsOrder = 7},
+            new Color() {ColorId = 8, ColorName = "Zielony", HexCode = "#23ba26", ColorsOrder = 8},
+            new Color() {ColorId = 9, ColorName = "Turkusowy", HexCode = "#18cca8", ColorsOrder = 9},
+            new Color() {ColorId = 10, ColorName = "Błękitny", HexCode = "#63e8eb", ColorsOrder = 10},
+            new Color() {ColorId = 11, ColorName = "Niebieski", HexCode = "#0f5edb", ColorsOrder = 11},
+            new Color() {ColorId = 12, ColorName = "Fioletowy", HexCode = "#a01ff0", ColorsOrder = 12},
+            new Color() {ColorId = 13, ColorName = "Brązowy", HexCode = "#9f5228", ColorsOrder = 13}
+        ]);
+
+        modelBuilder.Entity<Category>().HasData([
+            new Category() {CategoryId = 1, CategoryName = "Górski", CategoriesOrder = 1},
+            new Category() {CategoryId = 2, CategoryName = "Gravel", CategoriesOrder = 2},
+            new Category() {CategoryId = 3, CategoryName = "Szosowy", CategoriesOrder = 3},
+            new Category() {CategoryId = 4, CategoryName = "Cross", CategoriesOrder = 4},
+            new Category() {CategoryId = 5, CategoryName = "Trekking", CategoriesOrder = 5},
+            new Category() {CategoryId = 6, CategoryName = "Miejski", CategoriesOrder = 6},
+            new Category() {CategoryId = 7, CategoryName = "Dirt", CategoriesOrder = 7},
+            new Category() {CategoryId = 8, CategoryName = "Bmx", CategoriesOrder = 8},
+            new Category() {CategoryId = 9, CategoryName = "Dziecięcy", CategoriesOrder = 9},
+            new Category() {CategoryId = 10, CategoryName = "Składak", CategoriesOrder = 10}
+        ]);
+
+        modelBuilder.Entity<WheelSize>().HasData([
+            12,
+            16,
+            20,
+            24,
+            26,
+            27,
+            28,
+            29,
+        ]);
+
         OnModelCreatingPartial(modelBuilder);
     }
 
