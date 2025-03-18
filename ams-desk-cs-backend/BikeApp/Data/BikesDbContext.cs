@@ -455,7 +455,7 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("unit_name");
         });
 
-            modelBuilder.Entity<RepairStatus>().HasData([
+        modelBuilder.Entity<RepairStatus>().HasData([
             new RepairStatus {RepairStatusId = 1, Color = "#FFA500", Name = "Przyjęto"},
             new RepairStatus {RepairStatusId = 2, Color = "#27a8be", Name = "Reklamacja"},
             new RepairStatus {RepairStatusId = 3, Color = "#fff0c2", Name = "W trakcie"},

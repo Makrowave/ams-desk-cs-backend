@@ -4,7 +4,6 @@ using ams_desk_cs_backend.LoginApp.Dtos;
 using ams_desk_cs_backend.LoginApp.Data.Models;
 using ams_desk_cs_backend.LoginApp.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
-using Isopoh.Cryptography.Argon2;
 using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.LoginApp.Services
@@ -31,21 +30,19 @@ namespace ams_desk_cs_backend.LoginApp.Services
             return new ServiceResult<IEnumerable<UserDto>>(ServiceStatus.Ok, string.Empty, users);
         }
 
-        public async Task<ServiceResult> PostUser(UserDto user)
+        public async Task<ServiceResult> PostUser(UserDto userDto)
         {
-            _userCredContext.Add(new User
+            if (userDto.Password == null || userDto.EmployeeId == null)
             {
-                Username = user.Username,
-                EmployeeId = user.EmployeeId,
-                Hash = Argon2.Hash(user.Password),
-                IsAdmin = false,
-                TokenVersion = 1
-            });
+                return new ServiceResult(ServiceStatus.BadRequest, "Brak hasła lub użytkownika");
+            }
+            var user = new User(userDto.Username, userDto.Password, userDto.EmployeeId.Value);
+            _userCredContext.Add(user);
             try
             {
                 await _userCredContext.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Nie można przypisać pracownika do drugiego konta");
             }
@@ -61,8 +58,10 @@ namespace ams_desk_cs_backend.LoginApp.Services
                 return new ServiceResult(ServiceStatus.NotFound, "Konto nie istnieje");
             }
             oldUser.Username = newUser.Username;
-            oldUser.Hash = Argon2.Hash(newUser.Password);
-
+            if (newUser.Password != null)
+            {
+                oldUser.SetPassword(newUser.Password);
+            }
             if (newUser.EmployeeId != null)
             {
                 if (!await EmployeeExists(newUser.EmployeeId.Value))
@@ -80,7 +79,7 @@ namespace ams_desk_cs_backend.LoginApp.Services
             {
                 await _userCredContext.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Nie można przypisać pracownika do drugiego konta");
             }
@@ -100,7 +99,7 @@ namespace ams_desk_cs_backend.LoginApp.Services
             {
                 await _userCredContext.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new ServiceResult(ServiceStatus.BadRequest, "Nie udało się usunąć konta");
             }

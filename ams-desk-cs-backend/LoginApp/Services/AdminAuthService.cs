@@ -1,5 +1,4 @@
 using ams_desk_cs_backend.LoginApp.Data;
-using ams_desk_cs_backend.LoginApp.Data.Models;
 using ams_desk_cs_backend.LoginApp.Dtos;
 using ams_desk_cs_backend.LoginApp.Interfaces;
 using ams_desk_cs_backend.Shared;
@@ -7,7 +6,6 @@ using ams_desk_cs_backend.Shared.Results;
 using Isopoh.Cryptography.Argon2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -22,8 +20,8 @@ namespace ams_desk_cs_backend.LoginApp.Services
         private readonly string _key;
         private readonly string _role = "Admin";
         private readonly JwtSecurityTokenHandler _jwtHandler;
-        public readonly int _accessTokenLength;
-        public readonly int _refreshTokenLength;
+        private readonly int _accessTokenLength;
+        private readonly int _refreshTokenLength;
         public AdminAuthService(UserCredContext context, IConfiguration configuration)
         {
             _context = context;
@@ -39,42 +37,33 @@ namespace ams_desk_cs_backend.LoginApp.Services
 
         public async Task<ServiceResult> ChangePassword(ChangePasswordDto userDto)
         {
-            User? user = null;
-            if (userDto.Username != null)
-            {
-                user = await GetUserAsync(userDto.Username);
-            }
-            if (user != null
-                && userDto.Username == user.Username
-                && userDto.Password != null
-                && userDto.NewPassword != null
-                && user.IsAdmin
-                && user.AdminHash != null
-                && Argon2.Verify(user.AdminHash, userDto.Password))
-            {
-                var hash = Argon2.Hash(userDto.NewPassword);
-                user.AdminHash = hash;
-                user.TokenVersion++;
-                await _context.SaveChangesAsync();
-                return new ServiceResult(ServiceStatus.Ok, string.Empty);
-            }
-            return new ServiceResult(ServiceStatus.BadRequest, "Nie udało się zmienić hasła");
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username);
+            if (user == null
+                || userDto.Username != user.Username
+                || !user.IsAdmin
+                || user.AdminHash == null
+                || !Argon2.Verify(user.AdminHash, userDto.Password))
+                return new ServiceResult(ServiceStatus.BadRequest, "Nie udało się zmienić hasła");
+
+            user.SetAdminPassword(userDto.NewPassword);
+            user.TokenVersion++;
+            await _context.SaveChangesAsync();
+            return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
 
         public async Task<ServiceResult<string>> Login(LoginDto userDto, bool mobile)
         {
             //Fetch user
-            User user = (await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username))!;
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == userDto.Username);
             //Check password
-            if (user != null && user.IsAdmin && user.AdminHash != null && Argon2.Verify(
-            user.AdminHash,
-            userDto.Password))
-            {
-                var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role);
-                return new ServiceResult<string>(ServiceStatus.Ok, string.Empty, token);
-            }
-
-            return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
+            if (user == null || !user.IsAdmin || user.AdminHash == null || !Argon2.Verify(
+                    user.AdminHash,
+                    userDto.Password))
+                return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
+            
+            var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role);
+            return new ServiceResult<string>(ServiceStatus.Ok, string.Empty, token);
         }
 
         public ServiceResult<string> Refresh(string token)
@@ -88,7 +77,7 @@ namespace ams_desk_cs_backend.LoginApp.Services
                     int.Parse(parsedToken[JwtRegisteredClaimNames.Sub]),
                     parsedToken[JwtApplicationClaimNames.Role]));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new ServiceResult<string>(ServiceStatus.Unauthorized, "Old token version", string.Empty);
             }
@@ -101,7 +90,7 @@ namespace ams_desk_cs_backend.LoginApp.Services
 
         private string GenerateJwtToken(int minutes, string name, string version, int id, string role)
         {
-            var claims = new Claim[] {
+            var claims = new[] {
                 new Claim(JwtRegisteredClaimNames.Name, name),
                 new Claim(JwtApplicationClaimNames.Version, version),
                 new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
@@ -123,10 +112,6 @@ namespace ams_desk_cs_backend.LoginApp.Services
             var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
             return tokenValue;
         }
-        private bool UserExists(string username)
-        {
-            return _context.Users.Any(x => x.Username == username);
-        }
 
         public int GetAccessTokenLenght()
         {
@@ -137,12 +122,7 @@ namespace ams_desk_cs_backend.LoginApp.Services
         {
             return _refreshTokenLength;
         }
-
-        private async Task<User> GetUserAsync(string username)
-        {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
-        }
-
+        
         public Task<ServiceResult> ChangeUserPassword(ChangePasswordDto user)
         {
             throw new NotImplementedException();

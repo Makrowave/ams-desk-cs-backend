@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ams_desk_cs_backend.LoginApp.Data.Models;
+﻿using ams_desk_cs_backend.LoginApp.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.LoginApp.Data;
@@ -47,6 +45,16 @@ public partial class UserCredContext : DbContext
                 .HasColumnName("employee_id");
         });
 
+        var defaultPass = "administrator";
+        var admin = new User("admin", defaultPass)
+        {
+            IsAdmin = true,
+        };
+        admin.SetAdminPassword(defaultPass);
+        modelBuilder.Entity<User>().HasData([
+            admin
+        ]);
+        
         OnModelCreatingPartial(modelBuilder);
     }
 
