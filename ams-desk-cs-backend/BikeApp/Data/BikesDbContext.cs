@@ -464,13 +464,41 @@ public partial class BikesDbContext : DbContext
             new RepairStatus {RepairStatusId = 6, Color = "#82e085", Name = "Powiadomiono"},
             new RepairStatus {RepairStatusId = 7, Color = "#32fc39", Name = "Wydano"},
             new RepairStatus {RepairStatusId = 8, Color = "#54afff", Name = "Kontakt z klientem"},
-            ]);
+        ]);
 
         modelBuilder.Entity<Unit>().HasData([
             new Unit {UnitId = 1, IsDiscrete = true, UnitName = "szt."},
             new Unit {UnitId = 2, IsDiscrete = false, UnitName = "m"},
             new Unit {UnitId = 3, IsDiscrete = false, UnitName = "cm"},
-            ]);
+            new Unit {UnitId = 4, IsDiscrete = false, UnitName = "ml"},
+        ]);
+
+        
+        modelBuilder.Entity<Status>().HasData([
+            new Status { StatusId = 1, StatusName = "Niezłożony", HexCode = "#fff0c2", StatusesOrder = 1 },
+            new Status { StatusId = 2, StatusName = "Złożony", HexCode = "#c8e6c9", StatusesOrder = 2 },
+            new Status { StatusId = 3, StatusName = "Sprzedany", HexCode = "#ff00ff", StatusesOrder = 3 },
+            new Status { StatusId = 4, StatusName = "Do wysyłki", HexCode = "#f7cca6", StatusesOrder = 4 },
+            new Status { StatusId = 5, StatusName = "Zadatek", HexCode = "#a6e1f7", StatusesOrder = 5 },
+            new Status { StatusId = 6, StatusName = "Reklamacja", HexCode = "#27a8be", StatusesOrder = 6 }
+        ]);
+
+        modelBuilder.Entity<ServiceCategory>().HasData([
+            new ServiceCategory() {ServiceCategoryId = 1, ServiceCategoryName = "Przeglądy"},
+            new ServiceCategory() {ServiceCategoryId = 2, ServiceCategoryName = "Zawieszenie"},
+            new ServiceCategory() {ServiceCategoryId = 3, ServiceCategoryName = "Przerzutki"},
+            new ServiceCategory() {ServiceCategoryId = 4, ServiceCategoryName = "Korby"},
+            new ServiceCategory() {ServiceCategoryId = 5, ServiceCategoryName = "Hamulce V-BRAKE"},
+            new ServiceCategory() {ServiceCategoryId = 6, ServiceCategoryName = "Hamulce tarczowe"},
+            new ServiceCategory() {ServiceCategoryId = 7, ServiceCategoryName = "Koła"},
+            new ServiceCategory() {ServiceCategoryId = 8, ServiceCategoryName = "Ogumienie"},
+            new ServiceCategory() {ServiceCategoryId = 9, ServiceCategoryName = "Piasty"},
+            new ServiceCategory() {ServiceCategoryId = 10, ServiceCategoryName = "Stery"},
+            new ServiceCategory() {ServiceCategoryId = 11, ServiceCategoryName = "Kierownica"},
+            new ServiceCategory() {ServiceCategoryId = 12, ServiceCategoryName = "Siodełko"},
+            new ServiceCategory() {ServiceCategoryId = 13, ServiceCategoryName = "Akcesoria"},
+            new ServiceCategory() {ServiceCategoryId = 14, ServiceCategoryName = "Rower i inne"},
+        ]);
 
         OnModelCreatingPartial(modelBuilder);
     }
