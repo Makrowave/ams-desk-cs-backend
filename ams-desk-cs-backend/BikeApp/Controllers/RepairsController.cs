@@ -71,15 +71,12 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             }
 
             var result = await _repairsService.UpdateStatus(id, statusId);
-            switch (result.Status)
+            return result.Status switch
             {
-                case ServiceStatus.NotFound:
-                    return NotFound(result.Message);
-                case ServiceStatus.Ok:
-                    return Ok(result.Data);
-                default:
-                    return BadRequest(result.Message);
-            }
+                ServiceStatus.NotFound => NotFound(result.Message),
+                ServiceStatus.Ok => Ok(result.Data),
+                _ => BadRequest(result.Message)
+            };
         }
 
         [HttpPut("Employee/{id}")]
@@ -91,15 +88,12 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             }
 
             var result = await _repairsService.UpdateEmployee(id, employeeId, collection);
-            switch (result.Status)
+            return result.Status switch
             {
-                case ServiceStatus.NotFound:
-                    return NotFound(result.Message);
-                case ServiceStatus.Ok:
-                    return Ok(result.Data);
-                default:
-                    return BadRequest(result.Message);
-            }
+                ServiceStatus.NotFound => NotFound(result.Message),
+                ServiceStatus.Ok => Ok(result.Data),
+                _ => BadRequest(result.Message)
+            };
         }
     }
 }

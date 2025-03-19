@@ -412,8 +412,12 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("repair_employee_id");
             entity.Property(e => e.CollectionEmployeeId)
                 .HasColumnName("collection_employee_id");
+            entity.Property(e => e.TakeInEmployeeId)
+                .HasColumnName("take_in_employee_id");
             entity.Property(e => e.Discount)
                 .HasColumnName("discount");
+            entity.Property(e => e.AdditionalCosts)
+                .HasColumnName("additional_costs");
             entity.Property(e => e.StatusId)
                 .HasColumnName("status_id");
             entity.Property(e => e.PlaceId)
@@ -431,6 +435,11 @@ public partial class BikesDbContext : DbContext
                 .HasForeignKey(d => d.RepairEmployeeId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("repair_employee_fkey");
+            
+            entity.HasOne(d => d.TakeInEmployee).WithMany(p => p.TakeInRepairs)
+                .HasForeignKey(d => d.TakeInEmployeeId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("takein_employee_fkey");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Repairs)
                 .HasForeignKey(d => d.StatusId)
@@ -453,6 +462,8 @@ public partial class BikesDbContext : DbContext
                 .ValueGeneratedOnAdd();
             entity.Property(e => e.UnitName)
                 .HasColumnName("unit_name");
+            entity.Property(e => e.IsDiscrete)
+                .HasColumnName("is_discrete");
         });
 
         modelBuilder.Entity<RepairStatus>().HasData([
@@ -530,14 +541,14 @@ public partial class BikesDbContext : DbContext
         ]);
 
         modelBuilder.Entity<WheelSize>().HasData([
-            12,
-            16,
-            20,
-            24,
-            26,
-            27,
-            28,
-            29,
+            new WheelSize {WheelSizeId = 12},
+            new WheelSize {WheelSizeId = 16},
+            new WheelSize {WheelSizeId = 20},
+            new WheelSize {WheelSizeId = 24},
+            new WheelSize {WheelSizeId = 26},
+            new WheelSize {WheelSizeId = 27},
+            new WheelSize {WheelSizeId = 28},
+            new WheelSize {WheelSizeId = 29},
         ]);
 
         OnModelCreatingPartial(modelBuilder);

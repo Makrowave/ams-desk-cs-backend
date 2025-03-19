@@ -10,5 +10,6 @@ namespace ams_desk_cs_backend.BikeApp.Data.Models
         public ICollection<Bike> Bikes { get; set; } = [];
         public ICollection<Repair> RepairRepairs { get; set; } = [];
         public ICollection<Repair> CollectionRepairs { get; set; } = [];
+        public ICollection<Repair> TakeInRepairs { get; set; } = [];
     }
 }

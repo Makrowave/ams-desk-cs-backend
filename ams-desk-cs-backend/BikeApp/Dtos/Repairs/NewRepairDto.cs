@@ -18,5 +18,7 @@ namespace ams_desk_cs_backend.BikeApp.Dtos.Repairs
         public string BikeName { get; set; } = null!;
         [Required]
         public short PlaceId { get; set; }
+        [Required]
+        public short TakeInEmployeeId { get; set; }
     }
 }

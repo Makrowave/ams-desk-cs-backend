@@ -17,12 +17,14 @@ namespace ams_desk_cs_backend.BikeApp.Dtos.Repairs
             CollectionDate = repair.CollectionDate;
             RepairEmployeeId = repair.RepairEmployeeId;
             CollectionEmployeeId = repair.CollectionEmployeeId;
+            TakeInEmployeeId = repair.TakeInEmployeeId;
             Discount = repair.Discount;
             AdditionalCosts = repair.AdditionalCosts;
             StatusId = (short)repair.StatusId;
             PlaceId = repair.PlaceId;
             Note = repair.Note;
             Status = repair.Status;
+            TakeInEmployeeName = repair.TakeInEmployee!.EmployeeName;
             RepairEmployeeName = repair.RepairEmployee?.EmployeeName;
             CollectionEmployeeName = repair.CollectionEmployee?.EmployeeName;
             Services = repair.Services;
@@ -50,6 +52,8 @@ namespace ams_desk_cs_backend.BikeApp.Dtos.Repairs
         [Required]
         public DateOnly ArrivalDate { get; set; }
         public DateOnly? CollectionDate { get; set; }
+        public short TakeInEmployeeId { get; set; }
+        public string TakeInEmployeeName { get; set; }
         public short? RepairEmployeeId { get; set; }
         public short? CollectionEmployeeId { get; set; }
         [Required]

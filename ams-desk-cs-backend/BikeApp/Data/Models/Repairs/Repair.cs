@@ -14,6 +14,7 @@ namespace ams_desk_cs_backend.BikeApp.Data.Models.Repairs
         public string Issue { get; set; } = null!;
         public DateOnly ArrivalDate { get; set; }
         public DateOnly? CollectionDate { get; set; }
+        public short TakeInEmployeeId { get; set; }
         public short? RepairEmployeeId { get; set; }
         public short? CollectionEmployeeId { get; set; }
         public float Discount { get; set; } = 0;
@@ -26,6 +27,7 @@ namespace ams_desk_cs_backend.BikeApp.Data.Models.Repairs
         public virtual RepairStatus? Status { get; set; }
         public virtual Employee? CollectionEmployee { get; set; }
         public virtual Employee? RepairEmployee { get; set; }
+        public virtual Employee? TakeInEmployee { get; set; }
         public virtual Place? Place { get; set; }
         public virtual ICollection<ServiceDone> Services { get; set; } = [];
         public virtual ICollection<PartUsed> Parts { get; set; } = [];

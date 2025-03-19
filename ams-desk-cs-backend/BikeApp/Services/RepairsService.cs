@@ -27,6 +27,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 ArrivalDate = DateOnly.FromDateTime(DateTime.Now),
                 StatusId = (short)RepairStatuses.Pending,
                 PlaceId = newRepair.PlaceId,
+                TakeInEmployeeId = newRepair.TakeInEmployeeId,
             };
             _context.Repairs.Add(repair);
             await _context.SaveChangesAsync();
@@ -208,6 +209,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 .Include(repair => repair.Status)
                 .Include(repair => repair.CollectionEmployee)
                 .Include(repair => repair.RepairEmployee)
+                .Include(repair => repair.TakeInEmployee)
                 .FirstOrDefaultAsync();
         }
     }

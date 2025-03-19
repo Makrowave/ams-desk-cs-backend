@@ -96,6 +96,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
             var filteredColors = colors.Where(color => color.ColorsOrder >= firstOrder && color.ColorsOrder <= lastOrder).ToList();
             filteredColors.ForEach(color => color.ColorsOrder++);
             filteredColors.Last().ColorsOrder = firstOrder;
+            Console.Write("gaming");
             await _context.SaveChangesAsync();
             return new ServiceResult(ServiceStatus.Ok, string.Empty);
         }
