@@ -24,13 +24,13 @@ namespace ams_desk_cs_backend.BikeApp.Services
             {
                 return ServiceResult<BikeSubRecordDto>.NotFound("Nie znaleziono roweru");
             }
-            if (await _context.Places.FindAsync(bike.PlaceId) == null)
+            if (!(await _context.Places.FindAsync(bike.PlaceId) == null) && bike.PlaceId != null)
             {
-                
+                existingBike.PlaceId = bike.PlaceId.Value;
             }
-            if (await _context.Statuses.FindAsync(bike.StatusId) == null)
+            if (!(await _context.Statuses.FindAsync(bike.StatusId) == null) && bike.StatusId != null)
             {
-                
+                existingBike.StatusId = bike.StatusId.Value;
             }
             if (bike.InsertionDate.HasValue)
             {

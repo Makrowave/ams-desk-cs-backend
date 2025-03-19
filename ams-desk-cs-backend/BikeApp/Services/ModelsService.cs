@@ -174,7 +174,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
                         .ToList();
                     return new ModelRecordDto(model, model.Bikes.Count(), placeBikeCount);
                 }).ToList();
-            
+            result = result.Where(model => model.BikeCount != 0).ToList();
             //Checks for words from input string in model name in order but with gaps
             //For example input "Bike XL blue" will match with "Bike 4.0 XL blue" and "...Bike XL blue 4.0..."
             //but not with "Bike 4.0 blue XL"
