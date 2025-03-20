@@ -37,9 +37,21 @@ namespace ams_desk_cs_backend.BikeApp.Services
                 IsWoman = modelDto.IsWoman,
                 InsertionDate = DateOnly.FromDateTime(DateTime.Today)
             };
+            
+            var placeBikeCount = _context.Places.Select(
+                    place => new PlaceBikeCountDto
+                    {
+                        PlaceId = place.PlaceId,
+                        Count = 0,
+                        IsAvailable = false
+                    }
+                )
+                .OrderBy(place => place.PlaceId)
+                .ToList();
+            
             _context.Add(model);
             await _context.SaveChangesAsync();
-            var result = new ModelRecordDto(model, 0, []);
+            var result = new ModelRecordDto(model, 0, placeBikeCount);
             return new ServiceResult<ModelRecordDto>(ServiceStatus.Ok, string.Empty, result);
         }
 
@@ -174,7 +186,10 @@ namespace ams_desk_cs_backend.BikeApp.Services
                         .ToList();
                     return new ModelRecordDto(model, model.Bikes.Count(), placeBikeCount);
                 }).ToList();
-            result = result.Where(model => model.BikeCount != 0).ToList();
+            if (filter.Avaible.HasValue && filter.Avaible.Value)
+            {
+                result = result.Where(model => model.BikeCount != 0).ToList();
+            }
             //Checks for words from input string in model name in order but with gaps
             //For example input "Bike XL blue" will match with "Bike 4.0 XL blue" and "...Bike XL blue 4.0..."
             //but not with "Bike 4.0 blue XL"
