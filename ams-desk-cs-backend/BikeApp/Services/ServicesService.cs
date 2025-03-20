@@ -35,6 +35,25 @@ namespace ams_desk_cs_backend.BikeApp.Services
             return new ServiceResult<IEnumerable<Service>>(ServiceStatus.Ok, string.Empty, services);
         }
 
+        public async Task<ServiceResult<IEnumerable<Service>>> GetServicesFromCategory(short categoryId)
+        {
+            var services = await _context.Services
+                .Include(service => service.ServicesDone)
+                .Include(service => service.ServiceCategory)
+                .Where(service => service.ServiceCategoryId == categoryId || categoryId == 0)
+                .OrderByDescending(service => service.ServicesDone.Count())
+                .Select(service => new Service
+                {
+                    ServiceId = service.ServiceId,
+                    ServiceCategoryId = service.ServiceCategoryId,
+                    ServiceName = service.ServiceName,
+                    Price = service.Price,
+                    ServiceCategory = service.ServiceCategory
+                }).ToListAsync();
+            services.ForEach(service => service.ServiceCategory!.Services = []);
+            return new ServiceResult<IEnumerable<Service>>(ServiceStatus.Ok, string.Empty, services);
+        }
+
         public async Task<ServiceResult<IEnumerable<ServiceCategoryDto>>> GetServiceCategories()
         {
             var categories = await _context.ServiceCategories.Select(category => new ServiceCategoryDto

@@ -52,6 +52,13 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
             return Ok(result.Data);
         }
         
+        [HttpGet("fromCategory/{id}")]
+        public async Task<ActionResult<IEnumerable<ServiceCategoryDto>>> GetByCategory(short id)
+        {
+            var result = await _servicesService.GetServicesFromCategory(id);
+            return Ok(result.Data);
+        }
+        
         [HttpDelete("{id}")]
         [Authorize(Policy = "AdminAccessToken")]
         public async Task<ActionResult<Part>> DeleteService(short id)
