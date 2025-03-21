@@ -178,23 +178,65 @@ namespace ams_desk_cs_backend.BikeApp.Services
                     "Nie można zmienić pracownika przy nierozpoczętym zgłoszeniu", null);
             }
 
-            if (collection)
-            {
-                oldRepair.CollectionEmployeeId = employeeId;
-            }
-            else
-            {
-                if (status == (short)RepairStatuses.Finished || status == (short)RepairStatuses.Notified)
-                {
-                    return new ServiceResult<RepairDto>(ServiceStatus.BadRequest,
-                        "Nie można zmienić pracownika przy ukończonym zgłoszeniu", null);
-                }
-
-                oldRepair.RepairEmployeeId = employeeId;
-            }
-
             await _context.SaveChangesAsync();
             var result = new RepairDto(oldRepair);
+            return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, result);
+        }
+
+        public async Task<ServiceResult<RepairDto>> StartRepair(int id, short employeeId)
+        {
+            var repair = await GetRepairFromDbAsync(id);
+            if (repair == null)
+            {
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
+                    "Nie znaleziono zgłoszenia.", null);
+            }
+
+            if (await _context.Employees.FindAsync(employeeId) == null)
+            {
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
+                    "Nie znaleziono pracownika.", null);
+            }
+            var statusId = repair.StatusId;
+
+            if (statusId != (short)RepairStatuses.Pending)
+            {
+                return ServiceResult<RepairDto>.BadRequest("Zgłoszenie jest już rozpoczęte");
+            }
+            repair.RepairEmployeeId = employeeId;
+            repair.StatusId = (short)RepairStatuses.InProgress;
+            await _context.SaveChangesAsync();
+            repair.Status = await _context.RepairStatuses.FindAsync(repair.StatusId);
+            var result = new RepairDto(repair);
+            return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, result);
+        }
+
+        public async Task<ServiceResult<RepairDto>> CollectRepair(int id, short employeeId)
+        {
+            var repair = await GetRepairFromDbAsync(id);
+            if (repair == null)
+            {
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
+                    "Nie znaleziono zgłoszenia.", null);
+            }
+
+            if (await _context.Employees.FindAsync(employeeId) == null)
+            {
+                return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
+                    "Nie znaleziono pracownika.", null);
+            }
+            var statusId = repair.StatusId;
+
+            if (statusId == (short)RepairStatuses.Pending || statusId == (short)RepairStatuses.Collected)
+            {
+                return ServiceResult<RepairDto>.BadRequest("Zgłoszenie nie jest ropoczęte lub jest zakończone");
+            }
+            repair.CollectionEmployeeId = employeeId;
+            repair.StatusId = (short)RepairStatuses.Collected;
+            repair.CollectionDate = DateOnly.FromDateTime(DateTime.Now);
+            await _context.SaveChangesAsync();
+            repair.Status = await _context.RepairStatuses.FindAsync(repair.StatusId);
+            var result = new RepairDto(repair);
             return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, result);
         }
 

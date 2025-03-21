@@ -41,9 +41,5 @@
         {
             return new ServiceResult<T>(ServiceStatus.BadRequest, message, default);
         }
-        public static ServiceResult<T> Unautorized(string message)
-        {
-            return new ServiceResult<T>(ServiceStatus.Unauthorized, message, default);
-        }
     }
 }

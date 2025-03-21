@@ -284,6 +284,8 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("part_type_name")
                 .ValueGeneratedOnAdd()
                 .HasMaxLength(50);
+            entity.Property(e => e.PartCategoryId)
+                .HasColumnName("part_category_id");
 
             entity.HasOne(d => d.PartCategory).WithMany(p => p.PartTypes)
                 .HasForeignKey(d => d.PartCategoryId)

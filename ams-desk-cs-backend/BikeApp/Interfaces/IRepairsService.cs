@@ -11,5 +11,7 @@ namespace ams_desk_cs_backend.BikeApp.Interfaces
         public Task<ServiceResult<RepairDto>> UpdateRepair(int id, RepairDto newRepair);
         public Task<ServiceResult<RepairDto>> UpdateStatus(int id, short statusId);
         public Task<ServiceResult<RepairDto>> UpdateEmployee(int id, short employeeId, bool collection);
+        public Task<ServiceResult<RepairDto>> StartRepair(int id, short employeeId);
+        public Task<ServiceResult<RepairDto>> CollectRepair(int id, short employeeId);
     }
 }

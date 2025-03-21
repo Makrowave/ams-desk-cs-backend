@@ -95,5 +95,37 @@ namespace ams_desk_cs_backend.BikeApp.Controllers
                 _ => BadRequest(result.Message)
             };
         }
+        [HttpPut("Start/{id}")]
+        public async Task<ActionResult<RepairDto>> StartRepair(int id, short employeeId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _repairsService.StartRepair(id, employeeId);
+            return result.Status switch
+            {
+                ServiceStatus.NotFound => NotFound(result.Message),
+                ServiceStatus.Ok => Ok(result.Data),
+                _ => BadRequest(result.Message)
+            };
+        }
+        [HttpPut("Collect/{id}")]
+        public async Task<ActionResult<RepairDto>> CollectRepair(int id, short employeeId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _repairsService.CollectRepair(id, employeeId);
+            return result.Status switch
+            {
+                ServiceStatus.NotFound => NotFound(result.Message),
+                ServiceStatus.Ok => Ok(result.Data),
+                _ => BadRequest(result.Message)
+            };
+        }
     }
 }
