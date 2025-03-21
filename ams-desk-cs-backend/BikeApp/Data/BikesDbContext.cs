@@ -126,7 +126,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.PrimaryColor).HasColumnType("CHAR(7)").HasColumnName("primary_color");
             entity.Property(e => e.SecondaryColor).HasColumnType("CHAR(7)").HasColumnName("secondary_color");
             entity.Property(e => e.Link)
-                .HasMaxLength(100)
+                .HasMaxLength(160)
                 .HasColumnName("link");
             entity.HasOne(d => d.Manufacturer).WithMany(p => p.Models)
                 .HasForeignKey(d => d.ManufacturerId)
