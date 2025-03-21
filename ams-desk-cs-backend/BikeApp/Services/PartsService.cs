@@ -14,6 +14,32 @@ namespace ams_desk_cs_backend.BikeApp.Services
             _context = context;
         }
 
+        public async Task<ServiceResult<IEnumerable<Part>>> GetFilteredParts(short categoryId, short typeId)
+        {
+            var parts= await _context.Parts.Include(part => part.PartsUsed)
+                .Include(part => part.Unit)
+                .Include(part => part.PartType)
+                .ThenInclude(partType => partType!.PartCategory)
+                .Where(part => part.PartTypeId == typeId || typeId == 0)
+                .Where(part => part.PartType!.PartCategoryId == categoryId || categoryId == 0)
+                .OrderByDescending(part => part.PartsUsed.Count)
+                .ThenByDescending(part => part.PartName)
+                .Select(part => new Part
+                {
+                    PartId = part.PartId,
+                    PartTypeId = part.PartTypeId,
+                    PartName = part.PartName,
+                    Price = part.Price,
+                    UnitId = part.UnitId,
+                    Unit = part.Unit,
+                    PartType = part.PartType
+                })
+                .ToListAsync();
+            parts.ForEach(part => part.PartType!.Parts = []);
+            parts.ForEach(part => part.PartType!.PartCategory!.PartTypes = []);
+            return new ServiceResult<IEnumerable<Part>>(ServiceStatus.Ok, string.Empty, parts);
+        }
+
         public async Task<ServiceResult<Part>> AddPart(Part part)
         {
             _context.Parts.Add(part);
@@ -25,21 +51,21 @@ namespace ams_desk_cs_backend.BikeApp.Services
         {
             var parts= await _context.Parts.Include(part => part.PartsUsed)
                 .Include(part => part.Unit)
-                .Include(part => part.PartCategory)
+                .Include(part => part.PartType)
                 .OrderByDescending(part => part.PartsUsed.Count)
                 .ThenByDescending(part => part.PartName)
                 .Select(part => new Part
                 {
                     PartId = part.PartId,
-                    PartCategoryId = part.PartCategoryId,
+                    PartTypeId = part.PartTypeId,
                     PartName = part.PartName,
                     Price = part.Price,
                     UnitId = part.UnitId,
                     Unit = part.Unit,
-                    PartCategory = part.PartCategory
+                    PartType = part.PartType
                 })
                 .ToListAsync();
-            parts.ForEach(part => part.PartCategory!.Parts = []);
+            parts.ForEach(part => part.PartType!.Parts = []);
             return new ServiceResult<IEnumerable<Part>>(ServiceStatus.Ok, string.Empty, parts);
         }
 
@@ -50,7 +76,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
             {
                 return ServiceResult<Part>.NotFound("Nie znaleziono części");
             }
-            existingPart.PartCategoryId = part.PartCategoryId;
+            existingPart.PartTypeId = part.PartTypeId;
             existingPart.UnitId = part.UnitId;
             existingPart.Price = part.Price;
             existingPart.PartName = part.PartName;

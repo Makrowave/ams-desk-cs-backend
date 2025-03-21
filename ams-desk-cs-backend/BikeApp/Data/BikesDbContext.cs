@@ -31,6 +31,7 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<WheelSize> WheelSizes { get; set; }
     //Repairs
     public virtual DbSet<Part> Parts { get; set; }
+    public virtual DbSet<PartType> PartTypes { get; set; }
     public virtual DbSet<PartCategory> PartCategories { get; set; }
     public virtual DbSet<PartUsed> PartsUsed { get; set; }
     public virtual DbSet<Repair> Repairs { get; set; }
@@ -252,16 +253,16 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.PartName)
                 .HasColumnName("part_name")
                 .ValueGeneratedOnAdd()
-                .HasMaxLength(40);
-            entity.Property(e => e.PartCategoryId)
+                .HasMaxLength(50);
+            entity.Property(e => e.PartTypeId)
                 .HasColumnName("part_category_id");
             entity.Property(e => e.Price)
                 .HasColumnName("part_price");
             entity.Property(e => e.UnitId)
                 .HasColumnName("unit_id");
 
-            entity.HasOne(d => d.PartCategory).WithMany(p => p.Parts)
-                .HasForeignKey(d => d.PartCategoryId)
+            entity.HasOne(d => d.PartType).WithMany(p => p.Parts)
+                .HasForeignKey(d => d.PartTypeId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("part_category_fkey");
 
@@ -272,6 +273,26 @@ public partial class BikesDbContext : DbContext
 
             //Here I don't want index since parts won't be standardized ATM
         });
+        modelBuilder.Entity<PartType>(entity =>
+        {
+            entity.HasKey(e => e.PartTypeId).HasName("part_type_pkey");
+            entity.ToTable("part_types");
+            entity.Property(e => e.PartTypeId)
+                .HasColumnName("part_type_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.PartTypeName)
+                .HasColumnName("part_type_name")
+                .ValueGeneratedOnAdd()
+                .HasMaxLength(50);
+
+            entity.HasOne(d => d.PartCategory).WithMany(p => p.PartTypes)
+                .HasForeignKey(d => d.PartCategoryId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("part_category_type_fkey");
+            
+            entity.HasIndex(e => e.PartTypeName).IsUnique();
+        });
+        
         modelBuilder.Entity<PartCategory>(entity =>
         {
             entity.HasKey(e => e.PartCategoryId).HasName("part_category_pkey");
@@ -280,12 +301,10 @@ public partial class BikesDbContext : DbContext
                 .HasColumnName("part_category_id")
                 .ValueGeneratedOnAdd();
             entity.Property(e => e.PartCategoryName)
-                .HasColumnName("part_name")
-                .ValueGeneratedOnAdd()
+                .HasColumnName("part_category_name")
                 .HasMaxLength(30);
-
-            entity.HasIndex(e => e.PartCategoryName).IsUnique();
         });
+        
         modelBuilder.Entity<PartUsed>(entity =>
         {
             entity.HasKey(e => e.PartUsedId).HasName("part_used_pkey");
@@ -324,7 +343,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ServiceName)
                 .HasColumnName("service_name")
                 .ValueGeneratedOnAdd()
-                .HasMaxLength(40);
+                .HasMaxLength(50);
             entity.Property(e => e.ServiceCategoryId)
                 .HasColumnName("service_category_id");
 
@@ -332,7 +351,6 @@ public partial class BikesDbContext : DbContext
                 .HasForeignKey(d => d.ServiceCategoryId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("service_category_fkey");
-            entity.HasIndex(e => e.ServiceName).IsUnique();
         });
         modelBuilder.Entity<ServiceCategory>(entity =>
         {

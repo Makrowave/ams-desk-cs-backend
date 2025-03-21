@@ -23,6 +23,13 @@ public class PartsController : ControllerBase
         var result = await _partsService.GetParts();
         return Ok(result.Data);
     }
+    
+    [HttpGet("filtered")]
+    public async Task<ActionResult<IEnumerable<Part>>> GetFilteredParts(short categoryId, short typeId) 
+    {
+        var result = await _partsService.GetFilteredParts(categoryId, typeId);
+        return Ok(result.Data);
+    }
 
     [HttpPost]
     public async Task<ActionResult<Part>> AddPart(Part part)
