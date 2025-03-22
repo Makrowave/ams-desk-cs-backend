@@ -20,6 +20,16 @@
             Status = status;
             Message = message;
         }
+
+        public static ServiceResult NotFound(string message)
+        {
+            return new ServiceResult(ServiceStatus.NotFound, message);
+        }
+        
+        public static ServiceResult BadRequest(string message)
+        {
+            return new ServiceResult(ServiceStatus.BadRequest, message);
+        }
     }
     public class ServiceResult<T> : ServiceResult
     {

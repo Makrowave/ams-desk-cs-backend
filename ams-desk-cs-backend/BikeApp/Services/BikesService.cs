@@ -106,6 +106,32 @@ namespace ams_desk_cs_backend.BikeApp.Services
             return new ServiceResult<IEnumerable<BikeSubRecordDto>>(ServiceStatus.Ok, string.Empty, bikes);
         }
 
+        public async Task<ServiceResult<(short PlaceId, int ModelId)>> SellBike(int id, int price)
+        {
+            var bike = await _context.Bikes.FindAsync(id);
+            if (bike == null)
+            {
+                return ServiceResult<(short PlaceId, int ModelId)>.NotFound("Nie znaleziono bike");
+            }
+
+            if (bike.StatusId == (short)BikeStatus.Sold)
+            {
+                return ServiceResult<(short PlaceId, int ModelId)>.BadRequest("Rower już był sprzedany");
+            }
+
+            if (price <= 0)
+            {
+                return ServiceResult<(short PlaceId, int ModelId)>.BadRequest("Cena nie może być <= 0");
+            }
+            
+            bike.StatusId = (short)BikeStatus.Sold;
+            bike.SalePrice = price;
+            bike.SaleDate = DateOnly.FromDateTime(DateTime.Now);
+            await _context.SaveChangesAsync();
+            var result = (bike.PlaceId, bike.ModelId);
+            return new ServiceResult<(short PlaceId, int ModelId)>(ServiceStatus.Ok, string.Empty, result);
+        }
+
         public async Task<ServiceResult> DeleteBike(int id)
         {
             var bike = await _context.Bikes.FindAsync(id);
