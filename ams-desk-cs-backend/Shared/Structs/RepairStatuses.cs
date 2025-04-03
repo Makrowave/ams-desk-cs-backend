@@ -7,5 +7,6 @@
     Finished,
     Notified,
     Collected,
-    ContactNeeded
+    ContactNeeded,
+    Cancelled,
 }

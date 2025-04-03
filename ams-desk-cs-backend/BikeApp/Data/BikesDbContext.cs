@@ -495,6 +495,7 @@ public partial class BikesDbContext : DbContext
             new RepairStatus {RepairStatusId = 6, Color = "#82e085", Name = "Powiadomiono"},
             new RepairStatus {RepairStatusId = 7, Color = "#32fc39", Name = "Wydano"},
             new RepairStatus {RepairStatusId = 8, Color = "#54afff", Name = "Kontakt z klientem"},
+            new RepairStatus {RepairStatusId = 9, Color = "#f51b47", Name = "Anulowano"},
         ]);
 
         modelBuilder.Entity<Unit>().HasData([
@@ -571,6 +572,10 @@ public partial class BikesDbContext : DbContext
             new WheelSize {WheelSizeId = 29},
         ]);
 
+        // modelBuilder.Entity<RepairStatus>().HasData([
+        //     new RepairStatus {RepairStatusId = 9, Color = "#f51b47", Name = "Anulowano"},
+        // ]);
+        
         OnModelCreatingPartial(modelBuilder);
     }
 

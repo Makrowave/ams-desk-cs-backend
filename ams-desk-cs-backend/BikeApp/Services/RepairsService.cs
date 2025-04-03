@@ -229,7 +229,7 @@ namespace ams_desk_cs_backend.BikeApp.Services
 
             if (statusId == (short)RepairStatuses.Pending || statusId == (short)RepairStatuses.Collected)
             {
-                return ServiceResult<RepairDto>.BadRequest("Zgłoszenie nie jest ropoczęte lub jest zakończone");
+                return ServiceResult<RepairDto>.BadRequest("Zgłoszenie nie jest rozpoczęte lub jest zakończone");
             }
             repair.CollectionEmployeeId = employeeId;
             repair.StatusId = (short)RepairStatuses.Collected;
