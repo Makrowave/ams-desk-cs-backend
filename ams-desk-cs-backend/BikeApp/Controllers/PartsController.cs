@@ -39,7 +39,6 @@ public class PartsController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Policy = "AdminAccessToken")]
     public async Task<ActionResult<Part>> UpdatePart(int id, Part part)
     {
         var result = await _partsService.ChangePart(id, part);
@@ -50,7 +49,6 @@ public class PartsController : ControllerBase
         return Ok(result.Data);
     }
     [HttpDelete("{id}")]
-    [Authorize(Policy = "AdminAccessToken")]
     public async Task<ActionResult<Part>> DeletePart(int id)
     {
         var result = await _partsService.DeletePart(id);

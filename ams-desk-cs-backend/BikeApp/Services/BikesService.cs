@@ -144,6 +144,56 @@ namespace ams_desk_cs_backend.BikeApp.Services
             return new ServiceResult(ServiceStatus.NoContent, string.Empty);
         }
 
+        public async Task<ServiceResult<BikeSubRecordDto>> MoveBike(int id, short placeId)
+        {
+            if (await _context.Places.FindAsync(placeId) == null)
+            {
+                return ServiceResult<BikeSubRecordDto>.NotFound("Nie znaleziono miejsca docelowego");
+            }
+            var bike = await _context.Bikes.FindAsync(id);
+            if (bike == null)
+            {
+                return ServiceResult<BikeSubRecordDto>.NotFound("Nie znaleziono roweru");
+            }
+            bike.PlaceId = placeId;
+            await _context.SaveChangesAsync();
+            return new ServiceResult<BikeSubRecordDto>(ServiceStatus.Ok, string.Empty, new BikeSubRecordDto
+            {
+                Id = bike.BikeId,
+                Place = bike.PlaceId,
+                StatusId = bike.StatusId,
+                AssembledBy = bike.AssembledBy,
+            });
+        }
+
+        public async Task<ServiceResult<BikeSubRecordDto>> AssembleBikeMobile(int id, short employeeId)
+        {
+            if (await _context.Employees.FindAsync(employeeId) == null)
+            {
+                return ServiceResult<BikeSubRecordDto>.NotFound("Nie znaleziono pracownika");
+            }
+            var bike = await _context.Bikes.FindAsync(id);
+            if (bike == null)
+            {
+                return ServiceResult<BikeSubRecordDto>.NotFound("Nie znaleziono roweru");
+            }
+
+            if (bike.StatusId != (short)BikeStatus.Warranty || bike.StatusId != (short)BikeStatus.NotAssembled)
+            {
+                return ServiceResult<BikeSubRecordDto>.BadRequest("Nie można złożyć złożonego roweru");
+            }
+            bike.AssembledBy = employeeId;
+            bike.StatusId = (short)BikeStatus.Assembled;
+            await _context.SaveChangesAsync();
+            return new ServiceResult<BikeSubRecordDto>(ServiceStatus.Ok, string.Empty, new BikeSubRecordDto
+            {
+                Id = bike.BikeId,
+                Place = bike.PlaceId,
+                StatusId = bike.StatusId,
+                AssembledBy = bike.AssembledBy,
+            });
+        }
+
         public async Task<ServiceResult<BikeSubRecordDto>> PostBike(BikeDto bikeDto)
         {
             if (!bikeDto.PlaceId.HasValue)

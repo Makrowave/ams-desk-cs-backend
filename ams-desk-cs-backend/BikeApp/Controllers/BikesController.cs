@@ -1,4 +1,5 @@
 ﻿
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using ams_desk_cs_backend.BikeApp.Dtos.AppModelDto;
@@ -69,13 +70,53 @@ public class BikesController : ControllerBase
         return NoContent();
     }
 
-    [HttpPut("sell/{id}")]
+    [HttpPut("Sell/{id}")]
     public async Task<IActionResult> SellBike(int id, int price)
     {
         var result = await _bikesService.SellBike(id, price);
         return result.Status switch
         {
             ServiceStatus.Ok => Ok(new {PlaceId = result.Data.PlaceId, ModelId = result.Data.ModelId}),
+            ServiceStatus.NotFound => NotFound(result.Message),
+            _ => BadRequest(result.Message)
+        };
+    }
+    [HttpPut("Move/{id}")]
+    public async Task<IActionResult> MoveBike(int id, short placeId)
+    {
+        var result = await _bikesService.MoveBike(id, placeId);
+        return result.Status switch
+        {
+            ServiceStatus.Ok => Ok(result.Data),
+            ServiceStatus.NotFound => NotFound(result.Message),
+            _ => BadRequest(result.Message)
+        };
+    }
+    [HttpPut("AssembleMobile/{id}")]
+    public async Task<IActionResult> AssembleBikeMobile(int id)
+    {
+        //Temporary solution
+        string authHeader = Request.Headers["Authorization"];
+        short employeeId = -1;
+        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+        {
+            string token = authHeader.Substring("Bearer ".Length).Trim();
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(token); 
+        
+            var claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value);
+            claims.TryGetValue("employeeId", out var employeeIdStr);
+            short.TryParse(employeeIdStr, out employeeId);
+        }
+
+        if (employeeId == -1)
+        {
+            return BadRequest("Nie przypisano pracownika do użytkownika - powiadom administratora");
+        }
+        var result = await _bikesService.AssembleBikeMobile(id, employeeId);
+        return result.Status switch
+        {
+            ServiceStatus.Ok => Ok(result.Data),
             ServiceStatus.NotFound => NotFound(result.Message),
             _ => BadRequest(result.Message)
         };

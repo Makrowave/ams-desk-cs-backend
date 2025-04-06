@@ -11,5 +11,7 @@ namespace ams_desk_cs_backend.BikeApp.Interfaces
         
         Task<ServiceResult<(short PlaceId, int ModelId)>> SellBike(int id, int price);
         Task<ServiceResult> DeleteBike(int id);
+        Task<ServiceResult<BikeSubRecordDto>> MoveBike(int id, short placeId);
+        Task<ServiceResult<BikeSubRecordDto>> AssembleBikeMobile(int id, short employeeId);
     }
 }
