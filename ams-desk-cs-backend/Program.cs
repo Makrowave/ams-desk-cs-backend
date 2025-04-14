@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Configuration;
+using ams_desk_cs_backend.Data;
+using ams_desk_cs_backend.Login.Data;
 using ams_desk_cs_backend.Shared.Extensions;
-using ams_desk_cs_backend.BikeApp.Data;
-using ams_desk_cs_backend.LoginApp.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 if (!builder.Environment.IsDevelopment())
 {

@@ -1,5 +1,17 @@
-﻿using ams_desk_cs_backend.BikeApp.Interfaces;
-using ams_desk_cs_backend.BikeApp.Services;
+﻿using ams_desk_cs_backend.BikeFilters.Interfaces;
+using ams_desk_cs_backend.BikeFilters.Services;
+using ams_desk_cs_backend.Bikes.Interfaces;
+using ams_desk_cs_backend.Bikes.Services;
+using ams_desk_cs_backend.Employees;
+using ams_desk_cs_backend.Employees.Interfaces;
+using ams_desk_cs_backend.Employees.Services;
+using ams_desk_cs_backend.Models;
+using ams_desk_cs_backend.Models.Interfaces;
+using ams_desk_cs_backend.Models.Services;
+using ams_desk_cs_backend.Places.Interfaces;
+using ams_desk_cs_backend.Places.Services;
+using ams_desk_cs_backend.Repairs.Interfaces;
+using ams_desk_cs_backend.Repairs.Services;
 
 namespace ams_desk_cs_backend.Shared.Extensions
 {

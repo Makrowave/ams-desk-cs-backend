@@ -1,10 +1,10 @@
-﻿using ams_desk_cs_backend.LoginApp.Authorization;
-using ams_desk_cs_backend.LoginApp.Interfaces;
-using ams_desk_cs_backend.LoginApp.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ams_desk_cs_backend.Login.Authorization;
+using ams_desk_cs_backend.Login.Interface;
+using ams_desk_cs_backend.Login.Service;
 
 namespace ams_desk_cs_backend.Shared.Extensions
 {
