@@ -5,3 +5,5 @@ It makes a complete project alongside [Ams Frontend](https://github.com/Makrowav
 
 
 Licensed under [Elv2](https://www.elastic.co/licensing/elastic-license).
+
+More info about system and its look at front-end repo and for mobile app view - mobile repo.
