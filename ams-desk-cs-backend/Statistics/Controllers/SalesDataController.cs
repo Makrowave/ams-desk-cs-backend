@@ -202,8 +202,18 @@ public class SalesDataController : ControllerBase
 
         var result = new Dictionary<string, object>();
         var even = stats.Count % 2 == 0;
+        if (stats.Count == 0)
+        {
+            result["sum"] = 0;
+            result["count"] = 0;
+            result["median"] = 0;
+            result["average"] = 0;
+            result["medianDiscount"] = 0;
+            return Ok(result);
+        }
 
         result["sum"] = stats.Sum(stat => stat.SalePrice);
+        result["count"] = stats.Count;
         result["median"] =
             stats
                 .OrderBy(stat => stat.SalePrice)
