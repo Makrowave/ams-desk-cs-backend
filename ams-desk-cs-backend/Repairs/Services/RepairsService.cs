@@ -47,8 +47,8 @@ public class RepairsService : IRepairsService
 
     public async Task<ServiceResult<IEnumerable<ShortRepairDto>>> GetRepairs(short place, short[] excludedStatuses)
     {
-        var repairs = await Queryable
-            .Where<Data.Models.Repairs.Repair>(_context.Repairs, repair => repair.PlaceId == place || place == 0)
+        var repairs = await _context.Repairs
+            .Where(repair => repair.PlaceId == place || place == 0)
             .Where(repair => !excludedStatuses.Any(status => status == (short)repair.StatusId))
             .Include(repair => repair.Place)
             .Include(repair => repair.Status)
@@ -99,6 +99,20 @@ public class RepairsService : IRepairsService
         var addedParts = newRepair.Parts.Where(p => p.PartUsedId == 0);
         _context.PartsUsed.RemoveRange(deletedParts);
         _context.PartsUsed.AddRange(addedParts);
+        
+        // Handle updating the amount on existing parts
+        var updatedParts = newRepair.Parts.Where(p => p.PartUsedId != 0 &&
+                                                      oldRepair.Parts.Any(part => part.PartUsedId == p.PartUsedId));
+
+        foreach (var part in updatedParts)
+        {
+            var existingPart = oldRepair.Parts.FirstOrDefault(oldPart => oldPart.PartUsedId == part.PartUsedId);
+
+            if (existingPart != null)
+            {
+                existingPart.Amount = part.Amount;
+            }
+        }
 
 
         await _context.SaveChangesAsync();

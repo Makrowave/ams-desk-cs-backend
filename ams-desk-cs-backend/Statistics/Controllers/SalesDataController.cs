@@ -2,12 +2,13 @@ using System.Reflection.Emit;
 using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Data.Models;
 using ams_desk_cs_backend.Statistics.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.Statistics.Controllers;
 
-// [Authorize(Policy = "AccessToken")]
+[Authorize(Policy = "AccessToken")]
 [Route("api/[controller]")]
 [ApiController]
 public class SalesDataController : ControllerBase
