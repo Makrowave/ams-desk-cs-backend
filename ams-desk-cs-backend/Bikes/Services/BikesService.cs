@@ -105,9 +105,9 @@ public class BikesService : IBikesService
         return new ServiceResult<IEnumerable<BikeSubRecordDto>>(ServiceStatus.Ok, string.Empty, bikes);
     }
 
-    public async Task<ServiceResult<(short PlaceId, int ModelId)>> SellBike(int id, int price)
+    public async Task<ServiceResult<(short PlaceId, int ModelId)>> SellBike(int id, int price, bool internet)
     {
-        var bike = await _context.Bikes.FindAsync(id);
+        var bike = await _context.Bikes.Include(bike => bike.Place).FirstOrDefaultAsync(bike => bike.BikeId == id);
         if (bike == null)
         {
             return ServiceResult<(short PlaceId, int ModelId)>.NotFound("Nie znaleziono bike");
@@ -122,10 +122,16 @@ public class BikesService : IBikesService
         {
             return ServiceResult<(short PlaceId, int ModelId)>.BadRequest("Cena nie może być <= 0");
         }
-            
+
+        if (bike.Place!.IsStorage)
+        {
+            return ServiceResult<(short PlaceId, int ModelId)>.BadRequest("Nie można sprzedać roweru z magazynu");
+        }
+        
         bike.StatusId = (short)BikeStatus.Sold;
         bike.SalePrice = price;
         bike.SaleDate = DateOnly.FromDateTime(DateTime.Now);
+        bike.InternetSale = internet;
         await _context.SaveChangesAsync();
         var result = (bike.PlaceId, bike.ModelId);
         return new ServiceResult<(short PlaceId, int ModelId)>(ServiceStatus.Ok, string.Empty, result);

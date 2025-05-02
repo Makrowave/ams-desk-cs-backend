@@ -9,7 +9,7 @@ public interface IBikesService
     Task<ServiceResult<IEnumerable<BikeSubRecordDto>>> GetBikes(int modelId, short PlaceId);
     Task<ServiceResult<BikeSubRecordDto>> PostBike(BikeDto bike);
         
-    Task<ServiceResult<(short PlaceId, int ModelId)>> SellBike(int id, int price);
+    Task<ServiceResult<(short PlaceId, int ModelId)>> SellBike(int id, int price, bool internet);
     Task<ServiceResult> DeleteBike(int id);
     Task<ServiceResult<BikeSubRecordDto>> MoveBike(int id, short placeId);
     Task<ServiceResult<BikeSubRecordDto>> AssembleBikeMobile(int id, short employeeId);

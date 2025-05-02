@@ -40,4 +40,16 @@ public class PlacesController : ControllerBase
         }
         return Ok();
     }
+
+    [HttpPut("SetStorage")]
+    [Authorize(Policy = "AdminAccessToken")]
+    public async Task<ActionResult> SetStorage(short placeId, bool isStorage)
+    {
+        var result = await _placeService.SetStorage(placeId, isStorage);
+        if (result.Status == ServiceStatus.NotFound)
+        {
+            return NotFound(result.Message);
+        }
+        return Ok();
+    }
 }

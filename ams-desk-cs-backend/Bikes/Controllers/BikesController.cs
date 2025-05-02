@@ -69,9 +69,9 @@ public class BikesController : ControllerBase
     }
 
     [HttpPut("Sell/{id}")]
-    public async Task<IActionResult> SellBike(int id, int price)
+    public async Task<IActionResult> SellBike(int id, int price, bool internet)
     {
-        var result = await _bikesService.SellBike(id, price);
+        var result = await _bikesService.SellBike(id, price, internet);
         return result.Status switch
         {
             ServiceStatus.Ok => Ok(new {PlaceId = result.Data.PlaceId, ModelId = result.Data.ModelId}),

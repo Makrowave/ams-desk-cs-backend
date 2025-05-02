@@ -8,6 +8,7 @@ public partial class Place
 
     public required string PlaceName { get; set; }
     public required short PlacesOrder { get; set; }
+    public required bool IsStorage { get; set; }
     public virtual ICollection<Bike> Bikes { get; set; } = [];
     public virtual ICollection<Repairs.Repair> Repairs { get; set; } = [];
 }

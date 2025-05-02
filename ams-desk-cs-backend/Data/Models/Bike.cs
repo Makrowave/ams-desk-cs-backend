@@ -15,6 +15,7 @@ public partial class Bike
     public DateOnly? SaleDate { get; set; }
 
     public int? SalePrice { get; set; }
+    public bool InternetSale { get; set; }
     public short? AssembledBy { get; set; }
 
     public virtual Model? Model { get; set; }

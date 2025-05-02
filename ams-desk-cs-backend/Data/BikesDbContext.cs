@@ -159,6 +159,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.PlaceName)
                 .HasMaxLength(16)
                 .HasColumnName("place_name");
+            entity.Property(e => e.IsStorage)
+                .HasColumnName("is_storage");
             entity.Property(e => e.PlacesOrder)
                 .HasColumnName("places_order");
         });

@@ -7,5 +7,6 @@ namespace ams_desk_cs_backend.Places.Interfaces
     {
         public Task<ServiceResult<IEnumerable<PlaceDto>>> GetPlaces();
         public Task<ServiceResult> ChangeOrder(short firstId, short lastId);
+        public Task<ServiceResult> SetStorage(short placeId, bool isStorage);
     }
 }

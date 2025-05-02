@@ -39,4 +39,16 @@ public class PlaceService : IPlacesService
         await _context.SaveChangesAsync();
         return new ServiceResult(ServiceStatus.Ok, string.Empty);
     }
+
+    public async  Task<ServiceResult> SetStorage(short placeId, bool isStorage)
+    {
+       var place  = await _context.Places.FirstOrDefaultAsync(place => place.PlaceId == placeId);
+       if (place == null)
+       {
+           return ServiceResult.NotFound("Nie znaleziono miejsca");
+       }
+       place.IsStorage = isStorage;
+       await _context.SaveChangesAsync();
+       return new ServiceResult(ServiceStatus.Ok, string.Empty);
+    }
 }
