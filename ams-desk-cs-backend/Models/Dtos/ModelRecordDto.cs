@@ -33,7 +33,7 @@ public class ModelRecordDto
     public string? EanCode { get; set; }
     public required string ModelName { get; set; }
     public short FrameSize { get; set; }
-    public short WheelSize { get; set; }
+    public decimal WheelSize { get; set; }
     public short ManufacturerId { get; set; }
     public int Price { get; set; }
     public bool IsWoman { get; set; }

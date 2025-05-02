@@ -2,6 +2,6 @@
 
 public class WheelSizeDto
 {
-    public short Key { get; set; }
-    public short Value { get; set; }
+    public decimal Key { get; set; }
+    public decimal Value { get; set; }
 }

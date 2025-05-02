@@ -20,7 +20,7 @@ public class FavoriteModelDto
     public string ModelName { get; set; }
     public string ManufacturerName { get; set; }
     public short FrameSize { get; set; }
-    public short WheelSize { get; set; }
+    public decimal WheelSize { get; set; }
     public string? ProductCode { get; set; }
     public string? PrimaryColor { get; set; }
     public string? SecondaryColor { get; set; }

@@ -5,7 +5,7 @@ public class ModelFilter
     public bool? Available { get; set; }
     public bool? Electric { get; set; }
     public int? ManufacturerId { get; set; }
-    public int? WheelSize { get; set; }
+    public decimal? WheelSize { get; set; }
     public int? FrameSize { get; set; }
     public int? StatusId { get; set; }
     public int? MinPrice { get; set; }

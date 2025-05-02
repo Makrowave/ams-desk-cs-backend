@@ -2,6 +2,6 @@
 
 public partial class WheelSize
 {
-    public required short WheelSizeId { get; set; }
+    public required decimal WheelSizeId { get; set; }
     public virtual ICollection<Model> Models { get; set; } = new List<Model>();
 }

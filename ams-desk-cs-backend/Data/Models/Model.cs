@@ -12,7 +12,7 @@ public partial class Model
 
     public bool IsWoman { get; set; }
 
-    public short WheelSizeId { get; set; }
+    public decimal WheelSizeId { get; set; }
 
     public short ManufacturerId { get; set; }
     public short? ColorId { get; set; }

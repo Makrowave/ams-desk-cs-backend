@@ -122,7 +122,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ProductCode)
                 .HasMaxLength(30)
                 .HasColumnName("product_code");
-            entity.Property(e => e.WheelSizeId).HasColumnName("wheel_size");
+            entity.Property(e => e.WheelSizeId).HasColumnName("wheel_size").HasColumnType("decimal(2,1)");
             entity.Property(e => e.PrimaryColor).HasColumnType("CHAR(7)").HasColumnName("primary_color");
             entity.Property(e => e.SecondaryColor).HasColumnType("CHAR(7)").HasColumnName("secondary_color");
             entity.Property(e => e.Link)
@@ -240,6 +240,7 @@ public partial class BikesDbContext : DbContext
             entity.ToTable("wheel_sizes");
             entity.Property(e => e.WheelSizeId)
                 .HasColumnName("wheel_size")
+                .HasColumnType("decimal(2,1)")
                 .ValueGeneratedNever();
         });
         //Repairs
