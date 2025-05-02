@@ -2,7 +2,7 @@
 
 public class ModelFilter
 {
-    public bool? Avaible { get; set; }
+    public bool? Available { get; set; }
     public bool? Electric { get; set; }
     public int? ManufacturerId { get; set; }
     public int? WheelSize { get; set; }

@@ -10,6 +10,6 @@ public class StatusDto
     [RegularExpression(Regexes.Name16, ErrorMessage = "Niepoprawna nazwa statusu")]
     public string StatusName { get; set; } = null!;
     [Required]
-    [RegularExpression(Regexes.Name16, ErrorMessage = "Niepoprawny kolor statusu")]
+    [RegularExpression(Regexes.Color, ErrorMessage = "Niepoprawny kolor statusu")]
     public string HexCode { get; set; } = null!;
 }

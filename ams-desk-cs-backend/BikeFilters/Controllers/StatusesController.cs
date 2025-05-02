@@ -9,10 +9,10 @@ namespace ams_desk_cs_backend.BikeFilters.Controllers;
 [Authorize(Policy = "AccessToken")]
 [Route("api/[controller]")]
 [ApiController]
-public class StatusController : ControllerBase
+public class StatusesController : ControllerBase
 {
     private readonly IStatusService _statusService;
-    public StatusController(IStatusService statusService)
+    public StatusesController(IStatusService statusService)
     {
         _statusService = statusService;
     }

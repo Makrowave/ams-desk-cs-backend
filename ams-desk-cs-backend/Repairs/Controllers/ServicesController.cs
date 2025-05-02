@@ -44,7 +44,7 @@ public class ServicesController : ControllerBase
         var result = await _servicesService.PostService(service);
         return Ok(result.Data);
     }
-    [HttpGet("categories")]
+    [HttpGet("Categories")]
     public async Task<ActionResult<IEnumerable<ServiceCategoryDto>>> GetServiceCategories()
     {
         var result = await _servicesService.GetServiceCategories();

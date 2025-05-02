@@ -84,7 +84,7 @@ public class ModelsService : IModelsService
                 model => model.ColorId == filter.ColorId
             );
         }
-        if (filter.Avaible.HasValue && filter.Avaible.Value)
+        if (filter.Available.HasValue && filter.Available.Value)
         {
             models = models.Where(
                 model => model.Bikes.Any()
@@ -187,7 +187,7 @@ public class ModelsService : IModelsService
                     .ToList();
                 return new ModelRecordDto(model, model.Bikes.Count(), placeBikeCount);
             }).ToList();
-        if (filter.Avaible.HasValue && filter.Avaible.Value)
+        if (filter.Available.HasValue && filter.Available.Value)
         {
             result = result.Where(model => model.BikeCount != 0).ToList();
         }

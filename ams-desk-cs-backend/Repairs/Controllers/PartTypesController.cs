@@ -22,7 +22,7 @@ public class PartTypesController : ControllerBase
         var result = await _partTypesService.GetPartTypes(id);
         return Ok(result.Data);
     }
-    [HttpGet("categories")]
+    [HttpGet("Categories")]
     public async Task<ActionResult<IEnumerable<PartCategoryDto>>> GetCategories()
     {
         var result = await _partTypesService.GetPartCategories();
