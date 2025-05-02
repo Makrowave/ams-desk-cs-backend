@@ -1,8 +1,10 @@
-﻿using ams_desk_cs_backend.BikeFilters.Enums;
+﻿using System.Text.RegularExpressions;
+using ams_desk_cs_backend.BikeFilters.Enums;
 using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Data.Models;
 using ams_desk_cs_backend.Models.Dtos;
 using ams_desk_cs_backend.Models.Interfaces;
+using ams_desk_cs_backend.Shared;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -240,6 +242,22 @@ public class ModelsService : IModelsService
         await _context.SaveChangesAsync();
         var result = new ModelRecordDto(oldModel, 0, []);
         return new ServiceResult<ModelRecordDto>(ServiceStatus.Ok, string.Empty, result);
+    }
+
+    public async Task<ServiceResult<ModelRecordDto>> UpdateEan(int id, string ean)
+    {
+        if (!Regex.IsMatch(ean, Regexes.EanCode))
+        {
+            return ServiceResult<ModelRecordDto>.BadRequest("Niepoprawny kod EAN");
+        }
+        var model = await _context.Models.FindAsync(id);
+        if (model == null)
+        {
+            return ServiceResult<ModelRecordDto>.NotFound("Nie znaleziono roweru");
+        }
+        model.EanCode = ean;
+        await _context.SaveChangesAsync();
+        return new ServiceResult<ModelRecordDto>(ServiceStatus.Ok, string.Empty, new ModelRecordDto(model, 0, []));
     }
 
     public async Task<ServiceResult> DeleteModel(int id)

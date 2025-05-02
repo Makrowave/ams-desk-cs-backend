@@ -67,7 +67,7 @@ public class ModelsController : ControllerBase
         {
             return BadRequest(result.Message);
         }
-        return NoContent();
+        return Ok();
     }
 
     [HttpPut("favorite/{id}")]
@@ -79,6 +79,21 @@ public class ModelsController : ControllerBase
             return NotFound(result.Message);
         }
 
+        return Ok(result.Data);
+    }
+
+    [HttpPut("updateEan/{id}")]
+    public async Task<ActionResult<ModelRecordDto>> UpdateEan(int id, [FromQuery] string ean)
+    {
+        var result = await _modelsService.UpdateEan(id, ean);
+        if (result.Status == ServiceStatus.NotFound)
+        {
+            return NotFound(result.Message);
+        }
+        if (result.Status == ServiceStatus.BadRequest)
+        {
+            return BadRequest(result.Message);
+        }
         return Ok(result.Data);
     }
 
