@@ -57,6 +57,8 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.SalePrice).HasColumnName("sale_price");
             entity.Property(e => e.StatusId).HasColumnName("status_id");
             entity.Property(e => e.AssembledBy).HasColumnName("assembled_by");
+            entity.Property(e => e.InternetSale).HasColumnName("internet_sale")
+                .HasDefaultValue(false);
 
             entity.HasOne(d => d.Model).WithMany(p => p.Bikes)
                 .HasForeignKey(d => d.ModelId)
@@ -160,7 +162,8 @@ public partial class BikesDbContext : DbContext
                 .HasMaxLength(16)
                 .HasColumnName("place_name");
             entity.Property(e => e.IsStorage)
-                .HasColumnName("is_storage");
+                .HasColumnName("is_storage")
+                .HasDefaultValue(false);
             entity.Property(e => e.PlacesOrder)
                 .HasColumnName("places_order");
         });

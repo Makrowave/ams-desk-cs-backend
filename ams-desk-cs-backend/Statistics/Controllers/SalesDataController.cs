@@ -56,18 +56,20 @@ public class SalesDataController : ControllerBase
         [FromQuery] DateTime? until,
         [FromQuery] string interval)
     {
+        // Validate interval
         if (interval != "year" && interval != "month" && interval != "day")
         {
             return BadRequest("Invalid interval - should be 'year', 'month', 'day'");
         }
-
+        // Create ranges
         var dateRange = await PrepareDatesAsync(since, until);
         if (dateRange.Since == null || dateRange.Until == null)
         {
             return Ok(new List<Object>());
         }
 
-        var places = await _context.Places.ToListAsync();
+        var places = await _context.Places.Where(place => !place.IsStorage).ToListAsync();
+        places.Add(new Place { PlaceId = -1, PlaceName = "Internet", IsStorage = false, PlacesOrder = 1000});
         var result = new List<SeriesDto<DateAndPriceDto>>();
 
         //Create series
@@ -242,9 +244,12 @@ public class SalesDataController : ControllerBase
             return Ok(new Dictionary<string, object>());
         }
 
-        var bikes = (await FilterByDateQueryable(_context.Bikes.Where(bike => bike.SaleDate != null),
-                dateRange.Since.Value, dateRange.Until.Value)
+        var filteredBikes = FilterByDateQueryable(_context.Bikes.Where(bike => bike.SaleDate != null),
+            dateRange.Since.Value, dateRange.Until.Value);
+        var bikes = (await filteredBikes
             .Include(bike => bike.Place)
+            .Where(bike => !bike.Place!.IsStorage)
+            .Where(bike => !bike.InternetSale)
             .GroupBy(bike => bike.Place)
             .ToListAsync()).OrderBy(group => group.Key!.PlaceId);
 
@@ -261,6 +266,16 @@ public class SalesDataController : ControllerBase
                         .Sum(middle => middle.SalePrice!.Value) / (even ? 2 : 1)
                 };
             }).ToDictionary(group => group.Place, group => (object)group.Value);
+        // Internet segment
+        var internetBikes = (await filteredBikes.Where(bike => bike.InternetSale).ToListAsync())
+            .OrderBy(bike => bike.SalePrice!.Value);
+        var internetCount = internetBikes.Count();
+        var internetEven = internetCount % 2 == 0;
+        var internetMedian = internetBikes.Skip(internetCount / 2 - (internetEven ? 1 : 0))
+            .Take(internetEven ? 2 : 1)
+            .Sum(middle => middle.SalePrice!.Value) / (internetEven ? 2 : 1);
+        result.Add("Internet", internetMedian);
+        // Add date
         result.Add("date", $"{dateRange.Since:yyyy-MM-dd} - {dateRange.Until:yyyy-MM-dd}");
         return Ok(new List<Dictionary<string, object>> { result });
     }
@@ -274,9 +289,12 @@ public class SalesDataController : ControllerBase
             return Ok(new Dictionary<string, object>());
         }
 
-        var bikes = (await FilterByDateQueryable(_context.Bikes.Where(bike => bike.SaleDate != null),
-                dateRange.Since.Value, dateRange.Until.Value)
+        var filteredBikes = FilterByDateQueryable(_context.Bikes.Where(bike => bike.SaleDate != null),
+            dateRange.Since.Value, dateRange.Until.Value);
+        var bikes = (await filteredBikes
             .Include(bike => bike.Place)
+            .Where(bike => !bike.Place!.IsStorage)
+            .Where(bike => !bike.InternetSale)
             .GroupBy(bike => bike.Place)
             .ToListAsync()).OrderBy(group => group.Key!.PlaceId);
 
@@ -286,6 +304,11 @@ public class SalesDataController : ControllerBase
                 Place = group.Key!.PlaceName,
                 Value = group.Average(bike => bike.SalePrice!.Value)
             }).ToDictionary(group => group.Place, group => (object)group.Value);
+        // Internet segment
+        var internetBikes = await filteredBikes.Where(bike => bike.InternetSale).ToListAsync();
+        var internetMedian = internetBikes.Average(bike => bike.SalePrice!.Value);
+        result.Add("Internet", internetMedian);
+        // Add date
         result.Add("date", $"{dateRange.Since:yyyy-MM-dd} - {dateRange.Until:yyyy-MM-dd}");
         return Ok(new List<Dictionary<string, object>> { result });
     }
@@ -299,10 +322,13 @@ public class SalesDataController : ControllerBase
             return Ok(new Dictionary<string, object>());
         }
 
-        var bikes = (await FilterByDateQueryable(_context.Bikes.Where(bike => bike.SaleDate != null),
-                dateRange.Since.Value, dateRange.Until.Value)
+        var filteredBikes = FilterByDateQueryable(_context.Bikes.Where(bike => bike.SaleDate != null),
+            dateRange.Since.Value, dateRange.Until.Value);
+        var bikes = (await filteredBikes
             .Include(bike => bike.Place)
             .Include(bike => bike.Model)
+            .Where(bike => !bike.Place!.IsStorage)
+            .Where(bike => !bike.InternetSale)
             .GroupBy(bike => bike.Place)
             .ToListAsync()).OrderBy(group => group.Key!.PlaceId);
 
@@ -321,6 +347,20 @@ public class SalesDataController : ControllerBase
                             (even ? 2 : 1)
                 };
             }).ToDictionary(group => group.Place, group => (object)group.Value);
+        // Internet segment
+        var internetBikes = await filteredBikes.Include(bike => bike.Model)
+            .Where(bike => bike.InternetSale).ToListAsync();
+        var internetCount = internetBikes.Count();
+        var internetEven = internetCount % 2 == 0;
+        var internetMedian = internetBikes
+                                 .OrderBy(bike => (bike.Model!.Price - bike.SalePrice!.Value) * 100 / bike.Model!.Price)
+                                 .Skip(internetCount / 2 - (internetEven ? 1 : 0))
+                                 .Take(internetEven ? 2 : 1)
+                                 .Sum(middle =>
+                                     (middle.Model!.Price - middle.SalePrice!.Value) * 100 / middle.Model!.Price) /
+                             (internetEven ? 2 : 1);
+        result.Add("Internet", internetMedian);
+        // Add date
         result.Add("date", $"{dateRange.Since:yyyy-MM-dd} - {dateRange.Until:yyyy-MM-dd}");
         return Ok(new List<Dictionary<string, object>> { result });
     }
@@ -334,9 +374,12 @@ public class SalesDataController : ControllerBase
             return Ok(new Dictionary<string, object>());
         }
 
-        var bikes = (await FilterByDateQueryable(_context.Bikes.Where(bike => bike.SaleDate != null),
-                dateRange.Since.Value, dateRange.Until.Value)
+        var filteredBikes = FilterByDateQueryable(_context.Bikes.Where(bike => bike.SaleDate != null),
+            dateRange.Since.Value, dateRange.Until.Value);
+        var bikes = (await filteredBikes
             .Include(bike => bike.Place)
+            .Where(bike => !bike.Place!.IsStorage)
+            .Where(bike => !bike.InternetSale)
             .GroupBy(bike => bike.Place)
             .ToListAsync()).OrderBy(group => group.Key!.PlaceId);
 
@@ -346,6 +389,11 @@ public class SalesDataController : ControllerBase
                 Place = group.Key!.PlaceName,
                 Value = group.Sum(bike => bike.SalePrice!.Value)
             }).ToDictionary(group => group.Place, group => (object)group.Value);
+        // Internet segment
+        var internetBikes = await filteredBikes.Where(bike => bike.InternetSale).ToListAsync();
+        var internetMedian = internetBikes.Sum(bike => bike.SalePrice!.Value);
+        result.Add("Internet", internetMedian);
+        // Add date
         result.Add("date", $"{dateRange.Since:yyyy-MM-dd} - {dateRange.Until:yyyy-MM-dd}");
         return Ok(new List<Dictionary<string, object>> { result });
     }
@@ -384,6 +432,14 @@ public class SalesDataController : ControllerBase
         return Ok(new List<Dictionary<string, object>> { result });
     }
 
+    /// <summary>
+    /// Creates Enumerable containing dates in ascending order. If interval is other than day, returns dates with interval, first day of interval.
+    /// Example - since: 01/01/2025, until: 09/03/2025, interval: "month", result: [01/01/2025, 01/02/2025, 01/03/2025]
+    /// </summary>
+    /// <param name="since">Date range start</param>
+    /// <param name="until">Date range end</param>
+    /// <param name="interval"></param>
+    /// <returns>IEnumerable of DateOnly of dates every interval</returns>
     private IEnumerable<DateOnly> CreateDates(DateOnly since, DateOnly until, string interval)
     {
         if (interval == "year")
@@ -404,9 +460,18 @@ public class SalesDataController : ControllerBase
             .Select(since.AddDays);
     }
 
+    /// <summary>
+    /// Creates Enumerable of sum of bikes sold in date range with some summing interval.
+    /// </summary>
+    /// <param name="since">Date range start</param>
+    /// <param name="until">Date range end</param>
+    /// <param name="interval">Grouping interval - day, month, year. Defaults to day</param>
+    /// <param name="placeId">Id of place to create the series. -1 for internet sales</param>
+    /// <returns>Enumerable of DateAndPriceDto - Date and Int</returns>
     private async Task<IEnumerable<DateAndPriceDto>> CreateSeriesAsync(DateOnly since, DateOnly until, string interval,
         short placeId)
     {
+        // Create tuples of dates and prices
         IEnumerable<(DateOnly Date, int Price)> dates =
             CreateDates(since, until, interval).Select(date =>
                 (
@@ -414,8 +479,14 @@ public class SalesDataController : ControllerBase
                     Price: 0
                 )
             );
-        var sales = _context.Bikes.Where(bike => bike.PlaceId == placeId);
+        IQueryable<Bike> sales;
+        // If id is -1 - internet sales, otherwise bikes not sold by internet
+        sales = placeId == -1 ? _context.Bikes.Where(bike => bike.InternetSale) 
+            : _context.Bikes.Where(bike => bike.PlaceId == placeId).Where(bike => !bike.InternetSale);
+        
+        // Bikes filtered by date
         sales = FilterByDateQueryable(sales, since, until);
+        //Group by interval
         var groupResult = interval switch
         {
             "year" => sales.GroupBy(sale => sale.SaleDate!.Value.Year)
@@ -437,9 +508,10 @@ public class SalesDataController : ControllerBase
                     Price = bikeGroup.Sum(bike => bike.SalePrice!.Value)
                 })
         };
-
+        // Order by date
         var queryResult = await groupResult.OrderBy(bike => bike.Date)
             .ToDictionaryAsync(record => record.Date, record => record.Price);
+        // Return sums for each interval
         var result = dates
             .Select(record => new DateAndPriceDto
             {
@@ -448,7 +520,13 @@ public class SalesDataController : ControllerBase
             }).ToList();
         return result;
     }
-
+    /// <summary>
+    /// Finds all sold bikes and filters by date.
+    /// </summary>
+    /// <param name="bikes">Bikes IQueryable to filter</param>
+    /// <param name="since">Date range start</param>
+    /// <param name="until">Date range end</param>
+    /// <returns>Sold bikes IQueryable filtered by date</returns>
     private IQueryable<Bike> FilterByDateQueryable(IQueryable<Bike> bikes, DateOnly since, DateOnly until)
     {
         return bikes.Where(bike => bike.SaleDate != null
@@ -458,6 +536,13 @@ public class SalesDataController : ControllerBase
         );
     }
 
+    /// <summary>
+    /// Creates 2 DateTime dates which are marking date range.
+    /// If since and until are null it creates dates based on first and last sale and if no bikes were sold - 2 nulls.
+    /// </summary>
+    /// <param name="since">First date in range</param>
+    /// <param name="until">Last date in range</param>
+    /// <returns>Tuple of DateTime dates or 2 nulls if no bikes were ever sold and passed args are nulls</returns>
     private async Task<(DateOnly? Since, DateOnly? Until)> PrepareDatesAsync(DateTime? since, DateTime? until)
     {
         DateOnly? sinceOnly = null;
