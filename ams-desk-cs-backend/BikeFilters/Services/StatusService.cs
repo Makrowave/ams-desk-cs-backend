@@ -120,6 +120,7 @@ public class StatusService : IStatusService
         {
             StatusId = status.StatusId,
             StatusName = status.StatusName,
+            HexCode = status.HexCode,
         };
         return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -139,6 +140,7 @@ public class StatusService : IStatusService
         {
             StatusId = oldStatus.StatusId,
             StatusName = oldStatus.StatusName,
+            HexCode = oldStatus.HexCode,
         };
         return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, result);
     }
