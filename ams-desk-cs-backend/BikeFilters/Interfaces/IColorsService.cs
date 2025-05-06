@@ -9,7 +9,7 @@ public interface IColorsService
     public Task<ServiceResult<ColorDto>> GetColor(short id);
     public Task<ServiceResult<ColorDto>> PostColor(ColorDto color);
     public Task<ServiceResult<ColorDto>> UpdateColor(short id, ColorDto color);
-    public Task<ServiceResult> ChangeOrder(short firstId, short lastId);
+    public Task<ServiceResult<List<ColorDto>>> ChangeOrder(short source, short dest);
     public Task<ServiceResult> DeleteColor(short id);
 
 }

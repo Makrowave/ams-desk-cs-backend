@@ -10,6 +10,6 @@ public interface IStatusService
     public Task<ServiceResult<StatusDto>> GetStatus(short id);
     public Task<ServiceResult<StatusDto>> PostStatus(StatusDto color);
     public Task<ServiceResult<StatusDto>> UpdateStatus(short id, StatusDto color);
-    public Task<ServiceResult> ChangeOrder(short firstId, short lastId);
+    public Task<ServiceResult<List<StatusDto>>> ChangeOrder(short source, short dest);
     public Task<ServiceResult> DeleteStatus(short id);
 }

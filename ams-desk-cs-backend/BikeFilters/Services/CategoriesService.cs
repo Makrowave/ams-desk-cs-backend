@@ -61,23 +61,52 @@ public class CategoriesService : ICategoriesService
         return new ServiceResult<CategoryDto>(ServiceStatus.Ok, string.Empty, result);
 
     }
-    public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+    public async Task<ServiceResult<List<CategoryDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Categories.Any(category => category.CategoryId == firstId || category.CategoryId == lastId))
+        if (!_context.Categories.Any(c => c.CategoryId == source || c.CategoryId == dest))
         {
-            return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            return ServiceResult<List<CategoryDto>>.NotFound("Nie znaleziono zamienianych elementów");
         }
-        var categories = await _context.Categories.OrderBy(category => category.CategoriesOrder).ToListAsync();
-        var firstOrder = categories.FirstOrDefault(category => category.CategoryId == firstId)!.CategoriesOrder;
-        var lastOrder = categories.FirstOrDefault(category => category.CategoryId == lastId)!.CategoriesOrder;
+        
+        var categories = await _context.Categories.OrderBy(c => c.CategoriesOrder).ToListAsync();
+        
+        var firstCategory = categories.First(c => c.CategoryId == source);
+        var lastCategory = categories.First(c => c.CategoryId == dest);
+        var firstOrder = firstCategory.CategoriesOrder;
+        var lastOrder = lastCategory.CategoriesOrder;
 
-        var filteredCategories =
-            categories.Where(category => category.CategoriesOrder >= firstOrder && category.CategoriesOrder <= lastOrder).ToList();
-        filteredCategories.ForEach(category => category.CategoriesOrder++);
-        filteredCategories.Last().CategoriesOrder = firstOrder;
+        if (firstOrder < lastOrder)
+        {
+            var toShift = categories
+                .Where(c => c.CategoriesOrder > firstOrder && c.CategoriesOrder <= lastOrder)
+                .ToList();
+
+            toShift.ForEach(c => c.CategoriesOrder--);
+            firstCategory.CategoriesOrder = lastOrder;
+        }
+        else if (firstOrder > lastOrder)
+        {
+            var toShift = categories
+                .Where(c => c.CategoriesOrder >= lastOrder && c.CategoriesOrder < firstOrder)
+                .ToList();
+
+            toShift.ForEach(c => c.CategoriesOrder++);
+            firstCategory.CategoriesOrder = lastOrder;
+        }
+
         await _context.SaveChangesAsync();
-        return new ServiceResult(ServiceStatus.Ok, string.Empty);
+
+        var result = await _context.Categories
+            .OrderBy(c => c.CategoriesOrder)
+            .Select(c => new CategoryDto
+            {
+                CategoryId = c.CategoryId,
+                CategoryName = c.CategoryName,
+            }).ToListAsync();
+
+        return new ServiceResult<List<CategoryDto>>(ServiceStatus.Ok, string.Empty, result);
     }
+
     public async Task<ServiceResult> DeleteCategory(short id)
     {
         try

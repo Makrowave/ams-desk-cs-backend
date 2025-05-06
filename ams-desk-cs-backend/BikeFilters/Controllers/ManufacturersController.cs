@@ -67,7 +67,7 @@ public class ManufacturersController : ControllerBase
             return BadRequest(result.Message);
         }
 
-        return Ok();
+        return Ok(result.Data);
     }
 
     [HttpDelete("{id}")]

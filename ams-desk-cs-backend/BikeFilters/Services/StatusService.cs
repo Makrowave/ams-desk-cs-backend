@@ -56,22 +56,54 @@ public class StatusService : IStatusService
             }).OrderBy(status => status.StatusId).ToListAsync();
         return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
     }
-    public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+    public async Task<ServiceResult<List<StatusDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Statuses.Any(status => status.StatusId == firstId || status.StatusId == lastId))
+        if (!_context.Statuses.Any(s => s.StatusId == source || s.StatusId == dest))
         {
-            return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            return ServiceResult<List<StatusDto>>.NotFound("Nie znaleziono zamienianych elementów");
         }
-        var statuses = await _context.Statuses.OrderBy(status => status.StatusesOrder).ToListAsync();
-        var firstOrder = statuses.FirstOrDefault(status => status.StatusId == firstId)!.StatusesOrder;
-        var lastOrder = statuses.FirstOrDefault(status => status.StatusId == lastId)!.StatusesOrder;
 
-        var filteredStatuses = statuses.Where(status => status.StatusesOrder >= firstOrder && status.StatusesOrder <= lastOrder).ToList();
-        filteredStatuses.ForEach(status => status.StatusesOrder++);
-        filteredStatuses.Last().StatusesOrder = firstOrder;
+        var statuses = await _context.Statuses.OrderBy(s => s.StatusesOrder).ToListAsync();
+        var sourceStatus = statuses.First(s => s.StatusId == source);
+        var destStatus = statuses.First(s => s.StatusId == dest);
+
+        var sourceOrder = sourceStatus.StatusesOrder;
+        var destOrder = destStatus.StatusesOrder;
+
+        if (sourceOrder < destOrder)
+        {
+            statuses
+                .Where(s => s.StatusesOrder > sourceOrder && s.StatusesOrder <= destOrder)
+                .ToList()
+                .ForEach(s => s.StatusesOrder--);
+
+            sourceStatus.StatusesOrder = destOrder;
+        }
+        else if (sourceOrder > destOrder)
+        {
+            statuses
+                .Where(s => s.StatusesOrder >= destOrder && s.StatusesOrder < sourceOrder)
+                .ToList()
+                .ForEach(s => s.StatusesOrder++);
+
+            sourceStatus.StatusesOrder = destOrder;
+        }
+
         await _context.SaveChangesAsync();
-        return new ServiceResult(ServiceStatus.Ok, string.Empty);
+
+        var result = await _context.Statuses
+            .OrderBy(s => s.StatusesOrder)
+            .Select(s => new StatusDto
+            {
+                StatusId = s.StatusId,
+                StatusName = s.StatusName,
+                HexCode = s.HexCode
+            })
+            .ToListAsync();
+
+        return new ServiceResult<List<StatusDto>>(ServiceStatus.Ok, string.Empty, result);
     }
+
 
     public async Task<ServiceResult<StatusDto>> PostStatus(StatusDto statusDto)
     {

@@ -63,34 +63,53 @@ public class ManufacturersService : IManufacturersService
         return new ServiceResult<ManufacturerDto>(ServiceStatus.Ok, string.Empty, result);
     }
 
-    public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+    public async Task<ServiceResult<List<ManufacturerDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Manufacturers.Any(manufacturer =>
-                manufacturer.ManufacturerId == firstId 
-                || manufacturer.ManufacturerId == lastId))
+        if (!_context.Manufacturers.Any(m => m.ManufacturerId == source || m.ManufacturerId == dest))
         {
-            return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            return ServiceResult<List<ManufacturerDto>>.NotFound("Nie znaleziono zamienianych elementów");
         }
 
-        var manufacturers = await _context.Manufacturers
-            .OrderBy(manufacturer => manufacturer.ManufacturersOrder)
-            .ToListAsync();
-        var firstOrder = manufacturers.
-            FirstOrDefault(manufacturer => manufacturer.ManufacturerId == firstId)!
-            .ManufacturersOrder;
-        var lastOrder = manufacturers
-            .FirstOrDefault(manufacturer => manufacturer.ManufacturerId == lastId)!
-            .ManufacturersOrder;
+        var manufacturers = await _context.Manufacturers.OrderBy(m => m.ManufacturersOrder).ToListAsync();
+        var sourceManufacturer = manufacturers.First(m => m.ManufacturerId == source);
+        var destManufacturer = manufacturers.First(m => m.ManufacturerId == dest);
 
-        var filteredManufacturers =
-            manufacturers.Where(manufacturer =>
-                    manufacturer.ManufacturersOrder >= firstOrder && manufacturer.ManufacturersOrder <= lastOrder)
-                .ToList();
-        filteredManufacturers.ForEach(manufacturer => manufacturer.ManufacturersOrder++);
-        filteredManufacturers.Last().ManufacturersOrder = firstOrder;
+        var sourceOrder = sourceManufacturer.ManufacturersOrder;
+        var destOrder = destManufacturer.ManufacturersOrder;
+
+        if (sourceOrder < destOrder)
+        {
+            manufacturers
+                .Where(m => m.ManufacturersOrder > sourceOrder && m.ManufacturersOrder <= destOrder)
+                .ToList()
+                .ForEach(m => m.ManufacturersOrder--);
+
+            sourceManufacturer.ManufacturersOrder = destOrder;
+        }
+        else if (sourceOrder > destOrder)
+        {
+            manufacturers
+                .Where(m => m.ManufacturersOrder >= destOrder && m.ManufacturersOrder < sourceOrder)
+                .ToList()
+                .ForEach(m => m.ManufacturersOrder++);
+
+            sourceManufacturer.ManufacturersOrder = destOrder;
+        }
+
         await _context.SaveChangesAsync();
-        return new ServiceResult(ServiceStatus.Ok, string.Empty);
+
+        var result = await _context.Manufacturers
+            .OrderBy(m => m.ManufacturersOrder)
+            .Select(m => new ManufacturerDto
+            {
+                ManufacturerId = m.ManufacturerId,
+                ManufacturerName = m.ManufacturerName
+            })
+            .ToListAsync();
+
+        return new ServiceResult<List<ManufacturerDto>>(ServiceStatus.Ok, string.Empty, result);
     }
+
 
     public async Task<ServiceResult> DeleteManufacturer(short id)
     {

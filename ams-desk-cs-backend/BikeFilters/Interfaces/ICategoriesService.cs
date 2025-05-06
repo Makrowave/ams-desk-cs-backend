@@ -8,7 +8,7 @@ public interface ICategoriesService
     public Task<ServiceResult<IEnumerable<CategoryDto>>> GetCategories();
     public Task<ServiceResult<CategoryDto>> PostCategory(CategoryDto category);
     public Task<ServiceResult<CategoryDto>> UpdateCategory(short id, CategoryDto category);
-    public Task<ServiceResult> ChangeOrder(short firstId, short lastId);
+    public Task<ServiceResult<List<CategoryDto>>> ChangeOrder(short source, short dest);
     public Task<ServiceResult> DeleteCategory(short id);
 
 }
