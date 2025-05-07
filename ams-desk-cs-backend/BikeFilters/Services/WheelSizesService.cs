@@ -22,18 +22,22 @@ public class WheelSizesService : IWheelSizesService
         return new ServiceResult<IEnumerable<WheelSizeDto>>(ServiceStatus.Ok, string.Empty, wheelSizesDto);
     }
 
-    public async Task<ServiceResult> PostWheelSize(short wheelSize)
+    public async Task<ServiceResult<WheelSizeDto>> PostWheelSize(decimal wheelSize)
     {
         var existingWheelSize = await _context.WheelSizes.FindAsync(wheelSize);
         if (existingWheelSize != null && wheelSize != 0)
         {
-            return new ServiceResult(ServiceStatus.BadRequest, "Rozmiar koła już istnieje");
+            return ServiceResult<WheelSizeDto>.BadRequest("Rozmiar koła już istnieje");
         }
         _context.WheelSizes.Add(new WheelSize { WheelSizeId = wheelSize });
         await _context.SaveChangesAsync();
-        return new ServiceResult(ServiceStatus.Ok, string.Empty);
+        return new ServiceResult<WheelSizeDto>(
+            ServiceStatus.Ok, 
+            string.Empty, 
+            new WheelSizeDto { Key = wheelSize, Value = wheelSize }
+            );
     }
-    public async Task<ServiceResult> DeleteWheelSize(short wheelSize)
+    public async Task<ServiceResult> DeleteWheelSize(decimal wheelSize)
     {
         try
         {

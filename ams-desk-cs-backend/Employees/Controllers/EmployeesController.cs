@@ -60,7 +60,7 @@ public class EmployeesController : ControllerBase
         {
             return BadRequest(result.Message);
         }
-        return Ok();
+        return Ok(result.Data);
     }
     [HttpDelete("{id}")]
     [Authorize(Policy = "AdminAccessToken")]

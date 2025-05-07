@@ -21,14 +21,14 @@ public class WheelSizesController : ControllerBase
     // GET: api/WheelSize
     [HttpGet]
     [Authorize(Policy = "AccessToken")]
-    public async Task<ActionResult<IEnumerable<short>>> GetWheelSizes()
+    public async Task<ActionResult<IEnumerable<decimal>>> GetWheelSizes()
     {
         var result = await _wheelSizesService.GetWheelSizes();
         return Ok(result.Data);
     }
-    [HttpPost("{wheelSize}")]
+    [HttpPost()]
     [Authorize(Policy = "AdminAccessToken")]
-    public async Task<IActionResult> AddWheelSize(short wheelSize)
+    public async Task<IActionResult> AddWheelSize([FromQuery] decimal wheelSize)
     {
         _logger.LogWarning(wheelSize.ToString());
         var result = await _wheelSizesService.PostWheelSize(wheelSize);
@@ -36,11 +36,11 @@ public class WheelSizesController : ControllerBase
         {
             return BadRequest(result.Message);
         }
-        return Ok(wheelSize);
+        return Ok(result.Data);
     }
     [HttpDelete("{id}")]
     [Authorize(Policy = "AdminAccessToken")]
-    public async Task<IActionResult> DeleteWheelSize(short id)
+    public async Task<IActionResult> DeleteWheelSize(decimal id)
     {
         var result = await _wheelSizesService.DeleteWheelSize(id);
         if (result.Status == ServiceStatus.NotFound)

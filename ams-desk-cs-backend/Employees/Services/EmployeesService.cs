@@ -63,24 +63,53 @@ public class EmployeesService : IEmployeesService
         return new ServiceResult<EmployeeDto>(ServiceStatus.Ok, string.Empty, result);
     }
 
-    public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+    public async Task<ServiceResult<List<EmployeeDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Employees.Any(employee => employee.EmployeeId == firstId || employee.EmployeeId == lastId))
+        if (!_context.Employees.Any(e => e.EmployeeId == source || e.EmployeeId == dest))
         {
-            return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            return ServiceResult<List<EmployeeDto>>.NotFound("Nie znaleziono zamienianych pracowników");
         }
 
-        var employees = await _context.Employees.OrderBy(employee => employee.EmployeesOrder).ToListAsync();
-        var firstOrder = employees.FirstOrDefault(employee => employee.EmployeeId == firstId)!.EmployeesOrder;
-        var lastOrder = employees.FirstOrDefault(employee => employee.EmployeeId == lastId)!.EmployeesOrder;
+        var employees = await _context.Employees.OrderBy(e => e.EmployeesOrder).ToListAsync();
+        var sourceEmployee = employees.First(e => e.EmployeeId == source);
+        var destEmployee = employees.First(e => e.EmployeeId == dest);
 
-        var filteredEmployees = employees.Where(employee =>
-            employee.EmployeesOrder >= firstOrder && employee.EmployeesOrder <= lastOrder).ToList();
-        filteredEmployees.ForEach(employee => employee.EmployeesOrder++);
-        filteredEmployees.Last().EmployeesOrder = firstOrder;
+        var sourceOrder = sourceEmployee.EmployeesOrder;
+        var destOrder = destEmployee.EmployeesOrder;
+
+        if (sourceOrder < destOrder)
+        {
+            employees
+                .Where(e => e.EmployeesOrder > sourceOrder && e.EmployeesOrder <= destOrder)
+                .ToList()
+                .ForEach(e => e.EmployeesOrder--);
+
+            sourceEmployee.EmployeesOrder = destOrder;
+        }
+        else if (sourceOrder > destOrder)
+        {
+            employees
+                .Where(e => e.EmployeesOrder >= destOrder && e.EmployeesOrder < sourceOrder)
+                .ToList()
+                .ForEach(e => e.EmployeesOrder++);
+
+            sourceEmployee.EmployeesOrder = destOrder;
+        }
+
         await _context.SaveChangesAsync();
-        return new ServiceResult(ServiceStatus.Ok, string.Empty);
+
+        var result = await _context.Employees
+            .OrderBy(e => e.EmployeesOrder)
+            .Select(e => new EmployeeDto
+            {
+                EmployeeId = e.EmployeeId,
+                EmployeeName = e.EmployeeName
+            })
+            .ToListAsync();
+
+        return new ServiceResult<List<EmployeeDto>>(ServiceStatus.Ok, string.Empty, result);
     }
+
 
     public async Task<ServiceResult> DeleteEmployee(short id)
     {
