@@ -27,7 +27,7 @@ public class ServicesController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Policy = "AdminAccessToken")]
-    public async Task<ActionResult<Service>> PutService(short id, Service service)
+    public async Task<ActionResult<ServiceDto>> PutService(short id, ServiceDto service)
     {
         var result = await _servicesService.PutService(id, service);
         if (result.Status == ServiceStatus.NotFound)
@@ -39,7 +39,7 @@ public class ServicesController : ControllerBase
         
     [HttpPost]
     [Authorize(Policy = "AdminAccessToken")]
-    public async Task<ActionResult<Service>> PostService(Service service)
+    public async Task<ActionResult<ServiceDto>> PostService(ServiceDto service)
     {
         var result = await _servicesService.PostService(service);
         return Ok(result.Data);
@@ -60,7 +60,7 @@ public class ServicesController : ControllerBase
         
     [HttpDelete("{id}")]
     [Authorize(Policy = "AdminAccessToken")]
-    public async Task<ActionResult<Part>> DeleteService(short id)
+    public async Task<ActionResult<ServiceDto>> DeleteService(short id)
     {
         var result = await _servicesService.DeleteService(id);
         if (result.Status == ServiceStatus.NotFound)

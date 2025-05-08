@@ -6,10 +6,10 @@ namespace ams_desk_cs_backend.Repairs.Interfaces;
 
 public interface IServicesService
 {
-    public Task<ServiceResult<IEnumerable<Service>>> GetServices();
-    public Task<ServiceResult<IEnumerable<Service>>> GetServicesFromCategory(short categoryId);
+    public Task<ServiceResult<IEnumerable<ServiceDto>>> GetServices();
+    public Task<ServiceResult<IEnumerable<ServiceDto>>> GetServicesFromCategory(short categoryId);
     public Task<ServiceResult<IEnumerable<ServiceCategoryDto>>> GetServiceCategories();
-    public Task<ServiceResult<Service>> PutService(short id, Service service);
+    public Task<ServiceResult<ServiceDto>> PutService(short id, ServiceDto service);
     public Task<ServiceResult> DeleteService(short id);
-    public Task<ServiceResult<Service>> PostService(Service service);
+    public Task<ServiceResult<ServiceDto>> PostService(ServiceDto service);
 }

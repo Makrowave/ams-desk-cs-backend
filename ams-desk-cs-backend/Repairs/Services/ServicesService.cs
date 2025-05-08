@@ -16,41 +16,27 @@ public class ServicesService : IServicesService
     }
 
 
-    public async Task<ServiceResult<IEnumerable<Service>>> GetServices()
+    public async Task<ServiceResult<IEnumerable<ServiceDto>>> GetServices()
     {
         var services = await _context.Services
             .Include(service => service.ServicesDone)
             .Include(service => service.ServiceCategory)
             .OrderByDescending(service => service.ServicesDone.Count())
-            .Select(service => new Service
-            {
-                ServiceId = service.ServiceId,
-                ServiceCategoryId = service.ServiceCategoryId,
-                ServiceName = service.ServiceName,
-                Price = service.Price,
-                ServiceCategory = service.ServiceCategory
-            }).ToListAsync();
+            .Select(service => new ServiceDto(service)).ToListAsync();
         services.ForEach(service => service.ServiceCategory!.Services = []);
-        return new ServiceResult<IEnumerable<Service>>(ServiceStatus.Ok, string.Empty, services);
+        return new ServiceResult<IEnumerable<ServiceDto>>(ServiceStatus.Ok, string.Empty, services);
     }
 
-    public async Task<ServiceResult<IEnumerable<Service>>> GetServicesFromCategory(short categoryId)
+    public async Task<ServiceResult<IEnumerable<ServiceDto>>> GetServicesFromCategory(short categoryId)
     {
         var services = await _context.Services
             .Include(service => service.ServicesDone)
             .Include(service => service.ServiceCategory)
             .Where(service => service.ServiceCategoryId == categoryId || categoryId == 0)
             .OrderByDescending(service => service.ServicesDone.Count())
-            .Select(service => new Service
-            {
-                ServiceId = service.ServiceId,
-                ServiceCategoryId = service.ServiceCategoryId,
-                ServiceName = service.ServiceName,
-                Price = service.Price,
-                ServiceCategory = service.ServiceCategory
-            }).ToListAsync();
+            .Select(service => new ServiceDto(service)).ToListAsync();
         services.ForEach(service => service.ServiceCategory!.Services = []);
-        return new ServiceResult<IEnumerable<Service>>(ServiceStatus.Ok, string.Empty, services);
+        return new ServiceResult<IEnumerable<ServiceDto>>(ServiceStatus.Ok, string.Empty, services);
     }
 
     public async Task<ServiceResult<IEnumerable<ServiceCategoryDto>>> GetServiceCategories()
@@ -63,18 +49,18 @@ public class ServicesService : IServicesService
         return new ServiceResult<IEnumerable<ServiceCategoryDto>>(ServiceStatus.Ok, string.Empty, categories);
     }
 
-    public async Task<ServiceResult<Service>> PutService(short id, Service service)
+    public async Task<ServiceResult<ServiceDto>> PutService(short id, ServiceDto service)
     {
         var existingService = await _context.Services.FindAsync(id);
         if (existingService == null)
         {
-            return ServiceResult<Service>.NotFound("Nie znaleziono usługi");
+            return ServiceResult<ServiceDto>.NotFound("Nie znaleziono usługi");
         }
         existingService.Price = service.Price;
         existingService.ServiceCategoryId = service.ServiceCategoryId;
         existingService.ServiceName = service.ServiceName;
         await _context.SaveChangesAsync();
-        return new ServiceResult<Service>(ServiceStatus.Ok, string.Empty, existingService);
+        return new ServiceResult<ServiceDto>(ServiceStatus.Ok, string.Empty, new ServiceDto(existingService));
     }
 
     public async Task<ServiceResult> DeleteService(short id)
@@ -89,10 +75,11 @@ public class ServicesService : IServicesService
         return new ServiceResult(ServiceStatus.Ok, string.Empty);
     }
 
-    public async Task<ServiceResult<Service>> PostService(Service service)
+    public async Task<ServiceResult<ServiceDto>> PostService(ServiceDto dto)
     {
+        var service = new Service(dto);
         _context.Services.Add(service);
         await _context.SaveChangesAsync();
-        return new ServiceResult<Service>(ServiceStatus.Ok, string.Empty, service);
+        return new ServiceResult<ServiceDto>(ServiceStatus.Ok, string.Empty, new ServiceDto(service));
     }
 }
