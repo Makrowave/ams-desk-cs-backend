@@ -1,4 +1,5 @@
 ﻿using ams_desk_cs_backend.Data;
+using ams_desk_cs_backend.Data.Models;
 using ams_desk_cs_backend.Places.Dtos;
 using ams_desk_cs_backend.Places.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
@@ -16,18 +17,23 @@ public class PlaceService : IPlacesService
     public async Task<ServiceResult<IEnumerable<PlaceDto>>> GetPlaces()
     {
         var places = await _context.Places.OrderBy(place => place.PlacesOrder)
-            .Select(place => new PlaceDto
-            {
-                PlaceId = place.PlaceId,
-                PlaceName = place.PlaceName,
-            }).ToListAsync();
+            .Select(place => new PlaceDto(place)).ToListAsync();
         return new ServiceResult<IEnumerable<PlaceDto>>(ServiceStatus.Ok, string.Empty, places);
     }
-    public async Task<ServiceResult> ChangeOrder(short firstId, short lastId)
+
+    public async Task<ServiceResult<IEnumerable<PlaceDto>>> GetPlacesNotStorage()
+    {
+        var places = await _context.Places.OrderBy(place => place.PlacesOrder)
+            .Where(place => !place.IsStorage)
+            .Select(place => new PlaceDto(place)).ToListAsync();
+        return new ServiceResult<IEnumerable<PlaceDto>>(ServiceStatus.Ok, string.Empty, places);
+    }
+
+    public async Task<ServiceResult<IEnumerable<PlaceDto>>> ChangeOrder(short firstId, short lastId)
     {
         if (!_context.Places.Any(place => place.PlaceId == firstId || place.PlaceId == lastId))
         {
-            return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono zamienianych elementów");
+            return ServiceResult<IEnumerable<PlaceDto>>.NotFound("Nie znaleziono zamienianych elementów");
         }
         var places = await _context.Places.OrderBy(place => place.PlacesOrder).ToListAsync();
         var firstOrder = places.FirstOrDefault(place => place.PlaceId == firstId)!.PlacesOrder;
@@ -37,18 +43,54 @@ public class PlaceService : IPlacesService
         filteredPlaces.ForEach(place => place.PlacesOrder++);
         filteredPlaces.Last().PlacesOrder = firstOrder;
         await _context.SaveChangesAsync();
-        return new ServiceResult(ServiceStatus.Ok, string.Empty);
+        var result = await _context.Places.OrderBy(place => place.PlacesOrder)
+            .Select(place => new PlaceDto(place))
+            .ToListAsync();
+        return new ServiceResult<IEnumerable<PlaceDto>>(ServiceStatus.Ok, string.Empty, result);
     }
 
-    public async  Task<ServiceResult> SetStorage(short placeId, bool isStorage)
+    public async Task<ServiceResult<PlaceDto>> PostPlace(PlaceDto placeDto)
     {
-       var place  = await _context.Places.FirstOrDefaultAsync(place => place.PlaceId == placeId);
-       if (place == null)
-       {
-           return ServiceResult.NotFound("Nie znaleziono miejsca");
-       }
-       place.IsStorage = isStorage;
-       await _context.SaveChangesAsync();
-       return new ServiceResult(ServiceStatus.Ok, string.Empty);
+        var places = await _context.Places.OrderBy(place => place.PlacesOrder).ToListAsync();
+        var oldPlace = places.FirstOrDefault(place => place.PlaceId == placeDto.PlaceId);
+        if (oldPlace != null)
+        {
+            return ServiceResult<PlaceDto>.BadRequest("Miejsce już istnieje");
+        }
+
+        var place = new Place
+        {
+            PlaceName = placeDto.PlaceName,
+            IsStorage = placeDto.IsStorage,
+            PlacesOrder = (short)((places.LastOrDefault()?.PlacesOrder ?? 0) + 1)
+        };
+        _context.Places.Add(place);
+        await _context.SaveChangesAsync();
+        return new ServiceResult<PlaceDto>(ServiceStatus.Ok, string.Empty, new PlaceDto(place));
+    }
+
+    public async Task<ServiceResult<PlaceDto>> PutPlace(short id, PlaceDto placeDto)
+    {
+        var place = await _context.Places.FindAsync(id);
+        if (place == null)
+        {
+            return ServiceResult<PlaceDto>.NotFound("Nie znaleziono miejsca");
+        }
+        place.PlaceName = placeDto.PlaceName;
+        place.IsStorage = placeDto.IsStorage;
+        await _context.SaveChangesAsync();
+        return new ServiceResult<PlaceDto>(ServiceStatus.Ok, string.Empty, new PlaceDto(place));
+    }
+
+    public async Task<ServiceResult> DeletePlace(short id)
+    {
+        var place = await _context.Places.FindAsync(id);
+        if (place == null)
+        {
+            return ServiceResult.NotFound("Nie znaleziono miejsca");
+        }
+        _context.Places.Remove(place);
+        await _context.SaveChangesAsync();
+        return new ServiceResult(ServiceStatus.Ok, string.Empty);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ams_desk_cs_backend.Data.Models;
+using ams_desk_cs_backend.Places.Dtos;
 using ams_desk_cs_backend.Places.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.AspNetCore.Authorization;
@@ -20,10 +21,49 @@ public class PlacesController : ControllerBase
 
     // GET: api/Places
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Place>>> GetPlaces()
+    public async Task<ActionResult<IEnumerable<PlaceDto>>> GetPlaces()
     {
         var result = await _placeService.GetPlaces();
         return Ok(result.Data);
+    }
+    [HttpGet("NotStorage")]
+    public async Task<ActionResult<IEnumerable<PlaceDto>>> GetNotStorage()
+    {
+        var result = await _placeService.GetPlacesNotStorage();
+        return Ok(result.Data);
+    }
+
+    
+    [HttpPost]
+    [Authorize(Policy = "AdminAccessToken")]
+    public async Task<ActionResult<PlaceDto>> PostPlace(PlaceDto place)
+    {
+        var result = await _placeService.PostPlace(place);
+        
+        return Ok(result.Data);
+    }
+    
+    [HttpPut("{id}")]
+    [Authorize(Policy = "AdminAccessToken")]
+    public async Task<ActionResult<PlaceDto>> PutPlace(short id, PlaceDto place)
+    {
+        var result = await _placeService.PutPlace(id, place);
+        if (result.Status == ServiceStatus.NotFound)
+        {
+            return NotFound(result.Message);
+        }
+        return Ok(result.Data);
+    }
+    [HttpDelete("{id}")]
+    [Authorize(Policy = "AdminAccessToken")]
+    public async Task<ActionResult<PlaceDto>> DeletePlace(short id)
+    {
+        var result = await _placeService.DeletePlace(id);
+        if (result.Status == ServiceStatus.NotFound)
+        {
+            return NotFound(result.Message);
+        }
+        return Ok();
     }
     [HttpPut("ChangeOrder")]
     [Authorize(Policy = "AdminAccessToken")]
@@ -37,18 +77,6 @@ public class PlacesController : ControllerBase
         if (result.Status == ServiceStatus.BadRequest)
         {
             return BadRequest(result.Message);
-        }
-        return Ok();
-    }
-
-    [HttpPut("SetStorage")]
-    [Authorize(Policy = "AdminAccessToken")]
-    public async Task<ActionResult> SetStorage(short placeId, bool isStorage)
-    {
-        var result = await _placeService.SetStorage(placeId, isStorage);
-        if (result.Status == ServiceStatus.NotFound)
-        {
-            return NotFound(result.Message);
         }
         return Ok();
     }
