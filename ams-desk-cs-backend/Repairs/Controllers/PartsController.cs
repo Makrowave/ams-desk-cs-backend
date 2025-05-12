@@ -1,4 +1,5 @@
 ﻿using ams_desk_cs_backend.Data.Models.Repairs;
+using ams_desk_cs_backend.Repairs.Dtos;
 using ams_desk_cs_backend.Repairs.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.AspNetCore.Authorization;
@@ -42,6 +43,17 @@ public class PartsController : ControllerBase
     public async Task<ActionResult<Part>> UpdatePart(int id, Part part)
     {
         var result = await _partsService.ChangePart(id, part);
+        if (result.Status == ServiceStatus.NotFound)
+        {
+            return NotFound(result.Message);
+        }
+        return Ok(result.Data);
+    }
+
+    [HttpPut("Merge")]
+    public async Task<IActionResult> MergeParts(MergePartsDto dto)
+    {
+        var result = await _partsService.MergeParts(dto.Id1, dto.Id2, dto.Part);
         if (result.Status == ServiceStatus.NotFound)
         {
             return NotFound(result.Message);

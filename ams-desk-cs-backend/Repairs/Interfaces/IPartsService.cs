@@ -9,5 +9,6 @@ public interface IPartsService
     public Task<ServiceResult<IEnumerable<Part>>> GetFilteredParts(short categoryId, short typeId);
     public Task<ServiceResult<Part>> AddPart(Part part);
     public Task<ServiceResult<Part>> ChangePart(int partId, Part part);
+    public Task<ServiceResult<Dictionary<string, object>>> MergeParts(int id1, int id2, Part part);
     public Task<ServiceResult> DeletePart(int id);
 }
