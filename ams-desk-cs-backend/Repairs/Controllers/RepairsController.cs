@@ -61,6 +61,18 @@ public class RepairsController : ControllerBase
 
         return Ok(result.Data);
     }
+    [HttpPut("UpdateIssue/{id}")]
+    public async Task<ActionResult<RepairDto>> UpdateRepairIssue(int id, NewRepairDto newRepair)
+    {
+
+        var result = await _repairsService.UpdateRepairIssue(id, newRepair);
+        if (result.Status == ServiceStatus.NotFound)
+        {
+            return NotFound(result.Message);
+        }
+
+        return Ok(result.Data);
+    }
 
     [HttpPut("Status/{id}")]
     public async Task<ActionResult<RepairDto>> UpdateRepairStatus(int id, short statusId)

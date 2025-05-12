@@ -120,31 +120,44 @@ public class RepairsService : IRepairsService
         return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, result);
     }
 
+    public async Task<ServiceResult<RepairDto>> UpdateRepairIssue(int id, NewRepairDto newRepair)
+    {
+        var oldRepair = await GetRepairFromDbAsync(id); 
+        if (oldRepair == null)
+        {
+            return ServiceResult<RepairDto>.NotFound("Nie znaleziono zgłoszenia.");
+        }
+        oldRepair.PhoneNumber = newRepair.PhoneNumber;
+        oldRepair.BikeName = newRepair.BikeName;
+        oldRepair.Issue = newRepair.Issue;
+        oldRepair.PlaceId = newRepair.PlaceId;
+        oldRepair.TakeInEmployeeId = newRepair.TakeInEmployeeId;
+        await _context.SaveChangesAsync();
+        var result = new RepairDto((await GetRepairFromDbAsync(id))!);
+        return new ServiceResult<RepairDto>(ServiceStatus.Ok, string.Empty, result);
+    }
+
     public async Task<ServiceResult<RepairDto>> UpdateStatus(int id, short statusId)
     {
         var oldRepair = await GetRepairFromDbAsync(id);
         if (oldRepair == null)
         {
-            return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
-                "Nie znaleziono zgłoszenia.", null);
+            return ServiceResult<RepairDto>.NotFound("Nie znaleziono zgłoszenia.");
         }
 
         if ((RepairStatuses)statusId == RepairStatuses.Pending)
         {
-            return new ServiceResult<RepairDto>(ServiceStatus.BadRequest,
-                "Nie można zmienić statusu na oczekujący", null);
+            return ServiceResult<RepairDto>.BadRequest("Nie można zmienić statusu na oczekujący");
         }
 
         if (oldRepair.StatusId == (short)RepairStatuses.Collected)
         {
-            return new ServiceResult<RepairDto>(ServiceStatus.BadRequest,
-                "Nie można edytować ukończonego zgłoszenia", null);
+            return ServiceResult<RepairDto>.BadRequest("Nie można edytować ukończonego zgłoszenia");
         }
 
         if (await _context.RepairStatuses.FindAsync(statusId) == null)
         {
-            return new ServiceResult<RepairDto>(ServiceStatus.NotFound,
-                "Nie znaleziono statusu.", null);
+            return ServiceResult<RepairDto>.BadRequest("Nie znaleziono statusu.");
         }
 
         if ((RepairStatuses)statusId == RepairStatuses.Collected)

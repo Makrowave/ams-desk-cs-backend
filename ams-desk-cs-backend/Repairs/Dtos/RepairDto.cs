@@ -7,7 +7,7 @@ namespace ams_desk_cs_backend.Repairs.Dtos;
 public class RepairDto
 {
     public RepairDto() { }
-    public RepairDto(Data.Models.Repairs.Repair repair)
+    public RepairDto(Repair repair)
     {
         RepairId = repair.RepairId;
         PhoneNumber = repair.PhoneNumber;
