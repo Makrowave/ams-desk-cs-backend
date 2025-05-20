@@ -1,4 +1,6 @@
 ﻿using ams_desk_cs_backend.Data.Models;
+using ams_desk_cs_backend.Data.Models.Deliveries;
+using ams_desk_cs_backend.Data.Models.Messages;
 using ams_desk_cs_backend.Data.Models.Repairs;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,20 +36,24 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<PartType> PartTypes { get; set; }
     public virtual DbSet<PartCategory> PartCategories { get; set; }
     public virtual DbSet<PartUsed> PartsUsed { get; set; }
-    public virtual DbSet<Models.Repairs.Repair> Repairs { get; set; }
+    public virtual DbSet<Repair> Repairs { get; set; }
     public virtual DbSet<RepairStatus> RepairStatuses { get; set; }
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
     public virtual DbSet<ServiceDone> ServicesDone { get; set; }
     public virtual DbSet<Unit> Units { get; set; }
+    public virtual DbSet<Delivery> Deliveries { get; set; }
+    public virtual DbSet<TemporaryModel> DeliveredBikes { get; set; }
+    public virtual DbSet<Post> Posts { get; set; }
+    public virtual DbSet<Response> Reponses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Bike>(entity =>
         {
-            entity.HasKey(e => e.BikeId).HasName("bikes_pkey");
+            entity.HasKey(e => e.BikeId).HasName("bike_pkey");
 
-            entity.ToTable("bikes");
+            entity.ToTable("bike");
 
             entity.Property(e => e.BikeId).HasColumnName("bike_id").ValueGeneratedOnAdd();
             entity.Property(e => e.InsertionDate).HasColumnName("insertion_date");
@@ -57,6 +63,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.SalePrice).HasColumnName("sale_price");
             entity.Property(e => e.StatusId).HasColumnName("status_id");
             entity.Property(e => e.AssembledBy).HasColumnName("assembled_by");
+            entity.Property(e => e.AssembledBy).HasColumnName("delivery_id");
             entity.Property(e => e.InternetSale).HasColumnName("internet_sale")
                 .HasDefaultValue(false);
 
@@ -79,13 +86,18 @@ public partial class BikesDbContext : DbContext
                 .HasForeignKey(d => d.AssembledBy)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("bikes_assembled_by_fkey");
+            
+            entity.HasOne(d => d.Delivery).WithMany(p => p.Bikes)
+                .HasForeignKey(d => d.DeliveryId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("bike_delivery_fkey");
         });
 
         modelBuilder.Entity<Manufacturer>(entity =>
         {
             entity.HasKey(e => e.ManufacturerId).HasName("manufacturer_pkey");
 
-            entity.ToTable("manufacturers");
+            entity.ToTable("manufacturer");
             entity.Property(e => e.ManufacturerId).HasColumnName("manufacturer_id").ValueGeneratedOnAdd();
             entity.Property(e => e.ManufacturerId)
                 .HasColumnName("manufacturer_id")
@@ -99,9 +111,9 @@ public partial class BikesDbContext : DbContext
 
         modelBuilder.Entity<Model>(entity =>
         {
-            entity.HasKey(e => e.ModelId).HasName("models_pkey");
+            entity.HasKey(e => e.ModelId).HasName("model_pkey");
 
-            entity.ToTable("models");
+            entity.ToTable("model");
 
             //entity.HasIndex(e => e.EanCode, "models_ean_code_key").IsUnique();
 
@@ -121,6 +133,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.Price).HasColumnName("price");
             entity.Property(e => e.Favorite).HasColumnName("favorite");
+            entity.Property(e => e.Archived).HasColumnName("archived");
             entity.Property(e => e.ProductCode)
                 .HasMaxLength(30)
                 .HasColumnName("product_code");
@@ -150,9 +163,9 @@ public partial class BikesDbContext : DbContext
 
         modelBuilder.Entity<Place>(entity =>
         {
-            entity.HasKey(e => e.PlaceId).HasName("places_pkey");
+            entity.HasKey(e => e.PlaceId).HasName("place_pkey");
 
-            entity.ToTable("places");
+            entity.ToTable("place");
 
             entity.Property(e => e.PlaceId).HasColumnName("place_id").ValueGeneratedOnAdd();
             entity.Property(e => e.PlaceId)
@@ -170,9 +183,9 @@ public partial class BikesDbContext : DbContext
 
         modelBuilder.Entity<Status>(entity =>
         {
-            entity.HasKey(e => e.StatusId).HasName("statuses_pkey");
+            entity.HasKey(e => e.StatusId).HasName("status_pkey");
 
-            entity.ToTable("statuses");
+            entity.ToTable("status");
 
             entity.Property(e => e.StatusId)
                 .HasColumnName("status_id")
@@ -191,9 +204,9 @@ public partial class BikesDbContext : DbContext
 
         modelBuilder.Entity<Color>(entity =>
         {
-            entity.HasKey(e => e.ColorId).HasName("colors_pkey");
+            entity.HasKey(e => e.ColorId).HasName("color_pkey");
 
-            entity.ToTable("colors");
+            entity.ToTable("color");
 
             entity.Property(e => e.ColorId)
                 .HasColumnName("color_id")
@@ -212,7 +225,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<Employee>(entity =>
         {
             entity.HasKey(e => e.EmployeeId).HasName("employee_pkey");
-            entity.ToTable("employees");
+            entity.ToTable("employee");
             entity.Property(e => e.EmployeeId)
                 .ValueGeneratedOnAdd()
                 .HasColumnName("employee_id");
@@ -226,8 +239,8 @@ public partial class BikesDbContext : DbContext
         });
         modelBuilder.Entity<Category>(entity =>
         {
-            entity.HasKey(e => e.CategoryId).HasName("categories_pkey");
-            entity.ToTable("categories");
+            entity.HasKey(e => e.CategoryId).HasName("category_pkey");
+            entity.ToTable("category");
             entity.Property(e => e.CategoryId)
                 .HasColumnName("category_id")
                 .ValueGeneratedOnAdd();
@@ -252,7 +265,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<Part>(entity =>
         {
             entity.HasKey(e => e.PartId).HasName("part_pkey");
-            entity.ToTable("parts");
+            entity.ToTable("part");
             entity.Property(e => e.PartId)
                 .HasColumnName("part_id")
                 .ValueGeneratedOnAdd();
@@ -282,7 +295,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<PartType>(entity =>
         {
             entity.HasKey(e => e.PartTypeId).HasName("part_type_pkey");
-            entity.ToTable("part_types");
+            entity.ToTable("part_type");
             entity.Property(e => e.PartTypeId)
                 .HasColumnName("part_type_id")
                 .ValueGeneratedOnAdd();
@@ -304,7 +317,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<PartCategory>(entity =>
         {
             entity.HasKey(e => e.PartCategoryId).HasName("part_category_pkey");
-            entity.ToTable("part_categories");
+            entity.ToTable("part_category");
             entity.Property(e => e.PartCategoryId)
                 .HasColumnName("part_category_id")
                 .ValueGeneratedOnAdd();
@@ -316,7 +329,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<PartUsed>(entity =>
         {
             entity.HasKey(e => e.PartUsedId).HasName("part_used_pkey");
-            entity.ToTable("parts_used");
+            entity.ToTable("part_used");
             entity.Property(e => e.PartUsedId)
                 .HasColumnName("part_used_id")
                 .ValueGeneratedOnAdd();
@@ -342,7 +355,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<Service>(entity =>
         {
             entity.HasKey(e => e.ServiceId).HasName("service_pkey");
-            entity.ToTable("services");
+            entity.ToTable("service");
             entity.Property(e => e.ServiceId)
                 .HasColumnName("service_id")
                 .ValueGeneratedOnAdd();
@@ -363,7 +376,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<ServiceCategory>(entity =>
         {
             entity.HasKey(e => e.ServiceCategoryId).HasName("service_category_pkey");
-            entity.ToTable("service_categories");
+            entity.ToTable("service_category");
             entity.Property(e => e.ServiceCategoryId)
                 .HasColumnName("service_category_id")
                 .ValueGeneratedOnAdd();
@@ -376,7 +389,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<ServiceDone>(entity =>
         {
             entity.HasKey(e => e.ServiceDoneId).HasName("service_used_pkey");
-            entity.ToTable("services_done");
+            entity.ToTable("service_done");
             entity.Property(e => e.ServiceDoneId)
                 .HasColumnName("service_done_id")
                 .ValueGeneratedOnAdd();
@@ -400,7 +413,7 @@ public partial class BikesDbContext : DbContext
         modelBuilder.Entity<RepairStatus>(entity =>
         {
             entity.HasKey(e => e.RepairStatusId).HasName("repair_status_pkey");
-            entity.ToTable("repair_statuses");
+            entity.ToTable("repair_status");
             entity.Property(e => e.RepairStatusId)
                 .HasColumnName("repair_status_id")
                 .ValueGeneratedOnAdd();
@@ -414,10 +427,10 @@ public partial class BikesDbContext : DbContext
         });
 
 
-        modelBuilder.Entity<Models.Repairs.Repair>(entity =>
+        modelBuilder.Entity<Repair>(entity =>
         {
             entity.HasKey(e => e.RepairId).HasName("repair_pkey");
-            entity.ToTable("repairs");
+            entity.ToTable("repair");
             entity.Property(e => e.RepairId)
                 .HasColumnName("repair_id")
                 .ValueGeneratedOnAdd();
@@ -481,8 +494,8 @@ public partial class BikesDbContext : DbContext
 
         modelBuilder.Entity<Unit>(entity =>
         {
-            entity.HasKey(e => e.UnitId).HasName("unit");
-            entity.ToTable("units");
+            entity.HasKey(e => e.UnitId).HasName("unit_pkey");
+            entity.ToTable("unit");
             entity.Property(e => e.UnitId)
                 .HasColumnName("unit_id")
                 .ValueGeneratedOnAdd();
@@ -491,6 +504,140 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.IsDiscrete)
                 .HasColumnName("is_discrete");
         });
+        modelBuilder.Entity<Delivery>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("delivery_pkey");
+            entity.ToTable("delivery");
+            entity.Property(e => e.Id)
+                .HasColumnName("delivery_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.Date)
+                .HasColumnName("date");
+            entity.Property(e => e.InvoiceNumber)
+                .HasColumnName("invoice_number")
+                .HasMaxLength(50);
+            entity.Property(e => e.DeliveryNumber)
+                .HasColumnName("delivery_number")
+                .HasMaxLength(50);
+        });
+        modelBuilder.Entity<TemporaryModel>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("temporary_model_pkey");
+            entity.ToTable("temporary_model");
+            entity.Property(e => e.Id)
+                .HasColumnName("temporary_model_id")
+                .ValueGeneratedOnAdd();
+            entity.Property(e => e.EanCode)
+                .HasMaxLength(13)
+                .HasColumnName("ean_code");
+            entity.Property(e => e.ModelName)
+                .HasMaxLength(50)
+                .HasColumnName("model_name");
+            entity.Property(e => e.FrameSize).HasColumnName("frame_size");
+            entity.Property(e => e.IsElectric).HasColumnName("is_electric");
+            entity.Property(e => e.IsWoman).HasColumnName("is_woman");
+            entity.Property(e => e.ManufacturerId).HasColumnName("manufacturer_id");
+            entity.Property(e => e.ColorId).HasColumnName("color_id");
+            entity.Property(e => e.CategoryId).HasColumnName("category_id");
+            entity.Property(e => e.Price).HasColumnName("price");
+            entity.Property(e => e.ProductCode)
+                .HasMaxLength(30)
+                .HasColumnName("product_code");
+            entity.Property(e => e.WheelSizeId).HasColumnName("wheel_size").HasColumnType("decimal(2,1)");
+            entity.Property(e => e.PrimaryColor).HasColumnType("CHAR(7)").HasColumnName("primary_color");
+            entity.Property(e => e.SecondaryColor).HasColumnType("CHAR(7)").HasColumnName("secondary_color");
+            entity.Property(e => e.DeliveryId).HasColumnName("delivery_id");
+            entity.HasOne(d => d.Manufacturer).WithMany(p => p.TemporaryModels)
+                .HasForeignKey(d => d.ManufacturerId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("temporary_model_manufacturer_id_fkey");
+            entity.HasOne(d => d.Category).WithMany(p => p.TemporaryModels)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("temporary_model_category_id_fkey");
+            entity.HasOne(d => d.Color).WithMany(p => p.TemporaryModels)
+                .HasForeignKey(d => d.ColorId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("temporary_model_color_id_fkey");
+            entity.HasOne(d => d.WheelSize).WithMany(p => p.TemporaryModels)
+                .HasForeignKey(d => d.WheelSizeId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("temporary_model_wheel_size_fkey");
+            entity.HasOne(d => d.Delivery).WithMany(p => p.TemporaryModels)
+                .HasForeignKey(d => d.DeliveryId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("temporary_model_delivery_fkey");
+        });
+        modelBuilder.Entity<Post>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("post_pkey");
+
+            entity.ToTable("post");
+
+            entity.Property(e => e.Id)
+                .HasColumnName("post_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.PlaceId)
+                .HasColumnName("place_id");
+
+            entity.Property(e => e.Content)
+                .HasColumnName("content")
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property(e => e.IsResolved)
+                .HasColumnName("is_resolved");
+
+            entity.Property(e => e.IsArchived)
+                .HasColumnName("is_archived");
+
+            entity.HasOne(e => e.Place)
+                .WithMany()
+                .HasForeignKey(e => e.PlaceId)
+                .HasConstraintName("post_place_fkey");
+        });
+
+        modelBuilder.Entity<Response>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("response_pkey");
+
+            entity.ToTable("response");
+
+            entity.Property(e => e.Id)
+                .HasColumnName("response_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.Content)
+                .HasColumnName("content")
+                .IsRequired();
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnName("created_at");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnName("updated_at");
+
+            entity.Property(e => e.UserId)
+                .HasColumnName("user_id");
+
+            entity.Property<int?>("PostId")
+                .HasColumnName("post_id");
+            
+            entity.HasOne(r => r.Post)
+                .WithMany(p => p.Responses)
+                .HasForeignKey("PostId")
+                .HasConstraintName("response_post_fkey");
+        });
+
 
         modelBuilder.Entity<RepairStatus>().HasData([
             new RepairStatus {RepairStatusId = 1, Color = "#FFA500", Name = "Przyjęto"},
@@ -573,14 +720,10 @@ public partial class BikesDbContext : DbContext
             new WheelSize {WheelSizeId = 20},
             new WheelSize {WheelSizeId = 24},
             new WheelSize {WheelSizeId = 26},
-            new WheelSize {WheelSizeId = 27},
+            new WheelSize {WheelSizeId = (decimal)27.5},
             new WheelSize {WheelSizeId = 28},
             new WheelSize {WheelSizeId = 29},
         ]);
-
-        // modelBuilder.Entity<RepairStatus>().HasData([
-        //     new RepairStatus {RepairStatusId = 9, Color = "#f51b47", Name = "Anulowano"},
-        // ]);
         
         OnModelCreatingPartial(modelBuilder);
     }

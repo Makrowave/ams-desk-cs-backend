@@ -1,4 +1,6 @@
-﻿namespace ams_desk_cs_backend.Data.Models;
+﻿using ams_desk_cs_backend.Data.Models.Deliveries;
+
+namespace ams_desk_cs_backend.Data.Models;
 
 public partial class Bike
 {
@@ -17,6 +19,8 @@ public partial class Bike
     public int? SalePrice { get; set; }
     public bool InternetSale { get; set; }
     public short? AssembledBy { get; set; }
+    public int? DeliveryId { get; set; }
+    public virtual Delivery? Delivery { get; set; }
 
     public virtual Model? Model { get; set; }
 

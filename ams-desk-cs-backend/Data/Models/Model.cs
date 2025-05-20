@@ -25,6 +25,7 @@ public partial class Model
     public bool IsElectric { get; set; }
     public string? Link { get; set; }
     public bool Favorite { get; set; }
+    public bool Archived { get; set; }
     public DateOnly InsertionDate { get; set; }
 
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
