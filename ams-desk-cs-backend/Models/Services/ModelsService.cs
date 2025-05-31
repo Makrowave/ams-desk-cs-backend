@@ -60,7 +60,7 @@ public class ModelsService : IModelsService
     {
         var models = _context.Models.Include(model => model.Bikes
                 .Where(bi =>
-                    bi.StatusId != (short)BikeStatus.Sold
+                    bi.StatusId != (short)BikeStatus.Sold && (!filter.StatusId.HasValue || bi.StatusId == filter.StatusId)
                     && (filter.PlaceId == 0 || bi.PlaceId == filter.PlaceId)))
             .Where(
                 model => model.Price >= filter.MinPrice!.Value && model.Price <= filter.MaxPrice!.Value
@@ -106,8 +106,6 @@ public class ModelsService : IModelsService
         {
             models = models.Where(
                 model => model.Bikes.Count(bike => bike.StatusId == filter.StatusId) > 0
-                    
-                // model => model.Bikes.Count(bike => bike != null && bike.StatusId == filter.StatusId) > 0
             );
         }
         //All bikes or only electric
@@ -185,7 +183,7 @@ public class ModelsService : IModelsService
                     )
                     .OrderBy(place => place.PlaceId)
                     .ToList();
-                return new ModelRecordDto(model, model.Bikes.Count(), placeBikeCount);
+                return new ModelRecordDto(model, model.Bikes.Count, placeBikeCount);
             }).ToList();
         if (filter.Available.HasValue && filter.Available.Value)
         {

@@ -22,7 +22,6 @@ public class ModelsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ModelRecordDto>> GetModelRecords([FromQuery] ModelFilter filter)
     {
-        //Don't want return error here - empty table is desired
         var result = await _modelsService.GetModelRecords(filter);
         return Ok(result.Data);
     }
