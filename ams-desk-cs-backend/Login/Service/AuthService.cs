@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ams_desk_cs_backend.Login.Data;
+using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Login.Dto;
 using ams_desk_cs_backend.Login.Interface;
 using ams_desk_cs_backend.Shared;
@@ -14,7 +14,7 @@ namespace ams_desk_cs_backend.Login.Service;
 
 public class AuthService : IAuthService
 {
-    private readonly UserCredContext _context;
+    private readonly BikesDbContext _context;
     private readonly string _issuer;
     private readonly string _audience;
     private readonly string _key;
@@ -22,7 +22,7 @@ public class AuthService : IAuthService
     private readonly JwtSecurityTokenHandler _jwtHandler;
     private readonly int _accessTokenLength;
     private readonly int _refreshTokenLength;
-    public AuthService(UserCredContext context, IConfiguration configuration)
+    public AuthService(BikesDbContext context, IConfiguration configuration)
     {
         _context = context;
         _issuer = configuration["Login:JWT:Issuer"] ?? throw new ArgumentNullException(nameof(configuration));

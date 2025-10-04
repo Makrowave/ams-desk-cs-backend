@@ -1,5 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using ams_desk_cs_backend.Login.Data;
+using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Shared;
 using Microsoft.AspNetCore.Authorization;
 
@@ -7,8 +7,8 @@ namespace ams_desk_cs_backend.Login.Authorization;
 
 public class VersionAuthorizationHandler : AuthorizationHandler<VersionRequirement>
 {
-    private readonly UserCredContext _userCredContext;
-    public VersionAuthorizationHandler(UserCredContext userCredContext)
+    private readonly BikesDbContext _userCredContext;
+    public VersionAuthorizationHandler(BikesDbContext userCredContext)
     {
         _userCredContext = userCredContext;
     }

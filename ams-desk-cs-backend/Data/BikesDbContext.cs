@@ -40,6 +40,8 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
     public virtual DbSet<ServiceDone> ServicesDone { get; set; }
     public virtual DbSet<Unit> Units { get; set; }
+    
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -124,7 +126,7 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.ProductCode)
                 .HasMaxLength(30)
                 .HasColumnName("product_code");
-            entity.Property(e => e.WheelSizeId).HasColumnName("wheel_size").HasColumnType("decimal(2,1)");
+            entity.Property(e => e.WheelSizeId).HasColumnName("wheel_size").HasColumnType("decimal(3,1)");
             entity.Property(e => e.PrimaryColor).HasColumnType("CHAR(7)").HasColumnName("primary_color");
             entity.Property(e => e.SecondaryColor).HasColumnType("CHAR(7)").HasColumnName("secondary_color");
             entity.Property(e => e.Link)
@@ -245,7 +247,7 @@ public partial class BikesDbContext : DbContext
             entity.ToTable("wheel_sizes");
             entity.Property(e => e.WheelSizeId)
                 .HasColumnName("wheel_size")
-                .HasColumnType("decimal(2,1)")
+                .HasColumnType("decimal(3,1)")
                 .ValueGeneratedNever();
         });
         //Repairs
@@ -491,6 +493,32 @@ public partial class BikesDbContext : DbContext
             entity.Property(e => e.IsDiscrete)
                 .HasColumnName("is_discrete");
         });
+        
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.UserId).HasName("users_pkey");
+
+            entity.ToTable("users");
+
+            entity.HasIndex(e => e.Username, "users_username_key").IsUnique();
+
+            entity.Property(e => e.UserId).HasColumnName("user_id").ValueGeneratedOnAdd();
+            entity.Property(e => e.Hash)
+                .HasMaxLength(120)
+                .HasColumnName("hash");
+            entity.Property(e => e.Username)
+                .HasMaxLength(32)
+                .HasColumnName("username");
+            entity.Property(e => e.TokenVersion)
+                .HasColumnName("token_version");
+            entity.Property(e => e.IsAdmin)
+                .HasColumnName("is_admin");
+            entity.Property(e => e.AdminHash)
+                .HasMaxLength(120)
+                .HasColumnName("admin_hash");
+            entity.Property(e => e.EmployeeId)
+                .HasColumnName("employee_id");
+        });
 
         modelBuilder.Entity<RepairStatus>().HasData([
             new RepairStatus {RepairStatusId = 1, Color = "#FFA500", Name = "Przyjęto"},
@@ -576,6 +604,17 @@ public partial class BikesDbContext : DbContext
             new WheelSize {WheelSizeId = 27},
             new WheelSize {WheelSizeId = 28},
             new WheelSize {WheelSizeId = 29},
+        ]);
+        
+        const string defaultPass = "administrator";
+        var admin = new User("admin", defaultPass)
+        {
+            UserId = -1,
+            IsAdmin = true,
+        };
+        admin.SetAdminPassword(defaultPass);
+        modelBuilder.Entity<User>().HasData([
+            admin
         ]);
 
         // modelBuilder.Entity<RepairStatus>().HasData([

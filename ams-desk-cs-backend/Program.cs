@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Configuration;
 using ams_desk_cs_backend.Data;
-using ams_desk_cs_backend.Login.Data;
 using ams_desk_cs_backend.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,10 +15,6 @@ if (!builder.Environment.IsDevelopment())
 var connectionString = builder.Configuration["Bikes:ConnectionString"];
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<BikesDbContext>(options
     => options.UseNpgsql(connectionString));
-
-var loginConnectionString = builder.Configuration["Login:ConnectionString"];
-builder.Services.AddEntityFrameworkNpgsql().AddDbContext<UserCredContext>(options
-    => options.UseNpgsql(loginConnectionString));
 
 // Add services to the container.
 builder.Services.AddControllers()

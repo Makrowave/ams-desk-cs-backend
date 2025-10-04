@@ -1,5 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using ams_desk_cs_backend.Login.Data;
+using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Shared;
 using Microsoft.AspNetCore.Authorization;
 
@@ -7,10 +7,10 @@ namespace ams_desk_cs_backend.Login.Authorization;
 
 public class AdminAuthorizationHandler : AuthorizationHandler<AdminRequirement>
 {
-    private readonly UserCredContext _userCredContext;
-    public AdminAuthorizationHandler(UserCredContext userCredContext)
+    private readonly BikesDbContext _context;
+    public AdminAuthorizationHandler(BikesDbContext context)
     {
-        _userCredContext = userCredContext;
+        _context = context;
     }
 
     protected override async Task HandleRequirementAsync(
@@ -34,7 +34,7 @@ public class AdminAuthorizationHandler : AuthorizationHandler<AdminRequirement>
             context.Fail();
             return;
         }
-        var user = await _userCredContext.Users.FindAsync(userId);
+        var user = await _context.Users.FindAsync(userId);
         if (user == null)
         {
             context.Fail();

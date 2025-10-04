@@ -1,6 +1,6 @@
 ﻿using Isopoh.Cryptography.Argon2;
 
-namespace ams_desk_cs_backend.Login.Data.Models;
+namespace ams_desk_cs_backend.Data.Models;
 
 public partial class User
 {
@@ -17,14 +17,16 @@ public partial class User
     {
         EmployeeId = employeeId;
     }
+    
     public short UserId { get; set; }
-
     public string Username { get; set; } = null!;
     public string Hash { get; private set; } = null!;
     public int TokenVersion { get; set; }
     public bool IsAdmin { get; set; }
     public string? AdminHash { get; private set; }
     public short? EmployeeId { get; set; }
+    
+    public Employee? Employee { get; set; }
 
     public void SetPassword(string password)
     {
@@ -34,5 +36,4 @@ public partial class User
     {
         AdminHash = Argon2.Hash(password);
     }
-    
 }

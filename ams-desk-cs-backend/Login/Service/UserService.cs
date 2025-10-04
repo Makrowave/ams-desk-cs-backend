@@ -1,6 +1,5 @@
 ﻿using ams_desk_cs_backend.Data;
-using ams_desk_cs_backend.Login.Data;
-using ams_desk_cs_backend.Login.Data.Models;
+using ams_desk_cs_backend.Data.Models;
 using ams_desk_cs_backend.Login.Dto;
 using ams_desk_cs_backend.Login.Interface;
 using ams_desk_cs_backend.Shared.Results;
@@ -10,17 +9,15 @@ namespace ams_desk_cs_backend.Login.Service;
 
 public class UserService : IUserService
 {
-    private readonly BikesDbContext _bikesDbContext;
-    private readonly UserCredContext _userCredContext;
-    public UserService(BikesDbContext bikesDbContext, UserCredContext userCredContext)
+    private readonly BikesDbContext _context;
+    public UserService(BikesDbContext context)
     {
-        _bikesDbContext = bikesDbContext;
-        _userCredContext = userCredContext;
+        _context = context;
     }
 
     public async Task<ServiceResult<IEnumerable<UserDto>>> GetUsers()
     {
-        var users = await _userCredContext.Users.Select(user => new UserDto
+        var users = await _context.Users.Select(user => new UserDto
         {
             UserId = user.UserId,
             Username = user.Username,
@@ -37,10 +34,10 @@ public class UserService : IUserService
             return new ServiceResult(ServiceStatus.BadRequest, "Brak hasła lub użytkownika");
         }
         var user = new User(userDto.Username, userDto.Password, userDto.EmployeeId.Value);
-        _userCredContext.Add(user);
+        _context.Add(user);
         try
         {
-            await _userCredContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -51,7 +48,7 @@ public class UserService : IUserService
     }
     public async Task<ServiceResult> ChangeUser(short id, UserDto newUser)
     {
-        var oldUser = await _userCredContext.Users.FindAsync(id);
+        var oldUser = await _context.Users.FindAsync(id);
         bool hasChanged = false;
         if (oldUser == null)
         {
@@ -77,7 +74,7 @@ public class UserService : IUserService
         }
         try
         {
-            await _userCredContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -89,15 +86,15 @@ public class UserService : IUserService
     public async Task<ServiceResult> DeleteUser(short id)
     {
 
-        var existingUser = await _userCredContext.Users.FindAsync(id);
+        var existingUser = await _context.Users.FindAsync(id);
         if (existingUser == null)
         {
             return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono konta");
         }
-        _userCredContext.Users.Remove(existingUser);
+        _context.Users.Remove(existingUser);
         try
         {
-            await _userCredContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
         catch (Exception)
         {
@@ -110,19 +107,19 @@ public class UserService : IUserService
 
     public async Task<ServiceResult> LogOutUser(short id)
     {
-        var existingUser = await _userCredContext.Users.FindAsync(id);
+        var existingUser = await _context.Users.FindAsync(id);
         if (existingUser == null)
         {
             return new ServiceResult(ServiceStatus.NotFound, "Nie znaleziono konta");
         }
         existingUser.TokenVersion++;
-        _userCredContext.SaveChanges();
+        await _context.SaveChangesAsync();
         return new ServiceResult(ServiceStatus.Ok, string.Empty);
     }
 
     public async Task<ServiceResult> LogOutAll()
     {
-        var users = await _userCredContext.Users.ToListAsync();
+        var users = await _context.Users.ToListAsync();
         if (users.Count == 0)
         {
             return new ServiceResult(ServiceStatus.BadRequest, "Brak użytkowników w systemie");
@@ -131,13 +128,13 @@ public class UserService : IUserService
         {
             user.TokenVersion++;
         }
-        _userCredContext.SaveChanges();
+        await _context.SaveChangesAsync();
         return new ServiceResult(ServiceStatus.Ok, string.Empty);
     }
 
     private async Task<bool> EmployeeExists(short id)
     {
-        var result = await _bikesDbContext.Employees.FindAsync(id);
+        var result = await _context.Employees.FindAsync(id);
         return result != null;
     }
 }
