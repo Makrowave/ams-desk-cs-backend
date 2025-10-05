@@ -91,12 +91,13 @@ public class RepairsDataController: ControllerBase
                     Price: 0
                 )
             );
-        IQueryable<Repair> repairs;
-        // If id is -1 - internet sales, otherwise bikes not sold by internet
-        repairs = _context.Repairs.Where(repair => repair.PlaceId == placeId).Where(repair => repair.StatusId == (short)RepairStatuses.Collected);
+        IQueryable<Repair> repairsQuery;
+        repairsQuery = _context.Repairs.Where(repair => repair.PlaceId == placeId)
+            .Include(repair => repair.Place)
+            .Where(repair => repair.StatusId == (short)RepairStatuses.Collected);
         
         // Bikes filtered by date
-        repairs = FilterByDateQueryable(repairs, since, until);
+        var repairs = await FilterByDateQueryable(repairsQuery, since, until).ToListAsync();
         //Group by interval
         var groupResult = interval switch
         {
@@ -120,8 +121,8 @@ public class RepairsDataController: ControllerBase
                 })
         };
         // Order by date
-        var queryResult = await groupResult.OrderBy(bike => bike.Date)
-            .ToDictionaryAsync(record => record.Date, record => record.Price);
+        var queryResult = groupResult.OrderBy(bike => bike.Date)
+            .ToDictionary(record => record.Date, record => record.Price);
         // Return sums for each interval
         var result = dates
             .Select(record => new DateAndPriceDto
@@ -132,7 +133,7 @@ public class RepairsDataController: ControllerBase
         return result;
     }
     
-    public static IQueryable<Repair> FilterByDateQueryable(IQueryable<Repair> repairs, DateOnly since, DateOnly until)
+    private static IQueryable<Repair> FilterByDateQueryable(IQueryable<Repair> repairs, DateOnly since, DateOnly until)
     {
         return repairs.Where(repair => repair.CollectionDate != null
                                        && repair.CollectionDate.Value >= since
