@@ -29,5 +29,16 @@ public class Repair
     public virtual Place? Place { get; set; }
     public virtual ICollection<ServiceDone> Services { get; set; } = [];
     public virtual ICollection<PartUsed> Parts { get; set; } = [];
+    
+    // Methods
+    public float GetTotalPrice()
+    {
+        float totalPrice = 0;
+        Services.ToList().ForEach(service => totalPrice += service.Price);
+        Parts.ToList().ForEach(service => totalPrice += service.Price);
+        totalPrice += AdditionalCosts;
+        totalPrice -= Discount;
+        return totalPrice;
+    }
 
 }
