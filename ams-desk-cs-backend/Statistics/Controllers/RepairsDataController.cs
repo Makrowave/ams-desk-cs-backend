@@ -94,6 +94,8 @@ public class RepairsDataController: ControllerBase
         IQueryable<Repair> repairsQuery;
         repairsQuery = _context.Repairs.Where(repair => repair.PlaceId == placeId)
             .Include(repair => repair.Place)
+            .Include(repair => repair.Parts)
+            .Include(repair => repair.Services)
             .Where(repair => repair.StatusId == (short)RepairStatuses.Collected);
         
         // Bikes filtered by date
