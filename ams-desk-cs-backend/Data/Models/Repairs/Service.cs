@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using ams_desk_cs_backend.Repairs.Dtos;
-using ams_desk_cs_backend.Shared;
 
 namespace ams_desk_cs_backend.Data.Models.Repairs;
 
+[Table("services")]
 public class Service
 {
     public Service() { }
@@ -17,10 +19,25 @@ public class Service
         Price = dto.Price;
         ServiceCategoryId = dto.ServiceCategoryId;
     }
+
+    [Key]
+    [Column("service_id")]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public short ServiceId { get; set; }
-    public string ServiceName { get; set; } = null!;
+
+    [Column("service_name")]
+    [MaxLength(50)]
+    public string ServiceName { get; set; }
+
+    [Column("price")]
     public float Price { get; set; }
+
+    [Column("service_category_id")]
     public short ServiceCategoryId { get; set; }
+
+    [ForeignKey(nameof(ServiceCategoryId))]
+    [InverseProperty(nameof(ServiceCategory.Services))]
     public virtual ServiceCategory? ServiceCategory { get; set; }
-    public virtual ICollection<ServiceDone> ServicesDone { get; set; } = [];
+
+    public virtual ICollection<ServiceDone> ServicesDone { get; set; } = new List<ServiceDone>();
 }
