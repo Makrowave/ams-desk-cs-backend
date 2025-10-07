@@ -1,22 +1,25 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
 using System.Configuration;
 using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Shared.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
 if (!builder.Environment.IsDevelopment())
 {
     builder.Configuration.SetBasePath(AppContext.BaseDirectory)
-      .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true).AddEnvironmentVariables();
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .AddEnvironmentVariables();
 }
 
 // Connect to DBs
 var connectionString = builder.Configuration["Bikes:ConnectionString"];
-builder.Services.AddEntityFrameworkNpgsql().AddDbContext<BikesDbContext>(options
-    => options.UseNpgsql(connectionString));
+builder.Services.AddEntityFrameworkNpgsql().AddDbContext<BikesDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers()
     .AddJsonOptions(o => { o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; });
 
@@ -25,7 +28,7 @@ builder.AddAuthServices();
 builder.AddAllAuthentication();
 builder.AddAllAuthorization();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -33,27 +36,45 @@ builder.Services.AddSwaggerGen();
 var FrontEndURL = builder.Configuration["CORSOrigins"];
 var PolicyName = "FrontEnd";
 builder.Services.AddCors(options =>
-    {
-        options.AddPolicy(name: PolicyName,
-            policy =>
+{
+    options.AddPolicy(name: PolicyName,
+        policy =>
+        {
+            if (FrontEndURL != null)
             {
-                if (FrontEndURL != null)
-                {
-                    policy.WithOrigins([FrontEndURL])
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials();
-                }
-                else
-                {
-                    throw new ConfigurationErrorsException("FrontEndURL was not specified in appsettings.json");
-                }
-            });
-    });
+                policy.WithOrigins(FrontEndURL)
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials();
+            }
+            else
+            {
+                throw new ConfigurationErrorsException("FrontEndURL was not specified in appsettings.json");
+            }
+        });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Run migrations at startup with logging
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<BikesDbContext>();
+        logger.LogInformation("Applying database migrations...");
+        context.Database.Migrate();
+        logger.LogInformation("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while applying database migrations.");
+        throw; // Optionally rethrow to stop app startup
+    }
+}
+
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -61,7 +82,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors(PolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
