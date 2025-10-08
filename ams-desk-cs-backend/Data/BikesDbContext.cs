@@ -34,7 +34,7 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<PartType> PartTypes { get; set; }
     public virtual DbSet<PartCategory> PartCategories { get; set; }
     public virtual DbSet<PartUsed> PartsUsed { get; set; }
-    public virtual DbSet<Models.Repairs.Repair> Repairs { get; set; }
+    public virtual DbSet<Repair> Repairs { get; set; }
     public virtual DbSet<RepairStatus> RepairStatuses { get; set; }
     public virtual DbSet<Service> Services { get; set; }
     public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
