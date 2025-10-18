@@ -12,16 +12,16 @@ public partial class PlaceDto
 
     public PlaceDto(Place place)
     {
-        PlaceId = place.PlaceId;
-        PlaceName = place.PlaceName;
+        Id = place.PlaceId;
+        Name = place.PlaceName;
         IsStorage = place.IsStorage;
     }
-    public short? PlaceId { get; set; }
+    public short? Id { get; set; }
 
     [Required]
     [RegularExpression(Regexes.PolishText)]
     [MaxLength(40)]
-    public string PlaceName { get; set; } = null!;
+    public string Name { get; set; } = null!;
     [Required]
     public bool IsStorage { get; set; }
 }

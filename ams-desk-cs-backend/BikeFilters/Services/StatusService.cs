@@ -25,9 +25,9 @@ public class StatusService : IStatusService
         }
         return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, new StatusDto
         {
-            StatusId = status.StatusId,
-            StatusName = status.StatusName,
-            HexCode = status.HexCode,
+            Id = status.StatusId,
+            Name = status.StatusName,
+            Color = status.HexCode,
         });
     }
 
@@ -36,9 +36,9 @@ public class StatusService : IStatusService
         var statuses = await _context.Statuses.OrderBy(status => status.StatusesOrder)
             .Select(status => new StatusDto
             {
-                StatusId = status.StatusId,
-                StatusName = status.StatusName,
-                HexCode = status.HexCode,
+                Id = status.StatusId,
+                Name = status.StatusName,
+                Color = status.HexCode,
             }).ToListAsync();
         return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
     }
@@ -50,10 +50,10 @@ public class StatusService : IStatusService
             .OrderBy(status => status.StatusesOrder)
             .Select(status => new StatusDto
             {
-                StatusId = status.StatusId,
-                StatusName = status.StatusName,
-                HexCode = status.HexCode,
-            }).OrderBy(status => status.StatusId).ToListAsync();
+                Id = status.StatusId,
+                Name = status.StatusName,
+                Color = status.HexCode,
+            }).OrderBy(status => status.Id).ToListAsync();
         return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
     }
     public async Task<ServiceResult<List<StatusDto>>> ChangeOrder(short source, short dest)
@@ -95,9 +95,9 @@ public class StatusService : IStatusService
             .OrderBy(s => s.StatusesOrder)
             .Select(s => new StatusDto
             {
-                StatusId = s.StatusId,
-                StatusName = s.StatusName,
-                HexCode = s.HexCode
+                Id = s.StatusId,
+                Name = s.StatusName,
+                Color = s.HexCode
             })
             .ToListAsync();
 
@@ -110,17 +110,17 @@ public class StatusService : IStatusService
         var order = _context.Statuses.Count() + 1;
         var status = new Status
         {
-            StatusName = statusDto.StatusName,
-            HexCode = statusDto.HexCode,
+            StatusName = statusDto.Name,
+            HexCode = statusDto.Color,
             StatusesOrder = (short)order
         };
         _context.Add(status);
         await _context.SaveChangesAsync();
         var result = new StatusDto
         {
-            StatusId = status.StatusId,
-            StatusName = status.StatusName,
-            HexCode = status.HexCode,
+            Id = status.StatusId,
+            Name = status.StatusName,
+            Color = status.HexCode,
         };
         return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -133,14 +133,14 @@ public class StatusService : IStatusService
             return ServiceResult<StatusDto>.NotFound("Nie znaleziono statusu");
         }
 
-        oldStatus.StatusName = newStatus.StatusName;
-        oldStatus.HexCode = newStatus.HexCode;
+        oldStatus.StatusName = newStatus.Name;
+        oldStatus.HexCode = newStatus.Color;
         await _context.SaveChangesAsync();
         var result = new StatusDto
         {
-            StatusId = oldStatus.StatusId,
-            StatusName = oldStatus.StatusName,
-            HexCode = oldStatus.HexCode,
+            Id = oldStatus.StatusId,
+            Name = oldStatus.StatusName,
+            Color = oldStatus.HexCode,
         };
         return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, result);
     }

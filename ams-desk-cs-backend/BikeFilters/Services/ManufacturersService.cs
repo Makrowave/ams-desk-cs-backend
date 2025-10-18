@@ -21,8 +21,8 @@ public class ManufacturersService : IManufacturersService
         var manufacturers = await _context.Manufacturers.OrderBy(manufacturer => manufacturer.ManufacturersOrder)
             .Select(manufacter => new ManufacturerDto
             {
-                ManufacturerId = manufacter.ManufacturerId,
-                ManufacturerName = manufacter.ManufacturerName,
+                Id = manufacter.ManufacturerId,
+                Name = manufacter.ManufacturerName,
             }).ToListAsync();
         return new ServiceResult<IEnumerable<ManufacturerDto>>(ServiceStatus.Ok, string.Empty, manufacturers);
     }
@@ -32,15 +32,15 @@ public class ManufacturersService : IManufacturersService
         var order = _context.Manufacturers.Count() + 1;
         var manufacturer = new Manufacturer
         {
-            ManufacturerName = manufacturerDto.ManufacturerName,
+            ManufacturerName = manufacturerDto.Name,
             ManufacturersOrder = (short)order
         };
         _context.Add(manufacturer);
         await _context.SaveChangesAsync();
         var result = new ManufacturerDto
         {
-            ManufacturerId = manufacturer.ManufacturerId,
-            ManufacturerName = manufacturerDto.ManufacturerName,
+            Id = manufacturer.ManufacturerId,
+            Name = manufacturerDto.Name,
         };
         return new ServiceResult<ManufacturerDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -53,12 +53,12 @@ public class ManufacturersService : IManufacturersService
             return ServiceResult<ManufacturerDto>.NotFound("Nie znaleziono producenta");
         }
 
-        oldManufacturer.ManufacturerName = newManufacturer.ManufacturerName;
+        oldManufacturer.ManufacturerName = newManufacturer.Name;
         await _context.SaveChangesAsync();
         var result = new ManufacturerDto
         {
-            ManufacturerId = oldManufacturer.ManufacturerId,
-            ManufacturerName = oldManufacturer.ManufacturerName,
+            Id = oldManufacturer.ManufacturerId,
+            Name = oldManufacturer.ManufacturerName,
         };
         return new ServiceResult<ManufacturerDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -102,8 +102,8 @@ public class ManufacturersService : IManufacturersService
             .OrderBy(m => m.ManufacturersOrder)
             .Select(m => new ManufacturerDto
             {
-                ManufacturerId = m.ManufacturerId,
-                ManufacturerName = m.ManufacturerName
+                Id = m.ManufacturerId,
+                Name = m.ManufacturerName
             })
             .ToListAsync();
 

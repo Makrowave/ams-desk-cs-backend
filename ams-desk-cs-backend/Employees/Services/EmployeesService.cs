@@ -21,8 +21,8 @@ public class EmployeesService : IEmployeesService
         var employees = await _context.Employees.OrderBy(employee => employee.EmployeesOrder)
             .Select(employee => new EmployeeDto
             {
-                EmployeeId = employee.EmployeeId,
-                EmployeeName = employee.EmployeeName,
+                Id = employee.EmployeeId,
+                Name = employee.EmployeeName,
             }).ToListAsync();
         return new ServiceResult<IEnumerable<EmployeeDto>>(ServiceStatus.Ok, string.Empty, employees);
     }
@@ -32,15 +32,15 @@ public class EmployeesService : IEmployeesService
         var order = _context.Employees.Count() + 1;
         var employee = new Employee
         {
-            EmployeeName = employeeDto.EmployeeName,
+            EmployeeName = employeeDto.Name,
             EmployeesOrder = (short)order,
         };
         _context.Add(employee);
         await _context.SaveChangesAsync();
         var result = new EmployeeDto
         {
-            EmployeeId = employee.EmployeeId,
-            EmployeeName = employee.EmployeeName,
+            Id = employee.EmployeeId,
+            Name = employee.EmployeeName,
         };
         return new ServiceResult<EmployeeDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -53,12 +53,12 @@ public class EmployeesService : IEmployeesService
             return ServiceResult<EmployeeDto>.NotFound("Nie znaleziono pracownika");
         }
 
-        existingEmployee.EmployeeName = employee.EmployeeName;
+        existingEmployee.EmployeeName = employee.Name;
         await _context.SaveChangesAsync();
         var result = new EmployeeDto
         {
-            EmployeeId = existingEmployee.EmployeeId,
-            EmployeeName = existingEmployee.EmployeeName,
+            Id = existingEmployee.EmployeeId,
+            Name = existingEmployee.EmployeeName,
         };
         return new ServiceResult<EmployeeDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -102,8 +102,8 @@ public class EmployeesService : IEmployeesService
             .OrderBy(e => e.EmployeesOrder)
             .Select(e => new EmployeeDto
             {
-                EmployeeId = e.EmployeeId,
-                EmployeeName = e.EmployeeName
+                Id = e.EmployeeId,
+                Name = e.EmployeeName
             })
             .ToListAsync();
 

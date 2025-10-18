@@ -6,8 +6,8 @@ namespace ams_desk_cs_backend.Employees.Dtos;
 public partial class EmployeeDto
 {
     [Required]
-    public short EmployeeId { get; set; }
+    public short Id { get; set; }
     [Required]
     [RegularExpression(Regexes.EmployeeName, ErrorMessage = "Niepoprawna nazwa pracownika")]
-    public string EmployeeName { get; set; } = null!;
+    public string Name { get; set; } = null!;
 }

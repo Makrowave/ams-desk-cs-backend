@@ -2,6 +2,12 @@
 
 public class WheelSizeDto
 {
-    public decimal Key { get; set; }
-    public decimal Value { get; set; }
+
+    public WheelSizeDto(decimal id)
+    {
+        Id = id;
+        Name = $"{id:N1}";
+    }
+    public decimal Id { get; set; }
+    public string Name { get; set; }
 }

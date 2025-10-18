@@ -19,8 +19,8 @@ public class CategoriesService : ICategoriesService
         var categories = await _context.Categories.OrderBy(category => category.CategoriesOrder)
             .Select(category => new CategoryDto
             {
-                CategoryId = category.CategoryId,
-                CategoryName = category.CategoryName,
+                Id = category.CategoryId,
+                Name = category.CategoryName,
             }).ToListAsync();
         return new ServiceResult<IEnumerable<CategoryDto>>(ServiceStatus.Ok, string.Empty, categories);
     }
@@ -30,15 +30,15 @@ public class CategoriesService : ICategoriesService
         var order = _context.Categories.Count() + 1;
         var category = new Category
         {
-            CategoryName = categoryDto.CategoryName,
+            CategoryName = categoryDto.Name,
             CategoriesOrder = (short)order
         };
         _context.Add(category);
         await _context.SaveChangesAsync();
         var result = new CategoryDto()
         {
-            CategoryId = category.CategoryId,
-            CategoryName = category.CategoryName,
+            Id = category.CategoryId,
+            Name = category.CategoryName,
         };
         return new ServiceResult<CategoryDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -51,12 +51,12 @@ public class CategoriesService : ICategoriesService
             return ServiceResult<CategoryDto>.NotFound("Nie znaleziono kategorii");
         }
 
-        oldCategory.CategoryName = newCategory.CategoryName;
+        oldCategory.CategoryName = newCategory.Name;
         await _context.SaveChangesAsync();
         var result = new CategoryDto
         {
-            CategoryId = oldCategory.CategoryId,
-            CategoryName = oldCategory.CategoryName,
+            Id = oldCategory.CategoryId,
+            Name = oldCategory.CategoryName,
         };
         return new ServiceResult<CategoryDto>(ServiceStatus.Ok, string.Empty, result);
 
@@ -100,8 +100,8 @@ public class CategoriesService : ICategoriesService
             .OrderBy(c => c.CategoriesOrder)
             .Select(c => new CategoryDto
             {
-                CategoryId = c.CategoryId,
-                CategoryName = c.CategoryName,
+                Id = c.CategoryId,
+                Name = c.CategoryName,
             }).ToListAsync();
 
         return new ServiceResult<List<CategoryDto>>(ServiceStatus.Ok, string.Empty, result);

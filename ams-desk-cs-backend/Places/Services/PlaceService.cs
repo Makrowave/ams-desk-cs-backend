@@ -52,7 +52,7 @@ public class PlaceService : IPlacesService
     public async Task<ServiceResult<PlaceDto>> PostPlace(PlaceDto placeDto)
     {
         var places = await _context.Places.OrderBy(place => place.PlacesOrder).ToListAsync();
-        var oldPlace = places.FirstOrDefault(place => place.PlaceId == placeDto.PlaceId);
+        var oldPlace = places.FirstOrDefault(place => place.PlaceId == placeDto.Id);
         if (oldPlace != null)
         {
             return ServiceResult<PlaceDto>.BadRequest("Miejsce już istnieje");
@@ -60,7 +60,7 @@ public class PlaceService : IPlacesService
 
         var place = new Place
         {
-            PlaceName = placeDto.PlaceName,
+            PlaceName = placeDto.Name,
             IsStorage = placeDto.IsStorage,
             PlacesOrder = (short)((places.LastOrDefault()?.PlacesOrder ?? 0) + 1)
         };
@@ -76,7 +76,7 @@ public class PlaceService : IPlacesService
         {
             return ServiceResult<PlaceDto>.NotFound("Nie znaleziono miejsca");
         }
-        place.PlaceName = placeDto.PlaceName;
+        place.PlaceName = placeDto.Name;
         place.IsStorage = placeDto.IsStorage;
         await _context.SaveChangesAsync();
         return new ServiceResult<PlaceDto>(ServiceStatus.Ok, string.Empty, new PlaceDto(place));

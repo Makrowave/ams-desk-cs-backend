@@ -28,9 +28,9 @@ public class ColorsService : IColorsService
         return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty,
             new ColorDto
             {
-                ColorId = existingColor.ColorId,
-                ColorName = existingColor.ColorName,
-                HexCode = existingColor.HexCode,
+                Id = existingColor.ColorId,
+                Name = existingColor.ColorName,
+                Color = existingColor.HexCode,
             });
     }
 
@@ -38,9 +38,9 @@ public class ColorsService : IColorsService
     {
         var colors = await _context.Colors.OrderBy(c => c.ColorsOrder).Select(color => new ColorDto
         {
-            ColorId = color.ColorId,
-            ColorName = color.ColorName,
-            HexCode = color.HexCode,
+            Id = color.ColorId,
+            Name = color.ColorName,
+            Color = color.HexCode,
         }).ToListAsync();
         return new ServiceResult<IEnumerable<ColorDto>>(ServiceStatus.Ok, string.Empty, colors);
     }
@@ -49,17 +49,17 @@ public class ColorsService : IColorsService
         var order = _context.Colors.Count() + 1;
         var color = new Color
         {
-            ColorName = colorDto.ColorName,
-            HexCode = colorDto.HexCode,
+            ColorName = colorDto.Name,
+            HexCode = colorDto.Color,
             ColorsOrder = (short)order
         };
         _context.Add(color);
         await _context.SaveChangesAsync();
         var result = new ColorDto
         {
-            ColorId = color.ColorId,
-            ColorName = color.ColorName,
-            HexCode = color.HexCode,
+            Id = color.ColorId,
+            Name = color.ColorName,
+            Color = color.HexCode,
         };
         return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -71,14 +71,14 @@ public class ColorsService : IColorsService
             return ServiceResult<ColorDto>.NotFound("Nie znaleziono koloru");
         }
 
-        oldColor.ColorName = newColor.ColorName;
-        oldColor.HexCode = newColor.HexCode;
+        oldColor.ColorName = newColor.Name;
+        oldColor.HexCode = newColor.Color;
         await _context.SaveChangesAsync();
         var result = new ColorDto
         {
-            ColorId = oldColor.ColorId,
-            ColorName = oldColor.ColorName,
-            HexCode = oldColor.HexCode,
+            Id = oldColor.ColorId,
+            Name = oldColor.ColorName,
+            Color = oldColor.HexCode,
         };
         return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -122,9 +122,9 @@ public class ColorsService : IColorsService
             .OrderBy(c => c.ColorsOrder)
             .Select(c => new ColorDto
             {
-                ColorId = c.ColorId,
-                ColorName = c.ColorName,
-                HexCode = c.HexCode
+                Id = c.ColorId,
+                Name = c.ColorName,
+                Color = c.HexCode
             })
             .ToListAsync();
 
