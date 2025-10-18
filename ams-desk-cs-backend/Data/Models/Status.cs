@@ -4,25 +4,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.Data.Models;
 
-[Index(nameof(StatusName), IsUnique = true)]
+[Index(nameof(Name), IsUnique = true)]
 [Table("statuses")]
 public partial class Status
 {
     [Key]
     [Column("status_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short StatusId { get; set; }
+    public short Id { get; set; }
 
     [Column("status_name")]
     [MaxLength(16)]
-    public required string StatusName { get; set; }
+    public required string Name { get; set; }
 
     [Column("hex_code")]
     [MaxLength(7)]
-    public required string HexCode { get; set; }
+    public required string Color { get; set; }
 
     [Column("statuses_order")]
-    public required short StatusesOrder { get; set; }
+    public required short Order { get; set; }
 
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 }

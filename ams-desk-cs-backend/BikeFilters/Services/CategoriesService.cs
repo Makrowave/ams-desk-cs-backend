@@ -16,11 +16,11 @@ public class CategoriesService : ICategoriesService
     }
     public async Task<ServiceResult<IEnumerable<CategoryDto>>> GetCategories()
     {
-        var categories = await _context.Categories.OrderBy(category => category.CategoriesOrder)
+        var categories = await _context.Categories.OrderBy(category => category.Order)
             .Select(category => new CategoryDto
             {
-                CategoryId = category.CategoryId,
-                CategoryName = category.CategoryName,
+                Id = category.Id,
+                Name = category.Name,
             }).ToListAsync();
         return new ServiceResult<IEnumerable<CategoryDto>>(ServiceStatus.Ok, string.Empty, categories);
     }
@@ -30,15 +30,15 @@ public class CategoriesService : ICategoriesService
         var order = _context.Categories.Count() + 1;
         var category = new Category
         {
-            CategoryName = categoryDto.CategoryName,
-            CategoriesOrder = (short)order
+            Name = categoryDto.Name,
+            Order = (short)order
         };
         _context.Add(category);
         await _context.SaveChangesAsync();
         var result = new CategoryDto()
         {
-            CategoryId = category.CategoryId,
-            CategoryName = category.CategoryName,
+            Id = category.Id,
+            Name = category.Name,
         };
         return new ServiceResult<CategoryDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -51,57 +51,57 @@ public class CategoriesService : ICategoriesService
             return ServiceResult<CategoryDto>.NotFound("Nie znaleziono kategorii");
         }
 
-        oldCategory.CategoryName = newCategory.CategoryName;
+        oldCategory.Name = newCategory.Name;
         await _context.SaveChangesAsync();
         var result = new CategoryDto
         {
-            CategoryId = oldCategory.CategoryId,
-            CategoryName = oldCategory.CategoryName,
+            Id = oldCategory.Id,
+            Name = oldCategory.Name,
         };
         return new ServiceResult<CategoryDto>(ServiceStatus.Ok, string.Empty, result);
 
     }
     public async Task<ServiceResult<List<CategoryDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Categories.Any(c => c.CategoryId == source || c.CategoryId == dest))
+        if (!_context.Categories.Any(c => c.Id == source || c.Id == dest))
         {
             return ServiceResult<List<CategoryDto>>.NotFound("Nie znaleziono zamienianych elementów");
         }
         
-        var categories = await _context.Categories.OrderBy(c => c.CategoriesOrder).ToListAsync();
+        var categories = await _context.Categories.OrderBy(c => c.Order).ToListAsync();
         
-        var firstCategory = categories.First(c => c.CategoryId == source);
-        var lastCategory = categories.First(c => c.CategoryId == dest);
-        var firstOrder = firstCategory.CategoriesOrder;
-        var lastOrder = lastCategory.CategoriesOrder;
+        var firstCategory = categories.First(c => c.Id == source);
+        var lastCategory = categories.First(c => c.Id == dest);
+        var firstOrder = firstCategory.Order;
+        var lastOrder = lastCategory.Order;
 
         if (firstOrder < lastOrder)
         {
             var toShift = categories
-                .Where(c => c.CategoriesOrder > firstOrder && c.CategoriesOrder <= lastOrder)
+                .Where(c => c.Order > firstOrder && c.Order <= lastOrder)
                 .ToList();
 
-            toShift.ForEach(c => c.CategoriesOrder--);
-            firstCategory.CategoriesOrder = lastOrder;
+            toShift.ForEach(c => c.Order--);
+            firstCategory.Order = lastOrder;
         }
         else if (firstOrder > lastOrder)
         {
             var toShift = categories
-                .Where(c => c.CategoriesOrder >= lastOrder && c.CategoriesOrder < firstOrder)
+                .Where(c => c.Order >= lastOrder && c.Order < firstOrder)
                 .ToList();
 
-            toShift.ForEach(c => c.CategoriesOrder++);
-            firstCategory.CategoriesOrder = lastOrder;
+            toShift.ForEach(c => c.Order++);
+            firstCategory.Order = lastOrder;
         }
 
         await _context.SaveChangesAsync();
 
         var result = await _context.Categories
-            .OrderBy(c => c.CategoriesOrder)
+            .OrderBy(c => c.Order)
             .Select(c => new CategoryDto
             {
-                CategoryId = c.CategoryId,
-                CategoryName = c.CategoryName,
+                Id = c.Id,
+                Name = c.Name,
             }).ToListAsync();
 
         return new ServiceResult<List<CategoryDto>>(ServiceStatus.Ok, string.Empty, result);

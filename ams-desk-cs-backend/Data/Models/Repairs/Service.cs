@@ -11,11 +11,11 @@ public class Service
     public Service() { }
     public Service(ServiceDto dto, short id) : this(dto)
     {
-        ServiceId = id;
+        Id = id;
     }
     public Service(ServiceDto dto)
     {
-        ServiceName = dto.ServiceName;
+        Name = dto.Name;
         Price = dto.Price;
         ServiceCategoryId = dto.ServiceCategoryId;
     }
@@ -23,11 +23,11 @@ public class Service
     [Key]
     [Column("service_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short ServiceId { get; set; }
+    public short Id { get; set; }
 
     [Column("service_name")]
     [MaxLength(50)]
-    public string ServiceName { get; set; }
+    public string Name { get; set; }
 
     [Column("price")]
     public float Price { get; set; }

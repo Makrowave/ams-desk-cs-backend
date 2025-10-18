@@ -10,14 +10,14 @@ public partial class Manufacturer
     [Key]
     [Column("manufacturer_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short ManufacturerId { get; set; }
+    public short Id { get; set; }
 
     [Column("manufacturer_name")]
     [MaxLength(20)]
-    public required string ManufacturerName { get; set; }
+    public required string Name { get; set; }
 
     [Column("manufacturers_order")]
-    public required short ManufacturersOrder { get; set; }
+    public required short Order { get; set; }
 
     public virtual ICollection<Model> Models { get; set; } = new List<Model>();
 }

@@ -29,7 +29,7 @@ public class RepairsService : IRepairsService
         };
         _context.Repairs.Add(repair);
         await _context.SaveChangesAsync();
-        var id = repair.RepairId;
+        var id = repair.Id;
         return new ServiceResult<int>(ServiceStatus.Ok, string.Empty, id);
     }
 
@@ -55,13 +55,13 @@ public class RepairsService : IRepairsService
             .Select(
                 (repair) => new ShortRepairDto
                 {
-                    Id = repair.RepairId,
+                    Id = repair.Id,
                     PhoneNumber = repair.PhoneNumber,
                     BikeName = repair.BikeName,
                     Date = repair.ArrivalDate,
                     Status = repair.Status!,
                     PlaceId = repair.PlaceId,
-                    PlaceName = repair.Place!.PlaceName,
+                    PlaceName = repair.Place!.Name,
                 }).OrderByDescending(repair => repair.Id).ToListAsync();
         return new ServiceResult<IEnumerable<ShortRepairDto>>(ServiceStatus.Ok, string.Empty, repairs);
     }
@@ -87,26 +87,26 @@ public class RepairsService : IRepairsService
         //Handle new services:
         //Select services that are in the old one but are not in new one
         var deletedServices = oldRepair.Services.Where(service =>
-            !newRepair.Services.Select(s => s.ServiceDoneId).Contains(service.ServiceDoneId));
-        var addedServices = newRepair.Services.Where(s => s.ServiceDoneId == 0);
+            !newRepair.Services.Select(s => s.Id).Contains(service.Id));
+        var addedServices = newRepair.Services.Where(s => s.Id == 0);
         _context.ServicesDone.RemoveRange(deletedServices);
         _context.ServicesDone.AddRange(addedServices);
 
         //Handle new parts:
         //Same as services
         var deletedParts = oldRepair.Parts.Where(part =>
-            !newRepair.Parts.Select(p => p.PartUsedId).Contains(part.PartUsedId));
-        var addedParts = newRepair.Parts.Where(p => p.PartUsedId == 0);
+            !newRepair.Parts.Select(p => p.Id).Contains(part.Id));
+        var addedParts = newRepair.Parts.Where(p => p.Id == 0);
         _context.PartsUsed.RemoveRange(deletedParts);
         _context.PartsUsed.AddRange(addedParts);
         
         // Handle updating the amount on existing parts
-        var updatedParts = newRepair.Parts.Where(p => p.PartUsedId != 0 &&
-                                                      oldRepair.Parts.Any(part => part.PartUsedId == p.PartUsedId));
+        var updatedParts = newRepair.Parts.Where(p => p.Id != 0 &&
+                                                      oldRepair.Parts.Any(part => part.Id == p.Id));
 
         foreach (var part in updatedParts)
         {
-            var existingPart = oldRepair.Parts.FirstOrDefault(oldPart => oldPart.PartUsedId == part.PartUsedId);
+            var existingPart = oldRepair.Parts.FirstOrDefault(oldPart => oldPart.Id == part.Id);
 
             if (existingPart != null)
             {
@@ -267,7 +267,7 @@ public class RepairsService : IRepairsService
 
     private async Task<Data.Models.Repairs.Repair?> GetRepairFromDbAsync(int id)
     {
-        return await Queryable.Where<Data.Models.Repairs.Repair>(_context.Repairs, repair => repair.RepairId == id)
+        return await Queryable.Where<Data.Models.Repairs.Repair>(_context.Repairs, repair => repair.Id == id)
             .Include(repair => repair.Parts)
             .ThenInclude(part => part.Part)
             .ThenInclude(part => part!.Unit)

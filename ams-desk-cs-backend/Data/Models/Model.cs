@@ -22,7 +22,7 @@ public partial class Model
 
     [Column("model_name")]
     [MaxLength(50)]
-    public required string ModelName { get; set; }
+    public required string Name { get; set; }
 
     [Column("frame_size")]
     public short FrameSize { get; set; }
@@ -72,7 +72,7 @@ public partial class Model
 
     [ForeignKey(nameof(ColorId))]
     [InverseProperty(nameof(Color.Models))]
-    public virtual Color? Color { get; set; }
+    public virtual ModelColor? Color { get; set; }
 
     [ForeignKey(nameof(CategoryId))]
     [InverseProperty(nameof(Category.Models))]

@@ -25,20 +25,20 @@ public class StatusService : IStatusService
         }
         return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, new StatusDto
         {
-            StatusId = status.StatusId,
-            StatusName = status.StatusName,
-            HexCode = status.HexCode,
+            Id = status.Id,
+            Name = status.Name,
+            Color = status.Color,
         });
     }
 
     public async Task<ServiceResult<IEnumerable<StatusDto>>> GetStatuses()
     {
-        var statuses = await _context.Statuses.OrderBy(status => status.StatusesOrder)
+        var statuses = await _context.Statuses.OrderBy(status => status.Order)
             .Select(status => new StatusDto
             {
-                StatusId = status.StatusId,
-                StatusName = status.StatusName,
-                HexCode = status.HexCode,
+                Id = status.Id,
+                Name = status.Name,
+                Color = status.Color,
             }).ToListAsync();
         return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
     }
@@ -46,58 +46,58 @@ public class StatusService : IStatusService
     public async Task<ServiceResult<IEnumerable<StatusDto>>> GetStatusesExcluded(int[] excludedStatuses)
     {
         var statuses = await _context.Statuses
-            .Where(status => excludedStatuses.All(s => s != status.StatusId))
-            .OrderBy(status => status.StatusesOrder)
+            .Where(status => excludedStatuses.All(s => s != status.Id))
+            .OrderBy(status => status.Order)
             .Select(status => new StatusDto
             {
-                StatusId = status.StatusId,
-                StatusName = status.StatusName,
-                HexCode = status.HexCode,
-            }).OrderBy(status => status.StatusId).ToListAsync();
+                Id = status.Id,
+                Name = status.Name,
+                Color = status.Color,
+            }).OrderBy(status => status.Id).ToListAsync();
         return new ServiceResult<IEnumerable<StatusDto>>(ServiceStatus.Ok, string.Empty, statuses);
     }
     public async Task<ServiceResult<List<StatusDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Statuses.Any(s => s.StatusId == source || s.StatusId == dest))
+        if (!_context.Statuses.Any(s => s.Id == source || s.Id == dest))
         {
             return ServiceResult<List<StatusDto>>.NotFound("Nie znaleziono zamienianych elementów");
         }
 
-        var statuses = await _context.Statuses.OrderBy(s => s.StatusesOrder).ToListAsync();
-        var sourceStatus = statuses.First(s => s.StatusId == source);
-        var destStatus = statuses.First(s => s.StatusId == dest);
+        var statuses = await _context.Statuses.OrderBy(s => s.Order).ToListAsync();
+        var sourceStatus = statuses.First(s => s.Id == source);
+        var destStatus = statuses.First(s => s.Id == dest);
 
-        var sourceOrder = sourceStatus.StatusesOrder;
-        var destOrder = destStatus.StatusesOrder;
+        var sourceOrder = sourceStatus.Order;
+        var destOrder = destStatus.Order;
 
         if (sourceOrder < destOrder)
         {
             statuses
-                .Where(s => s.StatusesOrder > sourceOrder && s.StatusesOrder <= destOrder)
+                .Where(s => s.Order > sourceOrder && s.Order <= destOrder)
                 .ToList()
-                .ForEach(s => s.StatusesOrder--);
+                .ForEach(s => s.Order--);
 
-            sourceStatus.StatusesOrder = destOrder;
+            sourceStatus.Order = destOrder;
         }
         else if (sourceOrder > destOrder)
         {
             statuses
-                .Where(s => s.StatusesOrder >= destOrder && s.StatusesOrder < sourceOrder)
+                .Where(s => s.Order >= destOrder && s.Order < sourceOrder)
                 .ToList()
-                .ForEach(s => s.StatusesOrder++);
+                .ForEach(s => s.Order++);
 
-            sourceStatus.StatusesOrder = destOrder;
+            sourceStatus.Order = destOrder;
         }
 
         await _context.SaveChangesAsync();
 
         var result = await _context.Statuses
-            .OrderBy(s => s.StatusesOrder)
+            .OrderBy(s => s.Order)
             .Select(s => new StatusDto
             {
-                StatusId = s.StatusId,
-                StatusName = s.StatusName,
-                HexCode = s.HexCode
+                Id = s.Id,
+                Name = s.Name,
+                Color = s.Color
             })
             .ToListAsync();
 
@@ -110,17 +110,17 @@ public class StatusService : IStatusService
         var order = _context.Statuses.Count() + 1;
         var status = new Status
         {
-            StatusName = statusDto.StatusName,
-            HexCode = statusDto.HexCode,
-            StatusesOrder = (short)order
+            Name = statusDto.Name,
+            Color = statusDto.Color,
+            Order = (short)order
         };
         _context.Add(status);
         await _context.SaveChangesAsync();
         var result = new StatusDto
         {
-            StatusId = status.StatusId,
-            StatusName = status.StatusName,
-            HexCode = status.HexCode,
+            Id = status.Id,
+            Name = status.Name,
+            Color = status.Color,
         };
         return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -133,14 +133,14 @@ public class StatusService : IStatusService
             return ServiceResult<StatusDto>.NotFound("Nie znaleziono statusu");
         }
 
-        oldStatus.StatusName = newStatus.StatusName;
-        oldStatus.HexCode = newStatus.HexCode;
+        oldStatus.Name = newStatus.Name;
+        oldStatus.Color = newStatus.Color;
         await _context.SaveChangesAsync();
         var result = new StatusDto
         {
-            StatusId = oldStatus.StatusId,
-            StatusName = oldStatus.StatusName,
-            HexCode = oldStatus.HexCode,
+            Id = oldStatus.Id,
+            Name = oldStatus.Name,
+            Color = oldStatus.Color,
         };
         return new ServiceResult<StatusDto>(ServiceStatus.Ok, string.Empty, result);
     }

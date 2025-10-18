@@ -28,38 +28,38 @@ public class ColorsService : IColorsService
         return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty,
             new ColorDto
             {
-                ColorId = existingColor.ColorId,
-                ColorName = existingColor.ColorName,
-                HexCode = existingColor.HexCode,
+                Id = existingColor.Id,
+                Name = existingColor.Name,
+                Color = existingColor.Color,
             });
     }
 
     public async Task<ServiceResult<IEnumerable<ColorDto>>> GetColors()
     {
-        var colors = await _context.Colors.OrderBy(c => c.ColorsOrder).Select(color => new ColorDto
+        var colors = await _context.Colors.OrderBy(c => c.Order).Select(color => new ColorDto
         {
-            ColorId = color.ColorId,
-            ColorName = color.ColorName,
-            HexCode = color.HexCode,
+            Id = color.Id,
+            Name = color.Name,
+            Color = color.Color,
         }).ToListAsync();
         return new ServiceResult<IEnumerable<ColorDto>>(ServiceStatus.Ok, string.Empty, colors);
     }
     public async Task<ServiceResult<ColorDto>> PostColor(ColorDto colorDto)
     {
         var order = _context.Colors.Count() + 1;
-        var color = new Color
+        var color = new ModelColor
         {
-            ColorName = colorDto.ColorName,
-            HexCode = colorDto.HexCode,
-            ColorsOrder = (short)order
+            Name = colorDto.Name,
+            Color = colorDto.Color,
+            Order = (short)order
         };
         _context.Add(color);
         await _context.SaveChangesAsync();
         var result = new ColorDto
         {
-            ColorId = color.ColorId,
-            ColorName = color.ColorName,
-            HexCode = color.HexCode,
+            Id = color.Id,
+            Name = color.Name,
+            Color = color.Color,
         };
         return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -71,60 +71,60 @@ public class ColorsService : IColorsService
             return ServiceResult<ColorDto>.NotFound("Nie znaleziono koloru");
         }
 
-        oldColor.ColorName = newColor.ColorName;
-        oldColor.HexCode = newColor.HexCode;
+        oldColor.Name = newColor.Name;
+        oldColor.Color = newColor.Color;
         await _context.SaveChangesAsync();
         var result = new ColorDto
         {
-            ColorId = oldColor.ColorId,
-            ColorName = oldColor.ColorName,
-            HexCode = oldColor.HexCode,
+            Id = oldColor.Id,
+            Name = oldColor.Name,
+            Color = oldColor.Color,
         };
         return new ServiceResult<ColorDto>(ServiceStatus.Ok, string.Empty, result);
     }
 
     public async Task<ServiceResult<List<ColorDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Colors.Any(c => c.ColorId == source || c.ColorId == dest))
+        if (!_context.Colors.Any(c => c.Id == source || c.Id == dest))
         {
             return ServiceResult<List<ColorDto>>.NotFound("Nie znaleziono zamienianych elementów");
         }
 
-        var colors = await _context.Colors.OrderBy(c => c.ColorsOrder).ToListAsync();
-        var sourceColor = colors.First(c => c.ColorId == source);
-        var destColor = colors.First(c => c.ColorId == dest);
+        var colors = await _context.Colors.OrderBy(c => c.Order).ToListAsync();
+        var sourceColor = colors.First(c => c.Id == source);
+        var destColor = colors.First(c => c.Id == dest);
 
-        var sourceOrder = sourceColor.ColorsOrder;
-        var destOrder = destColor.ColorsOrder;
+        var sourceOrder = sourceColor.Order;
+        var destOrder = destColor.Order;
 
         if (sourceOrder < destOrder)
         {
             colors
-                .Where(c => c.ColorsOrder > sourceOrder && c.ColorsOrder <= destOrder)
+                .Where(c => c.Order > sourceOrder && c.Order <= destOrder)
                 .ToList()
-                .ForEach(c => c.ColorsOrder--);
+                .ForEach(c => c.Order--);
 
-            sourceColor.ColorsOrder = destOrder;
+            sourceColor.Order = destOrder;
         }
         else if (sourceOrder > destOrder)
         {
             colors
-                .Where(c => c.ColorsOrder >= destOrder && c.ColorsOrder < sourceOrder)
+                .Where(c => c.Order >= destOrder && c.Order < sourceOrder)
                 .ToList()
-                .ForEach(c => c.ColorsOrder++);
+                .ForEach(c => c.Order++);
 
-            sourceColor.ColorsOrder = destOrder;
+            sourceColor.Order = destOrder;
         }
 
         await _context.SaveChangesAsync();
 
         var result = await _context.Colors
-            .OrderBy(c => c.ColorsOrder)
+            .OrderBy(c => c.Order)
             .Select(c => new ColorDto
             {
-                ColorId = c.ColorId,
-                ColorName = c.ColorName,
-                HexCode = c.HexCode
+                Id = c.Id,
+                Name = c.Name,
+                Color = c.Color
             })
             .ToListAsync();
 

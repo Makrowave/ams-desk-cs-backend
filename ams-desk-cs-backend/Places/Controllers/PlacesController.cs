@@ -67,7 +67,7 @@ public class PlacesController : ControllerBase
     }
     [HttpPut("ChangeOrder")]
     [Authorize(Policy = "AdminAccessToken")]
-    public async Task<IActionResult> ChangeOrder(short first, short last)
+    public async Task<ActionResult<List<PlaceDto>>> ChangeOrder(short first, short last)
     {
         var result = await _placeService.ChangeOrder(first, last);
         if (result.Status == ServiceStatus.NotFound)
@@ -78,6 +78,6 @@ public class PlacesController : ControllerBase
         {
             return BadRequest(result.Message);
         }
-        return Ok();
+        return Ok(result.Data);
     }
 }

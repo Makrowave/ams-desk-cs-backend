@@ -24,12 +24,12 @@ public class SoldBikeDto
         {
             throw new ArgumentException("Invalid price");
         }
-        Id = bike.BikeId;
-        Model = bike.Model.ModelName;
-        Manufacturer = bike.Model.Manufacturer.ManufacturerName;
+        Id = bike.Id;
+        Model = bike.Model.Name;
+        Manufacturer = bike.Model.Manufacturer.Name;
         PrimaryColor = bike.Model.PrimaryColor;
         SecondaryColor = bike.Model.SecondaryColor;
-        Place = bike.Place!.PlaceName;
+        Place = bike.Place!.Name;
         Price = bike.Model.Price;
         SalePrice = bike.SalePrice.Value;
         Discount = Price - SalePrice;

@@ -10,11 +10,11 @@ public class PartCategory
     [Key]
     [Column("part_category_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short PartCategoryId { get; set; }
+    public short Id { get; set; }
 
     [Column("part_category_name")]
     [MaxLength(30)]
-    public required string PartCategoryName { get; set; }
+    public required string Name { get; set; }
 
     public virtual ICollection<PartType> PartTypes { get; set; } = new List<PartType>();
 }

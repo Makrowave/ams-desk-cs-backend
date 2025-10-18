@@ -15,7 +15,7 @@ public class UnitsService : IUnitsService
     }
     public async Task<ServiceResult<IEnumerable<UnitDto>>> GetUnits()
     {
-        var result = await _context.Units.Select(unit => new UnitDto { Id = unit.UnitId, Name = unit.UnitName }).ToListAsync();
+        var result = await _context.Units.Select(unit => new UnitDto { Id = unit.Id, Name = unit.Name }).ToListAsync();
         return new ServiceResult<IEnumerable<UnitDto>>(ServiceStatus.Ok, string.Empty ,result);
     }
 }

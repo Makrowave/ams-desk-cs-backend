@@ -4,25 +4,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.Data.Models;
 
-[Index(nameof(ColorName), IsUnique = true)]
+[Index(nameof(Name), IsUnique = true)]
 [Table("colors")]
-public partial class Color
+public partial class ModelColor
 {
     [Key]
     [Column("color_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short ColorId { get; set; }
+    public short Id { get; set; }
 
     [Column("color_name")]
     [MaxLength(30)]
-    public required string ColorName { get; set; }
+    public required string Name { get; set; }
 
     [Column("hex_code")]
     [MaxLength(7)]
-    public required string HexCode { get; set; }
+    public required string Color { get; set; }
 
     [Column("colors_order")]
-    public required short ColorsOrder { get; set; }
+    public required short Order { get; set; }
 
     public virtual ICollection<Model> Models { get; set; } = new List<Model>();
 }

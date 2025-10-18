@@ -73,7 +73,7 @@ public class BikesService : IBikesService
             .GroupJoin(
                 _context.Places,
                 bi => bi.PlaceId,
-                pl => pl.PlaceId,
+                pl => pl.Id,
                 (bi, pl) => new { bi, pl }
             )
             .SelectMany(
@@ -83,18 +83,18 @@ public class BikesService : IBikesService
             .GroupJoin(
                 _context.Statuses,
                 g => g.bi.StatusId,
-                st => st.StatusId,
+                st => st.Id,
                 (g, st) => new { g.bi, g.pl, st }
             )
             .SelectMany(
                 g => g.st.DefaultIfEmpty(),
                 (g, st) => new { g.bi, g.pl, st }
             )
-            .OrderBy(g => g.st.StatusesOrder).ThenBy(g => g.pl.PlaceId)
+            .OrderBy(g => g.st.Order).ThenBy(g => g.pl.Id)
             .Select(
                 g => new BikeSubRecordDto
                 {
-                    Id = g.bi.BikeId,
+                    Id = g.bi.Id,
                     Place = g.bi.PlaceId,
                     StatusId = g.bi.StatusId,
                     AssembledBy = g.bi.AssembledBy
@@ -107,7 +107,7 @@ public class BikesService : IBikesService
 
     public async Task<ServiceResult<(short PlaceId, int ModelId)>> SellBike(int id, int price, bool internet)
     {
-        var bike = await _context.Bikes.Include(bike => bike.Place).FirstOrDefaultAsync(bike => bike.BikeId == id);
+        var bike = await _context.Bikes.Include(bike => bike.Place).FirstOrDefaultAsync(bike => bike.Id == id);
         if (bike == null)
         {
             return ServiceResult<(short PlaceId, int ModelId)>.NotFound("Nie znaleziono bike");
@@ -164,7 +164,7 @@ public class BikesService : IBikesService
         await _context.SaveChangesAsync();
         return new ServiceResult<BikeSubRecordDto>(ServiceStatus.Ok, string.Empty, new BikeSubRecordDto
         {
-            Id = bike.BikeId,
+            Id = bike.Id,
             Place = bike.PlaceId,
             StatusId = bike.StatusId,
             AssembledBy = bike.AssembledBy,
@@ -192,7 +192,7 @@ public class BikesService : IBikesService
         await _context.SaveChangesAsync();
         return new ServiceResult<BikeSubRecordDto>(ServiceStatus.Ok, string.Empty, new BikeSubRecordDto
         {
-            Id = bike.BikeId,
+            Id = bike.Id,
             Place = bike.PlaceId,
             StatusId = bike.StatusId,
             AssembledBy = bike.AssembledBy,
@@ -224,7 +224,7 @@ public class BikesService : IBikesService
         await _context.SaveChangesAsync();
         var result = new BikeSubRecordDto
         {
-            Id = bike.BikeId,
+            Id = bike.Id,
             Place = bike.PlaceId,
             StatusId = bike.StatusId,
             AssembledBy = bike.AssembledBy,

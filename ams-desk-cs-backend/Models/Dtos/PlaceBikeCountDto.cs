@@ -2,7 +2,7 @@
 
 public class PlaceBikeCountDto
 {
-    public int PlaceId { get; set; }
+    public int Id { get; set; }
     public int Count { get; set; }
     public bool IsAvailable { get; set; }
 }

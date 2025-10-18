@@ -18,7 +18,7 @@ public class WheelSizesService : IWheelSizesService
     public async Task<ServiceResult<IEnumerable<WheelSizeDto>>> GetWheelSizes()
     {
         var wheelSizes = await _context.WheelSizes.Select(wheelSize => wheelSize.WheelSizeId).OrderBy(wheelSize => wheelSize).ToListAsync();
-        var wheelSizesDto = wheelSizes.Select(value => new WheelSizeDto { Key = value, Value = value });
+        var wheelSizesDto = wheelSizes.Select(value => new WheelSizeDto(value));
         return new ServiceResult<IEnumerable<WheelSizeDto>>(ServiceStatus.Ok, string.Empty, wheelSizesDto);
     }
 
@@ -34,7 +34,7 @@ public class WheelSizesService : IWheelSizesService
         return new ServiceResult<WheelSizeDto>(
             ServiceStatus.Ok, 
             string.Empty, 
-            new WheelSizeDto { Key = wheelSize, Value = wheelSize }
+            new WheelSizeDto(wheelSize)
             );
     }
     public async Task<ServiceResult> DeleteWheelSize(decimal wheelSize)

@@ -11,14 +11,14 @@ public class Part
     [Key]
     [Column("part_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int PartId { get; set; }
+    public int Id { get; set; }
 
     [Required]
     [Column("part_name")]
     [MaxLength(50)]
     [MinLength(1)]
     [RegularExpression(Regexes.PolishText)]
-    public string PartName { get; set; } = null!;
+    public string Name { get; set; } = null!;
 
     [Required]
     [Column("part_price")]

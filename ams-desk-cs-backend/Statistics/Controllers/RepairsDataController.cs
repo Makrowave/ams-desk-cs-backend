@@ -45,9 +45,9 @@ public class RepairsDataController: ControllerBase
         {
             result.Add(new SeriesDto<DateAndPriceDto>
                 {
-                    Label = place.PlaceName,
+                    Label = place.Name,
                     Data = (await CreateSeriesAsync(dateRange.Since.Value, dateRange.Until.Value, interval,
-                        place.PlaceId)).ToList(),
+                        place.Id)).ToList(),
                 }
             );
         }

@@ -10,10 +10,10 @@ public class Unit
     [Key]
     [Column("unit_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short UnitId { get; set; }
+    public short Id { get; set; }
 
     [Column("unit_name")]
-    public required string UnitName { get; set; }
+    public required string Name { get; set; }
 
     [Column("is_discrete")]
     public bool IsDiscrete { get; set; }

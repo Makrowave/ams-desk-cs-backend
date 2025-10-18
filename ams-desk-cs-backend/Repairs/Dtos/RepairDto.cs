@@ -9,7 +9,7 @@ public class RepairDto
     public RepairDto() { }
     public RepairDto(Repair repair)
     {
-        RepairId = repair.RepairId;
+        Id = repair.Id;
         PhoneNumber = repair.PhoneNumber;
         BikeName = repair.BikeName;
         Issue = repair.Issue;
@@ -24,9 +24,9 @@ public class RepairDto
         PlaceId = repair.PlaceId;
         Note = repair.Note;
         Status = repair.Status;
-        TakeInEmployeeName = repair.TakeInEmployee!.EmployeeName;
-        RepairEmployeeName = repair.RepairEmployee?.EmployeeName;
-        CollectionEmployeeName = repair.CollectionEmployee?.EmployeeName;
+        TakeInEmployeeName = repair.TakeInEmployee!.Name;
+        RepairEmployeeName = repair.RepairEmployee?.Name;
+        CollectionEmployeeName = repair.CollectionEmployee?.Name;
         Services = repair.Services;
         Parts = repair.Parts;
         foreach (var service in Services)
@@ -40,7 +40,7 @@ public class RepairDto
         Status?.Repairs?.Clear();
     }
     [Required]
-    public int RepairId { get; set; }
+    public int Id { get; set; }
     [Required]
     public string PhoneNumber { get; set; } = null!;
     [Required]

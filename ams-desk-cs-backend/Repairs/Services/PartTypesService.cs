@@ -21,8 +21,8 @@ public class PartTypesService : IPartTypesService
             .Select(type =>
                 new PartTypeDto
                 {
-                    Id = type.PartTypeId,
-                    Name = type.PartTypeName
+                    Id = type.Id,
+                    Name = type.Name
                 }).ToListAsync();
         return new ServiceResult<IEnumerable<PartTypeDto>>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -31,8 +31,8 @@ public class PartTypesService : IPartTypesService
     {
         var result = await _context.PartCategories.Select(category => new PartCategoryDto
         {
-            Id = category.PartCategoryId,
-            Name = category.PartCategoryName
+            Id = category.Id,
+            Name = category.Name
         }).ToListAsync();
         return new ServiceResult<IEnumerable<PartCategoryDto>>(ServiceStatus.Ok, string.Empty, result);
     }

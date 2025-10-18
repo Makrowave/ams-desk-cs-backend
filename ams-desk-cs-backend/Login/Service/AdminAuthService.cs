@@ -62,7 +62,7 @@ public class AdminAuthService : IAdminAuthService
                 userDto.Password))
             return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
             
-        var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role);
+        var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.Id, _role);
         return new ServiceResult<string>(ServiceStatus.Ok, string.Empty, token);
     }
 

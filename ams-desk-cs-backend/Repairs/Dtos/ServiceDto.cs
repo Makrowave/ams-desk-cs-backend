@@ -8,18 +8,18 @@ public class ServiceDto
 {
     public ServiceDto(Service service)
     {
-        ServiceId = service.ServiceId;
-        ServiceName = service.ServiceName;
+        Id = service.Id;
+        Name = service.Name;
         Price = service.Price;
         ServiceCategoryId = service.ServiceCategoryId;
         ServiceCategory = service.ServiceCategory;
     }
     public ServiceDto() {}
-    public short? ServiceId { get; set; }
+    public short? Id { get; set; }
     [Required]
     [RegularExpression(Regexes.PolishText)]
     [MaxLength(40)]
-    public string ServiceName { get; set; } = null!;
+    public string Name { get; set; } = null!;
     [Required]
     [Range(0, float.MaxValue)]
     public float Price { get; set; }

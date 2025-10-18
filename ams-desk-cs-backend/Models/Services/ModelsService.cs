@@ -23,7 +23,7 @@ public class ModelsService : IModelsService
     {
         var model = new Model
         {
-            ModelName = modelDto.ModelName,
+            Name = modelDto.Name,
             ProductCode = modelDto.ProductCode,
             EanCode = modelDto.EanCode,
             FrameSize = modelDto.FrameSize,
@@ -42,12 +42,12 @@ public class ModelsService : IModelsService
         var placeBikeCount = _context.Places.Select(
                 place => new PlaceBikeCountDto
                 {
-                    PlaceId = place.PlaceId,
+                    Id = place.Id,
                     Count = 0,
                     IsAvailable = false
                 }
             )
-            .OrderBy(place => place.PlaceId)
+            .OrderBy(place => place.Id)
             .ToList();
             
         _context.Add(model);
@@ -162,11 +162,11 @@ public class ModelsService : IModelsService
             //Find just first word in name so query returns less for later step (don't really know if it's optimal)
             var words = filter.Name.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             models = models.Where(
-                model => model.ModelName.ToLower().Contains(words[0])
+                model => model.Name.ToLower().Contains(words[0])
             );
         }
             
-        var places = await _context.Places.OrderBy(place => place.PlaceId).ToListAsync();
+        var places = await _context.Places.OrderBy(place => place.Id).ToListAsync();
         var selectedModels = await models.ToListAsync();
 
         var result = selectedModels.OrderBy(model => model.ModelId)
@@ -175,13 +175,13 @@ public class ModelsService : IModelsService
                 var placeBikeCount = places.Select(
                         place => new PlaceBikeCountDto
                         {
-                            PlaceId = place.PlaceId,
-                            Count = model.Bikes.Count(bike => bike.PlaceId == place.PlaceId),
-                            IsAvailable = model.Bikes.Any(bike => bike.PlaceId == place.PlaceId
+                            Id = place.Id,
+                            Count = model.Bikes.Count(bike => bike.PlaceId == place.Id),
+                            IsAvailable = model.Bikes.Any(bike => bike.PlaceId == place.Id
                                                                   && bike.StatusId == (short)BikeStatus.Assembled),
                         }
                     )
-                    .OrderBy(place => place.PlaceId)
+                    .OrderBy(place => place.Id)
                     .ToList();
                 return new ModelRecordDto(model, model.Bikes.Count, placeBikeCount);
             }).ToList();
@@ -198,7 +198,7 @@ public class ModelsService : IModelsService
             var words = filter.Name.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
             result = result.FindAll(model =>
             {
-                string modelName = model.ModelName.ToLower();
+                string modelName = model.Name.ToLower();
                 foreach (var word in words)
                 {
                     if (!modelName.Contains(word))
@@ -224,7 +224,7 @@ public class ModelsService : IModelsService
 
         oldModel.ProductCode = newModel.ProductCode;
         oldModel.EanCode = newModel.EanCode;
-        oldModel.ModelName = newModel.ModelName;
+        oldModel.Name = newModel.Name;
         oldModel.FrameSize = newModel.FrameSize;
         oldModel.WheelSizeId = newModel.WheelSize;
         oldModel.IsWoman = newModel.IsWoman;

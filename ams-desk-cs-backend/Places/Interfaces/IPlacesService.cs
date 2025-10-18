@@ -7,7 +7,7 @@ namespace ams_desk_cs_backend.Places.Interfaces
     {
         public Task<ServiceResult<IEnumerable<PlaceDto>>> GetPlaces();
         public Task<ServiceResult<IEnumerable<PlaceDto>>> GetPlacesNotStorage();
-        public Task<ServiceResult<IEnumerable<PlaceDto>>> ChangeOrder(short firstId, short lastId);
+        public Task<ServiceResult<List<PlaceDto>>> ChangeOrder(short firstId, short lastId);
         public Task<ServiceResult<PlaceDto>> PostPlace(PlaceDto placeDto);
         public Task<ServiceResult<PlaceDto>> PutPlace(short id, PlaceDto placeDto);
         public Task<ServiceResult> DeletePlace(short id);

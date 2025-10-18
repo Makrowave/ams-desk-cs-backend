@@ -59,7 +59,7 @@ public class AuthService : IAuthService
             return new ServiceResult<string>(ServiceStatus.BadRequest, "Nieprawidłowe dane logowania", null);
             
         string id = user.EmployeeId.ToString() ?? "DesktopOnly";
-        var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.UserId, _role, id, mobile);
+        var token = GenerateJwtToken(_refreshTokenLength, user.Username, user.TokenVersion.ToString(), user.Id, _role, id, mobile);
         return new ServiceResult<string>(ServiceStatus.Ok, string.Empty, token);
 
     }

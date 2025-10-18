@@ -2,7 +2,7 @@
 
 public class BikeDto
 {
-    public int? BikeId { get; set; }
+    public int? Id { get; set; }
 
     public int? ModelId { get; set; }
 

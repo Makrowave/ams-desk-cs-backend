@@ -3,5 +3,5 @@
 public class UnitDto
 {
     public short Id { get; set; }
-    public string Name { get; set; }
+    public required string Name { get; set; }
 }

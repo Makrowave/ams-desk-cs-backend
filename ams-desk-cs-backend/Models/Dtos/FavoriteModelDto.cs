@@ -6,18 +6,18 @@ public class FavoriteModelDto
 {
     public FavoriteModelDto(Model model)
     {
-        ModelId = model.ModelId;
-        ModelName = model.ModelName;
+        Id = model.ModelId;
+        Name = model.Name;
         FrameSize = model.FrameSize;
         WheelSize = model.WheelSizeId;
-        ManufacturerName = model.Manufacturer!.ManufacturerName;
+        ManufacturerName = model.Manufacturer!.Name;
         ProductCode = model.ProductCode;
         PrimaryColor = model.PrimaryColor;
         SecondaryColor = model.SecondaryColor;
         Count = model.Bikes.Count;
     }
-    public int ModelId { get; set; }
-    public string ModelName { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; }
     public string ManufacturerName { get; set; }
     public short FrameSize { get; set; }
     public decimal WheelSize { get; set; }

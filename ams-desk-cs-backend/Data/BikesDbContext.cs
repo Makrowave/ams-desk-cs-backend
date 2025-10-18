@@ -25,7 +25,7 @@ public partial class BikesDbContext : DbContext
 
     public virtual DbSet<Status> Statuses { get; set; }
 
-    public virtual DbSet<Color> Colors { get; set; }
+    public virtual DbSet<ModelColor> Colors { get; set; }
     public virtual DbSet<Category> Categories { get; set; }
     public virtual DbSet<Employee> Employees { get; set; }
     public virtual DbSet<WheelSize> WheelSizes { get; set; }
@@ -48,78 +48,78 @@ public partial class BikesDbContext : DbContext
         
 
         modelBuilder.Entity<RepairStatus>().HasData([
-            new RepairStatus {RepairStatusId = 1, Color = "#FFA500", Name = "Przyjęto"},
-            new RepairStatus {RepairStatusId = 2, Color = "#27a8be", Name = "Reklamacja"},
-            new RepairStatus {RepairStatusId = 3, Color = "#fff0c2", Name = "W trakcie"},
-            new RepairStatus {RepairStatusId = 4, Color = "#a6e1f7", Name = "Oczekuje na części"},
-            new RepairStatus {RepairStatusId = 5, Color = "#c8e6c9", Name = "Zakończono"},
-            new RepairStatus {RepairStatusId = 6, Color = "#82e085", Name = "Powiadomiono"},
-            new RepairStatus {RepairStatusId = 7, Color = "#32fc39", Name = "Wydano"},
-            new RepairStatus {RepairStatusId = 8, Color = "#54afff", Name = "Kontakt z klientem"},
-            new RepairStatus {RepairStatusId = 9, Color = "#f51b47", Name = "Anulowano"},
+            new RepairStatus {Id = 1, Color = "#FFA500", Name = "Przyjęto"},
+            new RepairStatus {Id = 2, Color = "#27a8be", Name = "Reklamacja"},
+            new RepairStatus {Id = 3, Color = "#fff0c2", Name = "W trakcie"},
+            new RepairStatus {Id = 4, Color = "#a6e1f7", Name = "Oczekuje na części"},
+            new RepairStatus {Id = 5, Color = "#c8e6c9", Name = "Zakończono"},
+            new RepairStatus {Id = 6, Color = "#82e085", Name = "Powiadomiono"},
+            new RepairStatus {Id = 7, Color = "#32fc39", Name = "Wydano"},
+            new RepairStatus {Id = 8, Color = "#54afff", Name = "Kontakt z klientem"},
+            new RepairStatus {Id = 9, Color = "#f51b47", Name = "Anulowano"},
         ]);
 
         modelBuilder.Entity<Unit>().HasData([
-            new Unit {UnitId = 1, IsDiscrete = true, UnitName = "szt."},
-            new Unit {UnitId = 2, IsDiscrete = false, UnitName = "m"},
-            new Unit {UnitId = 3, IsDiscrete = false, UnitName = "cm"},
-            new Unit {UnitId = 4, IsDiscrete = false, UnitName = "ml"},
+            new Unit {Id = 1, IsDiscrete = true, Name = "szt."},
+            new Unit {Id = 2, IsDiscrete = false, Name = "m"},
+            new Unit {Id = 3, IsDiscrete = false, Name = "cm"},
+            new Unit {Id = 4, IsDiscrete = false, Name = "ml"},
         ]);
 
         
         modelBuilder.Entity<Status>().HasData([
-            new Status { StatusId = 1, StatusName = "Niezłożony", HexCode = "#fff0c2", StatusesOrder = 1 },
-            new Status { StatusId = 2, StatusName = "Złożony", HexCode = "#c8e6c9", StatusesOrder = 2 },
-            new Status { StatusId = 3, StatusName = "Sprzedany", HexCode = "#ff00ff", StatusesOrder = 3 },
-            new Status { StatusId = 4, StatusName = "Do wysyłki", HexCode = "#f7cca6", StatusesOrder = 4 },
-            new Status { StatusId = 5, StatusName = "Zadatek", HexCode = "#a6e1f7", StatusesOrder = 5 },
-            new Status { StatusId = 6, StatusName = "Reklamacja", HexCode = "#27a8be", StatusesOrder = 6 }
+            new Status { Id = 1, Name = "Niezłożony", Color = "#fff0c2", Order = 1 },
+            new Status { Id = 2, Name = "Złożony", Color = "#c8e6c9", Order = 2 },
+            new Status { Id = 3, Name = "Sprzedany", Color = "#ff00ff", Order = 3 },
+            new Status { Id = 4, Name = "Do wysyłki", Color = "#f7cca6", Order = 4 },
+            new Status { Id = 5, Name = "Zadatek", Color = "#a6e1f7", Order = 5 },
+            new Status { Id = 6, Name = "Reklamacja", Color = "#27a8be", Order = 6 }
         ]);
 
         modelBuilder.Entity<ServiceCategory>().HasData([
-            new ServiceCategory() {ServiceCategoryId = 1, ServiceCategoryName = "Przeglądy"},
-            new ServiceCategory() {ServiceCategoryId = 2, ServiceCategoryName = "Zawieszenie"},
-            new ServiceCategory() {ServiceCategoryId = 3, ServiceCategoryName = "Przerzutki"},
-            new ServiceCategory() {ServiceCategoryId = 4, ServiceCategoryName = "Korby"},
-            new ServiceCategory() {ServiceCategoryId = 5, ServiceCategoryName = "Hamulce V-BRAKE"},
-            new ServiceCategory() {ServiceCategoryId = 6, ServiceCategoryName = "Hamulce tarczowe"},
-            new ServiceCategory() {ServiceCategoryId = 7, ServiceCategoryName = "Koła"},
-            new ServiceCategory() {ServiceCategoryId = 8, ServiceCategoryName = "Ogumienie"},
-            new ServiceCategory() {ServiceCategoryId = 9, ServiceCategoryName = "Piasty"},
-            new ServiceCategory() {ServiceCategoryId = 10, ServiceCategoryName = "Stery"},
-            new ServiceCategory() {ServiceCategoryId = 11, ServiceCategoryName = "Kierownica"},
-            new ServiceCategory() {ServiceCategoryId = 12, ServiceCategoryName = "Siodełko"},
-            new ServiceCategory() {ServiceCategoryId = 13, ServiceCategoryName = "Akcesoria"},
-            new ServiceCategory() {ServiceCategoryId = 14, ServiceCategoryName = "Rower i inne"},
+            new ServiceCategory() {Id = 1, Name = "Przeglądy"},
+            new ServiceCategory() {Id = 2, Name = "Zawieszenie"},
+            new ServiceCategory() {Id = 3, Name = "Przerzutki"},
+            new ServiceCategory() {Id = 4, Name = "Korby"},
+            new ServiceCategory() {Id = 5, Name = "Hamulce V-BRAKE"},
+            new ServiceCategory() {Id = 6, Name = "Hamulce tarczowe"},
+            new ServiceCategory() {Id = 7, Name = "Koła"},
+            new ServiceCategory() {Id = 8, Name = "Ogumienie"},
+            new ServiceCategory() {Id = 9, Name = "Piasty"},
+            new ServiceCategory() {Id = 10, Name = "Stery"},
+            new ServiceCategory() {Id = 11, Name = "Kierownica"},
+            new ServiceCategory() {Id = 12, Name = "Siodełko"},
+            new ServiceCategory() {Id = 13, Name = "Akcesoria"},
+            new ServiceCategory() {Id = 14, Name = "Rower i inne"},
         ]);
 
-        modelBuilder.Entity<Color>().HasData([
-            new Color() {ColorId = 1, ColorName = "Biały", HexCode = "#ffffff", ColorsOrder = 1},
-            new Color() {ColorId = 2, ColorName = "Szary", HexCode = "#7b8285", ColorsOrder = 2},
-            new Color() {ColorId = 3, ColorName = "Czarny", HexCode = "#000000", ColorsOrder = 3},
-            new Color() {ColorId = 4, ColorName = "Różowy", HexCode = "#f542ef", ColorsOrder = 4},
-            new Color() {ColorId = 5, ColorName = "Czerwony", HexCode = "#f54242", ColorsOrder = 5},
-            new Color() {ColorId = 6, ColorName = "Pomarańczowy", HexCode = "#f57d1b", ColorsOrder = 6},
-            new Color() {ColorId = 7, ColorName = "Żółty", HexCode = "#f5d41b", ColorsOrder = 7},
-            new Color() {ColorId = 8, ColorName = "Zielony", HexCode = "#23ba26", ColorsOrder = 8},
-            new Color() {ColorId = 9, ColorName = "Turkusowy", HexCode = "#18cca8", ColorsOrder = 9},
-            new Color() {ColorId = 10, ColorName = "Błękitny", HexCode = "#63e8eb", ColorsOrder = 10},
-            new Color() {ColorId = 11, ColorName = "Niebieski", HexCode = "#0f5edb", ColorsOrder = 11},
-            new Color() {ColorId = 12, ColorName = "Fioletowy", HexCode = "#a01ff0", ColorsOrder = 12},
-            new Color() {ColorId = 13, ColorName = "Brązowy", HexCode = "#9f5228", ColorsOrder = 13}
+        modelBuilder.Entity<ModelColor>().HasData([
+            new ModelColor() {Id = 1, Name = "Biały", Color = "#ffffff", Order = 1},
+            new ModelColor() {Id = 2, Name = "Szary", Color = "#7b8285", Order = 2},
+            new ModelColor() {Id = 3, Name = "Czarny", Color = "#000000", Order = 3},
+            new ModelColor() {Id = 4, Name = "Różowy", Color = "#f542ef", Order = 4},
+            new ModelColor() {Id = 5, Name = "Czerwony", Color = "#f54242", Order = 5},
+            new ModelColor() {Id = 6, Name = "Pomarańczowy", Color = "#f57d1b", Order = 6},
+            new ModelColor() {Id = 7, Name = "Żółty", Color = "#f5d41b", Order = 7},
+            new ModelColor() {Id = 8, Name = "Zielony", Color = "#23ba26", Order = 8},
+            new ModelColor() {Id = 9, Name = "Turkusowy", Color = "#18cca8", Order = 9},
+            new ModelColor() {Id = 10, Name = "Błękitny", Color = "#63e8eb", Order = 10},
+            new ModelColor() {Id = 11, Name = "Niebieski", Color = "#0f5edb", Order = 11},
+            new ModelColor() {Id = 12, Name = "Fioletowy", Color = "#a01ff0", Order = 12},
+            new ModelColor() {Id = 13, Name = "Brązowy", Color = "#9f5228", Order = 13}
         ]);
 
         modelBuilder.Entity<Category>().HasData([
-            new Category() {CategoryId = 1, CategoryName = "Górski", CategoriesOrder = 1},
-            new Category() {CategoryId = 2, CategoryName = "Gravel", CategoriesOrder = 2},
-            new Category() {CategoryId = 3, CategoryName = "Szosowy", CategoriesOrder = 3},
-            new Category() {CategoryId = 4, CategoryName = "Cross", CategoriesOrder = 4},
-            new Category() {CategoryId = 5, CategoryName = "Trekking", CategoriesOrder = 5},
-            new Category() {CategoryId = 6, CategoryName = "Miejski", CategoriesOrder = 6},
-            new Category() {CategoryId = 7, CategoryName = "Dirt", CategoriesOrder = 7},
-            new Category() {CategoryId = 8, CategoryName = "Bmx", CategoriesOrder = 8},
-            new Category() {CategoryId = 9, CategoryName = "Dziecięcy", CategoriesOrder = 9},
-            new Category() {CategoryId = 10, CategoryName = "Składak", CategoriesOrder = 10}
+            new Category() {Id = 1, Name = "Górski", Order = 1},
+            new Category() {Id = 2, Name = "Gravel", Order = 2},
+            new Category() {Id = 3, Name = "Szosowy", Order = 3},
+            new Category() {Id = 4, Name = "Cross", Order = 4},
+            new Category() {Id = 5, Name = "Trekking", Order = 5},
+            new Category() {Id = 6, Name = "Miejski", Order = 6},
+            new Category() {Id = 7, Name = "Dirt", Order = 7},
+            new Category() {Id = 8, Name = "Bmx", Order = 8},
+            new Category() {Id = 9, Name = "Dziecięcy", Order = 9},
+            new Category() {Id = 10, Name = "Składak", Order = 10}
         ]);
 
         modelBuilder.Entity<WheelSize>().HasData([
@@ -137,7 +137,7 @@ public partial class BikesDbContext : DbContext
         var admin = new User("admin", defaultPass)
         {
             Username = "admin",
-            UserId = -1,
+            Id = -1,
             IsAdmin = true,
         };
         admin.SetAdminPassword(defaultPass);
@@ -146,7 +146,7 @@ public partial class BikesDbContext : DbContext
         ]);
 
         // modelBuilder.Entity<RepairStatus>().HasData([
-        //     new RepairStatus {RepairStatusId = 9, Color = "#f51b47", Name = "Anulowano"},
+        //     new RepairStatus {Id = 9, Color = "#f51b47", Name = "Anulowano"},
         // ]);
         
         OnModelCreatingPartial(modelBuilder);
