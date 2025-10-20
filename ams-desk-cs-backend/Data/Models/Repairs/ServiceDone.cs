@@ -10,7 +10,7 @@ public class ServiceDone
     [Key]
     [Column("service_done_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int ServiceDoneId { get; set; }
+    public int Id { get; set; }
 
     [Required]
     [Column("service_id")]

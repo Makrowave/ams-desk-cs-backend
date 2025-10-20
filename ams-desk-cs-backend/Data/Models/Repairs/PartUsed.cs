@@ -10,7 +10,7 @@ public class PartUsed
     [Key]
     [Column("part_used_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int PartUsedId { get; set; }
+    public int Id { get; set; }
 
     [Required]
     [Column("part_id")]

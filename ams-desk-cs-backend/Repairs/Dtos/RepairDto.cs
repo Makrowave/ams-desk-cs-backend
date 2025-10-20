@@ -9,7 +9,7 @@ public class RepairDto
     public RepairDto() { }
     public RepairDto(Repair repair)
     {
-        RepairId = repair.RepairId;
+        RepairId = repair.Id;
         PhoneNumber = repair.PhoneNumber;
         BikeName = repair.BikeName;
         Issue = repair.Issue;
@@ -24,9 +24,9 @@ public class RepairDto
         PlaceId = repair.PlaceId;
         Note = repair.Note;
         Status = repair.Status;
-        TakeInEmployeeName = repair.TakeInEmployee!.EmployeeName;
-        RepairEmployeeName = repair.RepairEmployee?.EmployeeName;
-        CollectionEmployeeName = repair.CollectionEmployee?.EmployeeName;
+        TakeInEmployeeName = repair.TakeInEmployee!.Name;
+        RepairEmployeeName = repair.RepairEmployee?.Name;
+        CollectionEmployeeName = repair.CollectionEmployee?.Name;
         Services = repair.Services;
         Parts = repair.Parts;
         foreach (var service in Services)

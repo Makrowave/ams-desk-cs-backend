@@ -4,18 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.Data.Models.Repairs;
 
-[Index(nameof(PartTypeName), IsUnique = true)]
+[Index(nameof(Name), IsUnique = true)]
 [Table("part_types")]
 public class PartType
 {
     [Key]
     [Column("part_type_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short PartTypeId { get; set; }
+    public short Id { get; set; }
 
     [Column("part_type_name")]
     [MaxLength(50)]
-    public required string PartTypeName { get; set; }
+    public required string Name { get; set; }
 
     [Column("part_category_id")]
     public short PartCategoryId { get; set; }

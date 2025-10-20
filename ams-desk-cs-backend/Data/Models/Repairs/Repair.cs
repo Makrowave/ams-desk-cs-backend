@@ -9,7 +9,7 @@ public class Repair
     [Key]
     [Column("repair_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int RepairId { get; set; }
+    public int Id { get; set; }
 
     [Column("phone_number")]
     [MaxLength(9)]

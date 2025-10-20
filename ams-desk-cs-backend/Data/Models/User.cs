@@ -26,7 +26,7 @@ public partial class User
     [Key]
     [Column("user_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short UserId { get; set; }
+    public short Id { get; set; }
 
     [Column("username")]
     [MaxLength(32)]

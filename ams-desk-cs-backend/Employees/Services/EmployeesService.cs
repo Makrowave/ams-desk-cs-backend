@@ -18,11 +18,11 @@ public class EmployeesService : IEmployeesService
 
     public async Task<ServiceResult<IEnumerable<EmployeeDto>>> GetEmployees()
     {
-        var employees = await _context.Employees.OrderBy(employee => employee.EmployeesOrder)
+        var employees = await _context.Employees.OrderBy(employee => employee.Order)
             .Select(employee => new EmployeeDto
             {
-                Id = employee.EmployeeId,
-                Name = employee.EmployeeName,
+                Id = employee.iD,
+                Name = employee.Name,
             }).ToListAsync();
         return new ServiceResult<IEnumerable<EmployeeDto>>(ServiceStatus.Ok, string.Empty, employees);
     }
@@ -32,15 +32,15 @@ public class EmployeesService : IEmployeesService
         var order = _context.Employees.Count() + 1;
         var employee = new Employee
         {
-            EmployeeName = employeeDto.Name,
-            EmployeesOrder = (short)order,
+            Name = employeeDto.Name,
+            Order = (short)order,
         };
         _context.Add(employee);
         await _context.SaveChangesAsync();
         var result = new EmployeeDto
         {
-            Id = employee.EmployeeId,
-            Name = employee.EmployeeName,
+            Id = employee.iD,
+            Name = employee.Name,
         };
         return new ServiceResult<EmployeeDto>(ServiceStatus.Ok, string.Empty, result);
     }
@@ -53,57 +53,57 @@ public class EmployeesService : IEmployeesService
             return ServiceResult<EmployeeDto>.NotFound("Nie znaleziono pracownika");
         }
 
-        existingEmployee.EmployeeName = employee.Name;
+        existingEmployee.Name = employee.Name;
         await _context.SaveChangesAsync();
         var result = new EmployeeDto
         {
-            Id = existingEmployee.EmployeeId,
-            Name = existingEmployee.EmployeeName,
+            Id = existingEmployee.iD,
+            Name = existingEmployee.Name,
         };
         return new ServiceResult<EmployeeDto>(ServiceStatus.Ok, string.Empty, result);
     }
 
     public async Task<ServiceResult<List<EmployeeDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Employees.Any(e => e.EmployeeId == source || e.EmployeeId == dest))
+        if (!_context.Employees.Any(e => e.iD == source || e.iD == dest))
         {
             return ServiceResult<List<EmployeeDto>>.NotFound("Nie znaleziono zamienianych pracowników");
         }
 
-        var employees = await _context.Employees.OrderBy(e => e.EmployeesOrder).ToListAsync();
-        var sourceEmployee = employees.First(e => e.EmployeeId == source);
-        var destEmployee = employees.First(e => e.EmployeeId == dest);
+        var employees = await _context.Employees.OrderBy(e => e.Order).ToListAsync();
+        var sourceEmployee = employees.First(e => e.iD == source);
+        var destEmployee = employees.First(e => e.iD == dest);
 
-        var sourceOrder = sourceEmployee.EmployeesOrder;
-        var destOrder = destEmployee.EmployeesOrder;
+        var sourceOrder = sourceEmployee.Order;
+        var destOrder = destEmployee.Order;
 
         if (sourceOrder < destOrder)
         {
             employees
-                .Where(e => e.EmployeesOrder > sourceOrder && e.EmployeesOrder <= destOrder)
+                .Where(e => e.Order > sourceOrder && e.Order <= destOrder)
                 .ToList()
-                .ForEach(e => e.EmployeesOrder--);
+                .ForEach(e => e.Order--);
 
-            sourceEmployee.EmployeesOrder = destOrder;
+            sourceEmployee.Order = destOrder;
         }
         else if (sourceOrder > destOrder)
         {
             employees
-                .Where(e => e.EmployeesOrder >= destOrder && e.EmployeesOrder < sourceOrder)
+                .Where(e => e.Order >= destOrder && e.Order < sourceOrder)
                 .ToList()
-                .ForEach(e => e.EmployeesOrder++);
+                .ForEach(e => e.Order++);
 
-            sourceEmployee.EmployeesOrder = destOrder;
+            sourceEmployee.Order = destOrder;
         }
 
         await _context.SaveChangesAsync();
 
         var result = await _context.Employees
-            .OrderBy(e => e.EmployeesOrder)
+            .OrderBy(e => e.Order)
             .Select(e => new EmployeeDto
             {
-                Id = e.EmployeeId,
-                Name = e.EmployeeName
+                Id = e.iD,
+                Name = e.Name
             })
             .ToListAsync();
 

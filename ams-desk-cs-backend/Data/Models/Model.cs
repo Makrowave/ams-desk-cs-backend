@@ -72,7 +72,7 @@ public partial class Model
 
     [ForeignKey(nameof(ColorId))]
     [InverseProperty(nameof(Color.Models))]
-    public virtual Color? Color { get; set; }
+    public virtual ModelColor? Color { get; set; }
 
     [ForeignKey(nameof(CategoryId))]
     [InverseProperty(nameof(Category.Models))]

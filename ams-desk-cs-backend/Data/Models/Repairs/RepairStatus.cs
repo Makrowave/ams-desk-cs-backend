@@ -11,7 +11,7 @@ public class RepairStatus
     [Key]
     [Column("repair_status_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short RepairStatusId { get; set; }
+    public short Id { get; set; }
 
     [Column("repair_status_name")]
     [MaxLength(30)]

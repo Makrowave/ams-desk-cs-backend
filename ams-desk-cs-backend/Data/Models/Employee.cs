@@ -5,21 +5,21 @@ using ams_desk_cs_backend.Data.Models.Repairs;
 
 namespace ams_desk_cs_backend.Data.Models;
 
-[Index(nameof(EmployeeName), IsUnique = true)]
+[Index(nameof(Name), IsUnique = true)]
 [Table("employees")]
 public partial class Employee
 {
     [Key]
     [Column("employee_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short EmployeeId { get; set; }
+    public short iD { get; set; }
 
     [Column("employee_name")]
     [MaxLength(30)]
-    public required string EmployeeName { get; set; }
+    public required string Name { get; set; }
 
     [Column("employees_order")]
-    public required short EmployeesOrder { get; set; }
+    public required short Order { get; set; }
 
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 

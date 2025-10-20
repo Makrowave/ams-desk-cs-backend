@@ -10,7 +10,7 @@ public partial class Bike
     [Key]
     [Column("bike_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int BikeId { get; set; }
+    public int Id { get; set; }
 
     [Column("model_id")]
     public int ModelId { get; set; }

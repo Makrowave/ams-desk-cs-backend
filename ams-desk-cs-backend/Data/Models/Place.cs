@@ -10,14 +10,14 @@ public partial class Place
     [Key]
     [Column("place_id")]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public short PlaceId { get; set; }
+    public short Id { get; set; }
 
     [Column("place_name")]
     [MaxLength(16)]
-    public required string PlaceName { get; set; }
+    public required string Name { get; set; }
 
     [Column("places_order")]
-    public required short PlacesOrder { get; set; }
+    public required short Order { get; set; }
 
     [Column("is_storage")]
     public required bool IsStorage { get; set; }

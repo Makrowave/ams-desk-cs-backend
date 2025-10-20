@@ -10,7 +10,7 @@ public class FavoriteModelDto
         ModelName = model.ModelName;
         FrameSize = model.FrameSize;
         WheelSize = model.WheelSizeId;
-        ManufacturerName = model.Manufacturer!.ManufacturerName;
+        ManufacturerName = model.Manufacturer!.Name;
         ProductCode = model.ProductCode;
         PrimaryColor = model.PrimaryColor;
         SecondaryColor = model.SecondaryColor;

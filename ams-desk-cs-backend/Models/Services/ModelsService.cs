@@ -42,7 +42,7 @@ public class ModelsService : IModelsService
         var placeBikeCount = _context.Places.Select(
                 place => new PlaceBikeCountDto
                 {
-                    PlaceId = place.PlaceId,
+                    PlaceId = place.Id,
                     Count = 0,
                     IsAvailable = false
                 }
@@ -166,7 +166,7 @@ public class ModelsService : IModelsService
             );
         }
             
-        var places = await _context.Places.OrderBy(place => place.PlaceId).ToListAsync();
+        var places = await _context.Places.OrderBy(place => place.Id).ToListAsync();
         var selectedModels = await models.ToListAsync();
 
         var result = selectedModels.OrderBy(model => model.ModelId)
@@ -175,9 +175,9 @@ public class ModelsService : IModelsService
                 var placeBikeCount = places.Select(
                         place => new PlaceBikeCountDto
                         {
-                            PlaceId = place.PlaceId,
-                            Count = model.Bikes.Count(bike => bike.PlaceId == place.PlaceId),
-                            IsAvailable = model.Bikes.Any(bike => bike.PlaceId == place.PlaceId
+                            PlaceId = place.Id,
+                            Count = model.Bikes.Count(bike => bike.PlaceId == place.Id),
+                            IsAvailable = model.Bikes.Any(bike => bike.PlaceId == place.Id
                                                                   && bike.StatusId == (short)BikeStatus.Assembled),
                         }
                     )

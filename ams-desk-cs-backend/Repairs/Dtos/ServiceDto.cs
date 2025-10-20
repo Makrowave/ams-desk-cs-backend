@@ -8,8 +8,8 @@ public class ServiceDto
 {
     public ServiceDto(Service service)
     {
-        ServiceId = service.ServiceId;
-        ServiceName = service.ServiceName;
+        ServiceId = service.Id;
+        ServiceName = service.Name;
         Price = service.Price;
         ServiceCategoryId = service.ServiceCategoryId;
         ServiceCategory = service.ServiceCategory;

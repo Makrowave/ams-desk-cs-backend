@@ -23,12 +23,12 @@ public class PartsService : IPartsService
             .Where(part => part.PartTypeId == typeId || typeId == 0)
             .Where(part => part.PartType!.PartCategoryId == categoryId || categoryId == 0)
             .OrderByDescending(part => part.PartsUsed.Count)
-            .ThenByDescending(part => part.PartName)
+            .ThenByDescending(part => part.Name)
             .Select(part => new Part
             {
-                PartId = part.PartId,
+                Id = part.Id,
                 PartTypeId = part.PartTypeId,
-                PartName = part.PartName,
+                Name = part.Name,
                 Price = part.Price,
                 UnitId = part.UnitId,
                 Unit = part.Unit,
@@ -53,12 +53,12 @@ public class PartsService : IPartsService
             .Include(part => part.Unit)
             .Include(part => part.PartType)
             .OrderByDescending(part => part.PartsUsed.Count)
-            .ThenByDescending(part => part.PartName)
+            .ThenByDescending(part => part.Name)
             .Select(part => new Part
             {
-                PartId = part.PartId,
+                Id = part.Id,
                 PartTypeId = part.PartTypeId,
-                PartName = part.PartName,
+                Name = part.Name,
                 Price = part.Price,
                 UnitId = part.UnitId,
                 Unit = part.Unit,
@@ -79,12 +79,12 @@ public class PartsService : IPartsService
         existingPart.PartTypeId = part.PartTypeId;
         existingPart.UnitId = part.UnitId;
         existingPart.Price = part.Price;
-        existingPart.PartName = part.PartName;
+        existingPart.Name = part.Name;
         await _context.SaveChangesAsync();
         var result = await _context.Parts.Include(p => p.PartsUsed)
             .Include(p => p.Unit)
             .Include(p => p.PartType)
-            .FirstOrDefaultAsync(p => p.PartId == partId);
+            .FirstOrDefaultAsync(p => p.Id == partId);
         return new ServiceResult<Part>(ServiceStatus.Ok, string.Empty, result);
     }
 
@@ -96,21 +96,21 @@ public class PartsService : IPartsService
         {
             return ServiceResult<Dictionary<string, object>>.NotFound("Nie znaleziono jednej z części");
         }
-        part1.PartName = part.PartName;
+        part1.Name = part.Name;
         part1.UnitId = part.UnitId;
         part1.Price = part.Price;
         part1.PartTypeId = part.PartTypeId;
-        var partsUsed = await _context.PartsUsed.Where(partUsed => partUsed.PartId == part2.PartId).ToListAsync();
-        partsUsed.ForEach(partUsed => partUsed.PartId = part1.PartId);
+        var partsUsed = await _context.PartsUsed.Where(partUsed => partUsed.PartId == part2.Id).ToListAsync();
+        partsUsed.ForEach(partUsed => partUsed.PartId = part1.Id);
         _context.Remove(part2);
         await _context.SaveChangesAsync();
         var newPart = await _context.Parts.Include(p => p.PartsUsed)
             .Include(p => p.Unit)
             .Include(p => p.PartType)
-            .FirstOrDefaultAsync(p => p.PartId == id1);
+            .FirstOrDefaultAsync(p => p.Id == id1);
         var result = new Dictionary<string, object>();
-        result.Add("keptId", newPart!.PartId);
-        result.Add("removedId", part2.PartId);
+        result.Add("keptId", newPart!.Id);
+        result.Add("removedId", part2.Id);
         result.Add("part", newPart);
         return new ServiceResult<Dictionary<string, object>>(ServiceStatus.Ok, string.Empty, result);
     }

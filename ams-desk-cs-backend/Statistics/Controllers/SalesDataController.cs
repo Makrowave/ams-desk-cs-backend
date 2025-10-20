@@ -69,7 +69,7 @@ public class SalesDataController : ControllerBase
         }
 
         var places = await _context.Places.Where(place => !place.IsStorage).ToListAsync();
-        places.Add(new Place { PlaceId = -1, PlaceName = "Internet", IsStorage = false, PlacesOrder = 1000});
+        places.Add(new Place { Id = -1, Name = "Internet", IsStorage = false, Order = 1000});
         var result = new List<SeriesDto<DateAndPriceDto>>();
 
         //Create series
@@ -77,9 +77,9 @@ public class SalesDataController : ControllerBase
         {
             result.Add(new SeriesDto<DateAndPriceDto>
                 {
-                    Label = place.PlaceName,
+                    Label = place.Name,
                     Data = (await CreateSeriesAsync(dateRange.Since.Value, dateRange.Until.Value, interval,
-                        place.PlaceId)).ToList(),
+                        place.Id)).ToList(),
                 }
             );
         }
@@ -117,8 +117,8 @@ public class SalesDataController : ControllerBase
             .ThenInclude(model => model.Bikes)
             .Select(category => new PieChartDto
             {
-                Id = category.CategoryId,
-                Name = category.CategoryName,
+                Id = category.Id,
+                Name = category.Name,
                 Quantity = category.Models.Select(model => model.Bikes.Count(bike => bike.SaleDate != null
                     && bike.SaleDate.Value >= dateRange.Since.Value
                     && bike.SaleDate.Value <= dateRange.Until.Value
@@ -251,7 +251,7 @@ public class SalesDataController : ControllerBase
             .Where(bike => !bike.Place!.IsStorage)
             .Where(bike => !bike.InternetSale)
             .GroupBy(bike => bike.Place)
-            .ToListAsync()).OrderBy(group => group.Key!.PlaceId);
+            .ToListAsync()).OrderBy(group => group.Key!.Id);
 
         var result = bikes
             .Select(group =>
@@ -259,7 +259,7 @@ public class SalesDataController : ControllerBase
                 var even = group.Count() % 2 == 0;
                 return new
                 {
-                    Place = group.Key!.PlaceName,
+                    Place = group.Key!.Name,
                     Value = group.OrderBy(bike => bike.SalePrice!.Value)
                         .Skip(group.Count() / 2 - (even ? 1 : 0))
                         .Take(even ? 2 : 1)
@@ -296,12 +296,12 @@ public class SalesDataController : ControllerBase
             .Where(bike => !bike.Place!.IsStorage)
             .Where(bike => !bike.InternetSale)
             .GroupBy(bike => bike.Place)
-            .ToListAsync()).OrderBy(group => group.Key!.PlaceId);
+            .ToListAsync()).OrderBy(group => group.Key!.Id);
 
         var result = bikes
             .Select(group => new
             {
-                Place = group.Key!.PlaceName,
+                Place = group.Key!.Name,
                 Value = group.Average(bike => bike.SalePrice!.Value)
             }).ToDictionary(group => group.Place, group => (object)group.Value);
         // Internet segment
@@ -330,7 +330,7 @@ public class SalesDataController : ControllerBase
             .Where(bike => !bike.Place!.IsStorage)
             .Where(bike => !bike.InternetSale)
             .GroupBy(bike => bike.Place)
-            .ToListAsync()).OrderBy(group => group.Key!.PlaceId);
+            .ToListAsync()).OrderBy(group => group.Key!.Id);
 
         var result = bikes
             .Select(group =>
@@ -338,7 +338,7 @@ public class SalesDataController : ControllerBase
                 var even = group.Count() % 2 == 0;
                 return new
                 {
-                    Place = group.Key!.PlaceName,
+                    Place = group.Key!.Name,
                     Value = group.OrderBy(bike => (bike.Model!.Price - bike.SalePrice!.Value) * 100 / bike.Model!.Price)
                                 .Skip(group.Count() / 2 - (even ? 1 : 0))
                                 .Take(even ? 2 : 1)
@@ -381,12 +381,12 @@ public class SalesDataController : ControllerBase
             .Where(bike => !bike.Place!.IsStorage)
             .Where(bike => !bike.InternetSale)
             .GroupBy(bike => bike.Place)
-            .ToListAsync()).OrderBy(group => group.Key!.PlaceId);
+            .ToListAsync()).OrderBy(group => group.Key!.Id);
 
         var result = bikes
             .Select(group => new
             {
-                Place = group.Key!.PlaceName,
+                Place = group.Key!.Name,
                 Value = group.Sum(bike => bike.SalePrice!.Value)
             }).ToDictionary(group => group.Place, group => (object)group.Value);
         // Internet segment
@@ -416,7 +416,7 @@ public class SalesDataController : ControllerBase
             .Include(bike => bike.Model)
             .ThenInclude(model => model!.Category)
             .Where(bike => bike.PlaceId == placeId)
-            .GroupBy(bike => bike.Model!.Category!.CategoryName)
+            .GroupBy(bike => bike.Model!.Category!.Name)
             .ToListAsync();
 
         var result = grouping.Select(group => new
@@ -428,7 +428,7 @@ public class SalesDataController : ControllerBase
             .Take(4)
             .ToList()
             .ToDictionary(group => group.Category, group => (object)group.Value);
-        result.Add("place", place.PlaceName);
+        result.Add("place", place.Name);
         return Ok(new List<Dictionary<string, object>> { result });
     }
     

@@ -19,7 +19,7 @@ public class UserService : IUserService
     {
         var users = await _context.Users.Select(user => new UserDto
         {
-            UserId = user.UserId,
+            UserId = user.Id,
             Username = user.Username,
             EmployeeId = user.EmployeeId,
 

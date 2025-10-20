@@ -12,8 +12,8 @@ public partial class PlaceDto
 
     public PlaceDto(Place place)
     {
-        Id = place.PlaceId;
-        Name = place.PlaceName;
+        Id = place.Id;
+        Name = place.Name;
         IsStorage = place.IsStorage;
     }
     public short? Id { get; set; }

@@ -43,8 +43,8 @@ public class ServicesService : IServicesService
     {
         var categories = await _context.ServiceCategories.Select(category => new ServiceCategoryDto
         {
-            Id = category.ServiceCategoryId,
-            Name = category.ServiceCategoryName
+            Id = category.Id,
+            Name = category.Name
         }).ToListAsync();
         return new ServiceResult<IEnumerable<ServiceCategoryDto>>(ServiceStatus.Ok, string.Empty, categories);
     }
@@ -58,7 +58,7 @@ public class ServicesService : IServicesService
         }
         existingService.Price = service.Price;
         existingService.ServiceCategoryId = service.ServiceCategoryId;
-        existingService.ServiceName = service.ServiceName;
+        existingService.Name = service.ServiceName;
         await _context.SaveChangesAsync();
         return new ServiceResult<ServiceDto>(ServiceStatus.Ok, string.Empty, new ServiceDto(existingService));
     }
