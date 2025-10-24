@@ -22,7 +22,7 @@ public partial class Model
 
     [Column("model_name")]
     [MaxLength(50)]
-    public required string ModelName { get; set; }
+    public required string Name { get; set; }
 
     [Column("frame_size")]
     public short FrameSize { get; set; }

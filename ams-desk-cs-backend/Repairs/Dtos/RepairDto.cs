@@ -9,7 +9,7 @@ public class RepairDto
     public RepairDto() { }
     public RepairDto(Repair repair)
     {
-        RepairId = repair.Id;
+        Id = repair.Id;
         PhoneNumber = repair.PhoneNumber;
         BikeName = repair.BikeName;
         Issue = repair.Issue;
@@ -40,7 +40,7 @@ public class RepairDto
         Status?.Repairs?.Clear();
     }
     [Required]
-    public int RepairId { get; set; }
+    public int Id { get; set; }
     [Required]
     public string PhoneNumber { get; set; } = null!;
     [Required]

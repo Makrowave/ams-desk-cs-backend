@@ -8,10 +8,10 @@ public class ModelRecordDto
     [SetsRequiredMembers]
     public ModelRecordDto(Model model, int bikeCount, IEnumerable<PlaceBikeCountDto> placeBikeCount)
     {
-        ModelId = model.ModelId;
+        Id = model.ModelId;
         ProductCode = model.ProductCode;
         EanCode = model.EanCode;
-        ModelName = model.ModelName;
+        Name = model.Name;
         FrameSize = model.FrameSize;
         WheelSize = model.WheelSizeId;
         ManufacturerId = model.ManufacturerId;
@@ -28,10 +28,10 @@ public class ModelRecordDto
         PlaceBikeCount = placeBikeCount;
     }
 
-    public int ModelId { get; set; }
+    public int Id { get; set; }
     public string? ProductCode { get; set; }
     public string? EanCode { get; set; }
-    public required string ModelName { get; set; }
+    public required string Name { get; set; }
     public short FrameSize { get; set; }
     public decimal WheelSize { get; set; }
     public short ManufacturerId { get; set; }

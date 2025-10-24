@@ -6,14 +6,14 @@ namespace ams_desk_cs_backend.Models.Dtos;
 public class ModelDto
 {
     [Required]
-    public int ModelId { get; set; }
+    public int Id { get; set; }
     [RegularExpression(Regexes.ProductCode, ErrorMessage = "Niepoprawny kod produktu")]
     public string? ProductCode { get; set; }
     [RegularExpression(Regexes.EanCode, ErrorMessage = "Niepoprawny kod EAN")]
     public string? EanCode { get; set; }
     [Required]
     [RegularExpression(Regexes.ModelName, ErrorMessage = "Niepoprawna nazwa modelu")]
-    public string ModelName { get; set; } = null!;
+    public string Name { get; set; } = null!;
     [Required]
     [Range(0, 100, ErrorMessage = "Niepoprawny rozmiar ramy")]
     public short FrameSize { get; set; }

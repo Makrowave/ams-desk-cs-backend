@@ -25,7 +25,7 @@ public class SoldBikeDto
             throw new ArgumentException("Invalid price");
         }
         Id = bike.Id;
-        Model = bike.Model.ModelName;
+        Model = bike.Model.Name;
         Manufacturer = bike.Model.Manufacturer.Name;
         PrimaryColor = bike.Model.PrimaryColor;
         SecondaryColor = bike.Model.SecondaryColor;
