@@ -15,7 +15,7 @@ public class Service
     }
     public Service(ServiceDto dto)
     {
-        Name = dto.ServiceName;
+        Name = dto.Name;
         Price = dto.Price;
         ServiceCategoryId = dto.ServiceCategoryId;
     }

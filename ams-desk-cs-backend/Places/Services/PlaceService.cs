@@ -29,25 +29,49 @@ public class PlaceService : IPlacesService
         return new ServiceResult<IEnumerable<PlaceDto>>(ServiceStatus.Ok, string.Empty, places);
     }
 
-    public async Task<ServiceResult<IEnumerable<PlaceDto>>> ChangeOrder(short firstId, short lastId)
+    public async Task<ServiceResult<List<PlaceDto>>> ChangeOrder(short source, short dest)
     {
-        if (!_context.Places.Any(place => place.Id == firstId || place.Id == lastId))
+        if (!_context.Places.Any(p => p.Id == source || p.Id == dest))
         {
-            return ServiceResult<IEnumerable<PlaceDto>>.NotFound("Nie znaleziono zamienianych elementów");
+            return ServiceResult<List<PlaceDto>>.NotFound("Nie znaleziono zamienianych elementów");
         }
-        var places = await _context.Places.OrderBy(place => place.Order).ToListAsync();
-        var firstOrder = places.FirstOrDefault(place => place.Id == firstId)!.Order;
-        var lastOrder = places.FirstOrDefault(place => place.Id == lastId)!.Order;
 
-        var filteredPlaces = places.Where(place => place.Order >= firstOrder && place.Order <= lastOrder).ToList();
-        filteredPlaces.ForEach(place => place.Order++);
-        filteredPlaces.Last().Order = firstOrder;
+        var places = await _context.Places.OrderBy(p => p.Order).ToListAsync();
+
+        var firstPlace = places.First(p => p.Id == source);
+        var lastPlace = places.First(p => p.Id == dest);
+        var firstOrder = firstPlace.Order;
+        var lastOrder = lastPlace.Order;
+
+        if (firstOrder < lastOrder)
+        {
+            var toShift = places
+                .Where(p => p.Order > firstOrder && p.Order <= lastOrder)
+                .ToList();
+
+            toShift.ForEach(p => p.Order--);
+            firstPlace.Order = lastOrder;
+        }
+        else if (firstOrder > lastOrder)
+        {
+            var toShift = places
+                .Where(p => p.Order >= lastOrder && p.Order < firstOrder)
+                .ToList();
+
+            toShift.ForEach(p => p.Order++);
+            firstPlace.Order = lastOrder;
+        }
+
         await _context.SaveChangesAsync();
-        var result = await _context.Places.OrderBy(place => place.Order)
-            .Select(place => new PlaceDto(place))
+
+        var result = await _context.Places
+            .OrderBy(p => p.Order)
+            .Select(p => new PlaceDto(p))
             .ToListAsync();
-        return new ServiceResult<IEnumerable<PlaceDto>>(ServiceStatus.Ok, string.Empty, result);
+
+        return new ServiceResult<List<PlaceDto>>(ServiceStatus.Ok, string.Empty, result);
     }
+
 
     public async Task<ServiceResult<PlaceDto>> PostPlace(PlaceDto placeDto)
     {

@@ -58,7 +58,7 @@ public class ServicesService : IServicesService
         }
         existingService.Price = service.Price;
         existingService.ServiceCategoryId = service.ServiceCategoryId;
-        existingService.Name = service.ServiceName;
+        existingService.Name = service.Name;
         await _context.SaveChangesAsync();
         return new ServiceResult<ServiceDto>(ServiceStatus.Ok, string.Empty, new ServiceDto(existingService));
     }
