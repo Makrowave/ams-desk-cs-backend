@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ams_desk_cs_backend.Data.Models.Deliveries;
 using ams_desk_cs_backend.Data.Models.Repairs;
 
 namespace ams_desk_cs_backend.Data.Models;
@@ -25,4 +26,6 @@ public partial class Place
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
 
     public virtual ICollection<Repair> Repairs { get; set; } = new List<Repair>();
+    
+    public virtual ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
 }

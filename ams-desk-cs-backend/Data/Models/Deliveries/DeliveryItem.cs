@@ -1,0 +1,41 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ams_desk_cs_backend.Data.Models.Deliveries;
+
+[Table("delivery_item")]
+public class DeliveryItem
+{
+    [Key]
+    [Column("delivery_item_id")]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    
+    [Column("delivery_id")]
+    public int DeliveryId { get; set; }
+    
+    [Column("model_id")]
+    public int? ModelId { get; set; }
+    
+    [Column("temporary_model_id")]
+    public int? TemporaryModelId { get; set; }
+    
+    public int Count { get; set; }
+    
+    
+    [ForeignKey(nameof(DeliveryId))]
+    [InverseProperty(nameof(Delivery.DeliveryItems))]
+    public Delivery? Delivery { get; set; }
+    
+    
+    [ForeignKey(nameof(ModelId))]
+    [InverseProperty(nameof(Model.DeliveryItems))]
+    public Model? Model { get; set; }
+    
+    
+    [ForeignKey(nameof(TemporaryModelId))]
+    [InverseProperty(nameof(TemporaryModel.DeliveryItems))]
+    public TemporaryModel? TemporaryModel { get; set; }
+    
+    
+}

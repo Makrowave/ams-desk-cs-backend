@@ -169,7 +169,7 @@ public class ModelsService : IModelsService
         var places = await _context.Places.OrderBy(place => place.Id).ToListAsync();
         var selectedModels = await models.ToListAsync();
 
-        var result = selectedModels.OrderBy(model => model.ModelId)
+        var result = selectedModels.OrderBy(model => model.Id)
             .Select(model =>
             {
                 var placeBikeCount = places.Select(

@@ -6,7 +6,7 @@ public class FavoriteModelDto
 {
     public FavoriteModelDto(Model model)
     {
-        Id = model.ModelId;
+        Id = model.Id;
         Name = model.Name;
         FrameSize = model.FrameSize;
         WheelSize = model.WheelSizeId;

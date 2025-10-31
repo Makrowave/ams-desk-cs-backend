@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Deliveries\Controllers\" />
     <Folder Include="Statistics\Interfaces\" />
     <Folder Include="Statistics\Services\" />
   </ItemGroup>

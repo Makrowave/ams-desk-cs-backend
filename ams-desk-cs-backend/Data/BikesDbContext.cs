@@ -1,4 +1,5 @@
 ﻿using ams_desk_cs_backend.Data.Models;
+using ams_desk_cs_backend.Data.Models.Deliveries;
 using ams_desk_cs_backend.Data.Models.Repairs;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,12 +41,20 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<ServiceCategory> ServiceCategories { get; set; }
     public virtual DbSet<ServiceDone> ServicesDone { get; set; }
     public virtual DbSet<Unit> Units { get; set; }
-    
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Delivery> Deliveries { get; set; }
+    public virtual DbSet<DeliveryItem> DeliveryItems { get; set; }
+    public virtual DbSet<TemporaryModel> TemporaryModels { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
+        modelBuilder.Entity<DeliveryItem>(entity =>
+            entity.ToTable(tb =>
+            {
+                tb.HasCheckConstraint("CK_DeliveredItem_OneItemRef",
+                    "(\"model_id\" IS NOT NULL AND \"temporary_model_id\" IS NULL) OR (\"ItemId\" IS NULL AND \"TemporaryItemId\" IS NOT NULL)");
+            })
+        );
 
         modelBuilder.Entity<RepairStatus>().HasData([
             new RepairStatus {Id = 1, Color = "#FFA500", Name = "Przyjęto"},

@@ -8,7 +8,7 @@ public class ModelRecordDto
     [SetsRequiredMembers]
     public ModelRecordDto(Model model, int bikeCount, IEnumerable<PlaceBikeCountDto> placeBikeCount)
     {
-        Id = model.ModelId;
+        Id = model.Id;
         ProductCode = model.ProductCode;
         EanCode = model.EanCode;
         Name = model.Name;
