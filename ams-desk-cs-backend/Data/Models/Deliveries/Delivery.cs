@@ -19,12 +19,11 @@ public class Delivery
 
     [Column("delivery_document")]
     [MaxLength(60)]
-    public required string DeliveryDocument { get; set; }
+    public string? DeliveryDocument { get; set; }
     
     [Column("placeId")]
     public int PlaceId { get; set; }
     
-    //enum later
     [Column("statusId")]
     public int StatusId { get; set; }
     
