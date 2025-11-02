@@ -25,7 +25,7 @@ public record DeliveryDto
     
     public DateTime Date { get; init; }
     [MaxLength(60)]
-    public required string InvoiceNumber { get; init; }
+    public string InvoiceNumber { get; init; }
     
     [MaxLength(60)]
     public string? DeliveryDocument { get; init; }

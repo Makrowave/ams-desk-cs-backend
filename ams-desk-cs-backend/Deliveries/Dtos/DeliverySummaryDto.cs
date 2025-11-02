@@ -20,8 +20,8 @@ public record DeliverySummaryDto
     
     public int Id { get; init; }
     public DateTime Date { get; init; }
-    public required string InvoiceNumber { get; set; }
+    public string? InvoiceNumber { get; set; }
     public string? DeliveryDocument { get; set; }
     public int PlaceId { get; set; }
-    public required string Place { get; init; } 
+    public string Place { get; init; } = null!;
 }

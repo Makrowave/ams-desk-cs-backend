@@ -6,9 +6,9 @@ namespace ams_desk_cs_backend.Deliveries.Controllers;
 [Authorize(Policy = "AccessToken")]
 [Route("api/[controller]")]
 [ApiController]
-public class DeliveryItemController : ControllerBase
+public class DeliveryItemsController : ControllerBase
 {
-    [HttpPost("{deliveryId}")]
+    [HttpPost("{deliveryId:int}")]
     public async Task<IActionResult> PostNewItem(int deliveryId, [FromBody] string ean)
     {
         throw new NotImplementedException();
