@@ -11,31 +11,33 @@ public record DeliveryDto
 
     public DeliveryDto(Delivery delivery)
     {
+        if (delivery.Invoice == null)
+        {
+            throw new ArgumentException("Invalid delivery invoice.");
+        }
+        
         Id = delivery.Id;
-        Date = delivery.Date;
-        StatusId =  (DeliveryStatus)delivery.StatusId;
-        InvoiceNumber = delivery.InvoiceNumber;
-        DeliveryDocument = delivery.DeliveryDocument;
+        PlannedArrivalDate = delivery.PlannedArrivalDate;
+        StartDate = delivery.StartDate;
+        FinishDate = delivery.FinishDate;
+        InvoiceId = delivery.InvoiceId;
         PlaceId = delivery.PlaceId;
+        Status = (DeliveryStatus)delivery.Status;
         Place = delivery.Place;
-        DeliveryItems = delivery.DeliveryItems.Select(item => new DeliveryItemDto(item)).ToList();
+        Invoice = new InvoiceDto(delivery.Invoice);
+        DeliveryDocuments = delivery.DeliveryDocuments
+            .Select(doc => new DeliveryDocumentDto(doc))
+            .ToList();
     }
     
     public int Id { get; init; }
-    
-    public DateTime Date { get; init; }
-    [MaxLength(60)]
-    public string InvoiceNumber { get; init; }
-    
-    [MaxLength(60)]
-    public string? DeliveryDocument { get; init; }
-    
+    public DateTime PlannedArrivalDate { get; init; }
+    public DateTime? StartDate { get; init; }
+    public DateTime? FinishDate { get; init; }
+    public int InvoiceId { get; init; }
     public int PlaceId { get; init; }
-    
-    public DeliveryStatus StatusId { get; init; }
-    
+    public DeliveryStatus Status { get; init; }
     public Place? Place { get; init; }
-    
-    public ICollection<DeliveryItemDto> DeliveryItems { get; init; } = new List<DeliveryItemDto>();
-    
+    public InvoiceDto? Invoice { get; init; }
+    public ICollection<DeliveryDocumentDto> DeliveryDocuments { get; init; } = new List<DeliveryDocumentDto>();
 }

@@ -6,6 +6,7 @@ public record NewDeliveryDto
 {
     public int PlaceId { get; init; }
     
-    [MaxLength(60)]
-    public required string InvoiceNumber { get; init; }
+    public int InvoiceId { get; init; }
+    
+    public DateTime PlannedArrivalDate { get; init; } 
 }

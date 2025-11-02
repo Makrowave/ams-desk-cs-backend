@@ -10,18 +10,26 @@ public record DeliverySummaryDto
         {
             throw new NullReferenceException("Delivery place cannot be null");
         }
+
+        if (delivery.Invoice == null)
+        {
+            throw new NullReferenceException("Invoice cannot be null");
+        }
+        
         Id = delivery.Id;
-        Date = delivery.Date;
-        InvoiceNumber = delivery.InvoiceNumber;
-        DeliveryDocument = delivery.DeliveryDocument;
-        PlaceId = delivery.PlaceId;
+        PlannedArrival = delivery.PlannedArrivalDate;
+        StartDate = delivery.StartDate;
+        FinishDate = delivery.FinishDate;
+        Invoice = delivery.Invoice.InvoiceNumber;
+        StatusId = delivery.Status;
         Place = delivery.Place.Name;
     }
-    
+
     public int Id { get; init; }
-    public DateTime Date { get; init; }
-    public string? InvoiceNumber { get; set; }
-    public string? DeliveryDocument { get; set; }
-    public int PlaceId { get; set; }
+    public DateTime PlannedArrival { get; init; }
+    public DateTime? StartDate { get; init; }
+    public DateTime? FinishDate { get; init; }
+    public string Invoice { get; init; }
+    public int StatusId { get; init; }
     public string Place { get; init; } = null!;
 }

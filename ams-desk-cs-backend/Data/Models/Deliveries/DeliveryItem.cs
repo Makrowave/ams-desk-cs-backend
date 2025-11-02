@@ -11,8 +11,8 @@ public class DeliveryItem
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     
-    [Column("delivery_id")]
-    public int DeliveryId { get; set; }
+    [Column("delivery_document_id")]
+    public int DeliveryDocumentId { get; set; }
     
     [Column("model_id")]
     public int? ModelId { get; set; }
@@ -20,12 +20,16 @@ public class DeliveryItem
     [Column("temporary_model_id")]
     public int? TemporaryModelId { get; set; }
     
+    [Column("item_count")]
     public int Count { get; set; }
     
+    [Column("storage_count")]
+    public int StorageCount { get; set; }
     
-    [ForeignKey(nameof(DeliveryId))]
-    [InverseProperty(nameof(Delivery.DeliveryItems))]
-    public Delivery? Delivery { get; set; }
+    
+    [ForeignKey(nameof(DeliveryDocumentId))]
+    [InverseProperty(nameof(Delivery.DeliveryDocuments))]
+    public DeliveryDocument? DeliveryDocument { get; set; }
     
     
     [ForeignKey(nameof(ModelId))]

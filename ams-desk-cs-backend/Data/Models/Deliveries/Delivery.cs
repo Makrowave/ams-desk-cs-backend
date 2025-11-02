@@ -10,27 +10,31 @@ public class Delivery
     [Column("delivery_id")]
     public int Id { get; set; }
     
-    [Column("date")]
-    public DateTime Date { get; set; }
+    [Column("planned_arrival")]
+    public DateTime PlannedArrivalDate { get; set; }
+    
+    [Column("start_date")]
+    public DateTime? StartDate { get; set; }
+    
+    [Column("finish_date")]
+    public DateTime? FinishDate { get; set; }
 
-    [Column("invoice_number")]
-    [MaxLength(60)]
-    public required string InvoiceNumber { get; set; }
-
-    [Column("delivery_document")]
-    [MaxLength(60)]
-    public string? DeliveryDocument { get; set; }
+    [Column("invoice_id")]
+    public int InvoiceId { get; set; }
     
     [Column("placeId")]
     public int PlaceId { get; set; }
     
-    [Column("statusId")]
-    public int StatusId { get; set; }
-    
+    [Column("status")]
+    public int Status { get; set; }
     
     [ForeignKey(nameof(PlaceId))]
     [InverseProperty(nameof(Place.Deliveries))]
     public virtual Place? Place { get; set; }
     
-    public virtual ICollection<DeliveryItem> DeliveryItems { get; set; } = new List<DeliveryItem>();
+    [ForeignKey(nameof(InvoiceId))]
+    [InverseProperty(nameof(Invoice.Delivery))]
+    public virtual Invoice? Invoice { get; set; }
+    
+    public virtual ICollection<DeliveryDocument> DeliveryDocuments { get; set; } = new List<DeliveryDocument>();
 }

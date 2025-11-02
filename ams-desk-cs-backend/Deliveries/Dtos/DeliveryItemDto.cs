@@ -9,10 +9,11 @@ public record DeliveryItemDto
     public DeliveryItemDto(DeliveryItem deliveryItem)
     {
         Id = deliveryItem.Id;
-        DeliveryId = deliveryItem.DeliveryId;
+        DeliveryDocumentId = deliveryItem.DeliveryDocumentId;
         ModelId = deliveryItem.ModelId;
         TemporaryModelId = deliveryItem.TemporaryModelId;
         Count = deliveryItem.Count;
+        StorageCount = deliveryItem.StorageCount;
 
         if (deliveryItem.Model is not null)
             DeliveryModel = new DeliveryModelDto(deliveryItem.Model);
@@ -21,9 +22,10 @@ public record DeliveryItemDto
     }
 
     public int Id { get; init; }
-    public int DeliveryId { get; init; }
+    public int DeliveryDocumentId { get; init; }
     public int? ModelId { get; init; }
     public int? TemporaryModelId { get; init; }
     public int Count { get; init; }
+    public int StorageCount { get; init; }
     public DeliveryModelDto? DeliveryModel { get; init; }
 }
