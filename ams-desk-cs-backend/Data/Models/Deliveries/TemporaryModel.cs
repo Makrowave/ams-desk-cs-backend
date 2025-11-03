@@ -63,19 +63,19 @@ public partial class TemporaryModel
     public DateOnly InsertionDate { get; set; }
 
     [ForeignKey(nameof(ManufacturerId))]
-    [InverseProperty(nameof(Manufacturer.Models))]
+    [InverseProperty(nameof(Manufacturer.TemporaryModels))]
     public virtual Manufacturer? Manufacturer { get; set; }
 
     [ForeignKey(nameof(ColorId))]
-    [InverseProperty(nameof(Color.Models))]
+    [InverseProperty(nameof(Color.TemporaryModels))]
     public virtual ModelColor? Color { get; set; }
 
     [ForeignKey(nameof(CategoryId))]
-    [InverseProperty(nameof(Category.Models))]
+    [InverseProperty(nameof(Category.TemporaryModels))]
     public virtual Category? Category { get; set; }
 
     [ForeignKey(nameof(WheelSizeId))]
-    [InverseProperty(nameof(WheelSize.Models))]
+    [InverseProperty(nameof(WheelSize.TemporaryModels))]
     public virtual WheelSize? WheelSize { get; set; }
     
     public virtual ICollection<DeliveryItem> DeliveryItems { get; set; } = new List<DeliveryItem>();

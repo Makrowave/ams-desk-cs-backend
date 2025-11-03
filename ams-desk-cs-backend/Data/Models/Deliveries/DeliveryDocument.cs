@@ -14,7 +14,7 @@ public class DeliveryDocument
     [Column("delivery_document_name")]
     public required string Name { get; set; }
     
-    [Column("delivery_document_id")]
+    [Column("delivery_id")]
     public int DeliveryId { get; set; }
     
     [Column("delivery_document_date")]

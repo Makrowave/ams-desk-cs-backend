@@ -28,7 +28,7 @@ public class DeliveryItem
     
     
     [ForeignKey(nameof(DeliveryDocumentId))]
-    [InverseProperty(nameof(Delivery.DeliveryDocuments))]
+    [InverseProperty(nameof(DeliveryDocument.DeliveryItems))]
     public DeliveryDocument? DeliveryDocument { get; set; }
     
     

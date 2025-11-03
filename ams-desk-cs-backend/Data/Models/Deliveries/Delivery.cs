@@ -23,7 +23,7 @@ public class Delivery
     public int InvoiceId { get; set; }
     
     [Column("placeId")]
-    public int PlaceId { get; set; }
+    public short PlaceId { get; set; }
     
     [Column("status")]
     public int Status { get; set; }

@@ -53,7 +53,7 @@ public partial class BikesDbContext : DbContext
             entity.ToTable(tb =>
             {
                 tb.HasCheckConstraint("CK_DeliveredItem_OneItemRef",
-                    "(\"model_id\" IS NOT NULL AND \"temporary_model_id\" IS NULL) OR (\"ItemId\" IS NULL AND \"TemporaryItemId\" IS NOT NULL)");
+                    "(\"model_id\" IS NOT NULL AND \"temporary_model_id\" IS NULL) OR (\"temporary_model_id\" IS NULL AND \"model_id\" IS NOT NULL)");
             })
         );
 

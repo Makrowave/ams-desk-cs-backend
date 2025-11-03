@@ -35,9 +35,8 @@ public class Invoice
     public decimal BruttoAmount { get; set; }
     
     [Column("delivery_id")]
-    public int DeliveryId { get; set; }
+    public int? DeliveryId { get; set; }
     
-    [ForeignKey(nameof(DeliveryId))]
     [InverseProperty(nameof(Delivery.Invoice))]
     public Delivery? Delivery { get; set; }
 }

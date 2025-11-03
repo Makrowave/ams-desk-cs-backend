@@ -38,7 +38,7 @@ public record InvoiceDto
     
     public decimal BruttoAmount { get; init; }
     
-    public int DeliveryId { get; init; }
+    public int? DeliveryId { get; init; }
     
     public DeliveryDto? Delivery { get; init; }
 }
