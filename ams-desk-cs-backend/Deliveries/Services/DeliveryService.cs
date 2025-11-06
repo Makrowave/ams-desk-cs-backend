@@ -56,21 +56,37 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
         if (delivery == null) return null;
         if (delivery.Status != (int)DeliveryStatus.Pending) return null;
         delivery.Status = (int)DeliveryStatus.Started;
+        delivery.StartDate = DateTime.Now;
         await dbContext.SaveChangesAsync();
         return new DeliveryDto(delivery);
     }
 
-    public async Task<DeliveryDto> FinishDelivery(int deliveryId)
+    public async Task<DeliveryDto?> FinishDelivery(int deliveryId)
     {
-        throw new NotImplementedException();
+        var delivery = await dbContext.Deliveries.FirstOrDefaultAsync(delivery => delivery.Id == deliveryId);
+        if (delivery == null) return null;
+        if (delivery.Status != (int)DeliveryStatus.Started) return null;
+        delivery.Status = (int)DeliveryStatus.Finished;
+        delivery.FinishDate = DateTime.Now;
+        await dbContext.SaveChangesAsync();
+        var modelsResolved = await ResolveTemporaryModels(delivery);
+        
+        if (!modelsResolved) return null;
+        return new DeliveryDto(delivery);
     }
 
-    public async Task<DeliveryDto> CancelDelivery(int deliveryId)
+    public async Task<DeliveryDto?> CancelDelivery(int deliveryId)
     {
-        throw new NotImplementedException();
+        var delivery = await dbContext.Deliveries.FirstOrDefaultAsync(delivery => delivery.Id == deliveryId);
+        if (delivery == null) return null;
+        if (delivery.Status != (int)DeliveryStatus.Finished) return null;
+        delivery.Status = (int)DeliveryStatus.Cancelled;
+        delivery.FinishDate = DateTime.Now;
+        await dbContext.SaveChangesAsync();
+        return new DeliveryDto(delivery);
     }
 
-    public async Task ResolveTemporaryModels(int deliveryId)
+    public async Task<bool> ResolveTemporaryModels(Delivery delivery)
     {
         throw new NotImplementedException();
     }

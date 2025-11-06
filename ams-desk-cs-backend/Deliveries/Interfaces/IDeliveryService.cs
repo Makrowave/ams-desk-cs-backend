@@ -13,5 +13,5 @@ public interface IDeliveryService
     public abstract Task<DeliveryDto?> FinishDelivery(int deliveryId);
     public abstract Task<DeliveryDto?> CancelDelivery(int deliveryId);
     
-    public abstract Task ResolveTemporaryModels(int deliveryId);
+    public abstract Task<bool> ResolveTemporaryModels(Delivery delivery);
 }

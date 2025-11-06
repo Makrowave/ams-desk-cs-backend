@@ -110,7 +110,7 @@ public class BikesService : IBikesService
         var bike = await _context.Bikes.Include(bike => bike.Place).FirstOrDefaultAsync(bike => bike.Id == id);
         if (bike == null)
         {
-            return ServiceResult<(short PlaceId, int ModelId)>.NotFound("Nie znaleziono bike");
+            return ServiceResult<(short PlaceId, int ModelId)>.NotFound("Nie znaleziono roweru");
         }
 
         if (bike.StatusId == (short)BikeStatus.Sold)
