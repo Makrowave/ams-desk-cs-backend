@@ -86,4 +86,41 @@ public partial class Model
     
     public virtual ICollection<Bike> Bikes { get; set; } = new List<Bike>();
     public virtual ICollection<DeliveryItem> DeliveryItems { get; set; } = new List<DeliveryItem>();
+
+    public static Model? ModelFromTemporaryModel(TemporaryModel temp)
+    {
+        if (temp.Name == null ||
+            temp.FrameSize == null ||
+            temp.EanCode == null ||
+            temp.ProductCode == null ||
+            temp.IsWoman == null ||
+            temp.WheelSizeId == null ||
+            temp.ManufacturerId == null ||
+            temp.CategoryId == null ||
+            temp.Price == null ||
+            temp.IsElectric == null)
+        {
+            return null;
+        }
+
+        return new Model
+        {
+            ProductCode = temp.ProductCode,
+            EanCode = temp.EanCode,
+            Name = temp.Name,
+            FrameSize = temp.FrameSize.Value,
+            IsWoman = temp.IsWoman.Value,
+            WheelSizeId = temp.WheelSizeId.Value,
+            ManufacturerId = temp.ManufacturerId.Value,
+            ColorId = temp.ColorId,
+            CategoryId = temp.CategoryId.Value,
+            PrimaryColor = temp.PrimaryColor,
+            SecondaryColor = temp.SecondaryColor,
+            Price = temp.Price.Value,
+            IsElectric = temp.IsElectric.Value,
+            Link = temp.Link,
+            Favorite = false,
+            InsertionDate = temp.InsertionDate,
+        };
+    }
 }

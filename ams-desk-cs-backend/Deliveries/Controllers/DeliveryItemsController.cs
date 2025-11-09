@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using ams_desk_cs_backend.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ams_desk_cs_backend.Deliveries.Controllers;
@@ -6,7 +7,7 @@ namespace ams_desk_cs_backend.Deliveries.Controllers;
 [Authorize(Policy = "AccessToken")]
 [Route("api/[controller]")]
 [ApiController]
-public class DeliveryItemsController : ControllerBase
+public class DeliveryItemsController : ErrorOrController
 {
     [HttpPost("{deliveryId:int}")]
     public async Task<IActionResult> PostNewItem(int deliveryId, [FromBody] string ean)

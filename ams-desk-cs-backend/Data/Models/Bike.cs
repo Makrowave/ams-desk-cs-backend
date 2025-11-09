@@ -29,6 +29,9 @@ public partial class Bike
 
     [Column("sale_price")]
     public int? SalePrice { get; set; }
+    
+    [Column("purchase_cost", TypeName = "decimal(10,2)")]
+    public decimal? PurchaseCost { get; set; }
 
     [Column("internet_sale")]
     public bool InternetSale { get; set; } = false;

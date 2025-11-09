@@ -1,17 +1,17 @@
 ﻿using ams_desk_cs_backend.Data.Models.Deliveries;
 using ams_desk_cs_backend.Deliveries.Dtos;
+using ErrorOr;
 
 namespace ams_desk_cs_backend.Deliveries.Interfaces;
 
 public interface IDeliveryService
 {
-    public abstract Task<List<DeliverySummaryDto>> GetDeliveries();
-    public abstract Task<DeliveryDto?> GetDelivery(int deliveryId);
-    public abstract Task<DeliveryDto?> UpdateDelivery(DeliveryDto deliveryDto);
-    public abstract Task<DeliveryDto> AddDelivery(NewDeliveryDto deliveryDto);
-    public abstract Task<DeliveryDto?> StartDelivery(int deliveryId);
-    public abstract Task<DeliveryDto?> FinishDelivery(int deliveryId);
-    public abstract Task<DeliveryDto?> CancelDelivery(int deliveryId);
-    
-    public abstract Task<bool> ResolveTemporaryModels(Delivery delivery);
+    Task<ErrorOr<List<DeliverySummaryDto>>> GetDeliveries();
+    Task<ErrorOr<DeliveryDto>> GetDelivery(int deliveryId);
+    Task<ErrorOr<DeliveryDto>> UpdateDelivery(int id, DeliveryDto deliveryDto);
+    Task<ErrorOr<DeliveryDto>> AddDelivery(NewDeliveryDto deliveryDto);
+    Task<ErrorOr<DeliveryDto>> StartDelivery(int id);
+    Task<ErrorOr<DeliveryDto>> FinishDelivery(int id);
+    Task<ErrorOr<DeliveryDto>> CancelDelivery(int id);
+    Task<ErrorOr<Delivery>> ResolveTemporaryModels(Delivery delivery);
 }

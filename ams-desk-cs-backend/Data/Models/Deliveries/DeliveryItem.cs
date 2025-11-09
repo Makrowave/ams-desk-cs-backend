@@ -20,6 +20,9 @@ public class DeliveryItem
     [Column("temporary_model_id")]
     public int? TemporaryModelId { get; set; }
     
+    [Column("purchase_cost", TypeName = "decimal(10,2)")]
+    public decimal PurchaseCost { get; set; }
+    
     [Column("item_count")]
     public int Count { get; set; }
     

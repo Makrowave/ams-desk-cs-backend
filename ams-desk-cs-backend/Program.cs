@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
 using System.Configuration;
 using ams_desk_cs_backend.Data;
@@ -33,16 +32,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Configure CORS
-var FrontEndURL = builder.Configuration["CORSOrigins"];
-var PolicyName = "FrontEnd";
+var frontEndUrl = builder.Configuration["CORSOrigins"];
+const string policyName = "FrontEnd";
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: PolicyName,
+    options.AddPolicy(name: policyName,
         policy =>
         {
-            if (FrontEndURL != null)
+            if (frontEndUrl != null)
             {
-                policy.WithOrigins(FrontEndURL)
+                policy.WithOrigins(frontEndUrl)
                       .AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials();
@@ -82,7 +81,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors(PolicyName);
+app.UseCors(policyName);
 app.UseAuthentication();
 app.UseAuthorization();
 

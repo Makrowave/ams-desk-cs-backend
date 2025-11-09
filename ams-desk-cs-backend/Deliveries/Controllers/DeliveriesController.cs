@@ -1,4 +1,6 @@
 ﻿using ams_desk_cs_backend.Deliveries.Dtos;
+using ams_desk_cs_backend.Deliveries.Interfaces;
+using ams_desk_cs_backend.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,16 +10,16 @@ namespace ams_desk_cs_backend.Deliveries.Controllers;
 [Authorize(Policy = "AccessToken")]
 [Route("api/[controller]")]
 [ApiController]
-public class DeliveriesController : ControllerBase
+public class DeliveriesController(IDeliveryService deliveryService) : ErrorOrController
 {
     /// <summary>
     /// Returns all deliveries
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<DeliverySummaryDto>>> GetDeliveries()
+    public async Task<IActionResult> GetDeliveries()
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryService.GetDeliveries());
     }
 
     /// <summary>
@@ -26,9 +28,9 @@ public class DeliveriesController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id}")]
-    public async Task<ActionResult<DeliveryDto>> GetDelivery(int id)
+    public async Task<IActionResult> GetDelivery(int id)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryService.GetDelivery(id));
     }
 
     /// <summary>
@@ -38,9 +40,9 @@ public class DeliveriesController : ControllerBase
     /// <param name="deliveryDto"></param>
     /// <returns></returns>
     [HttpPut("update/{id}")]
-    public async Task<ActionResult<DeliveryDto>> UpdateDelivery(int id, [FromBody] DeliveryDto deliveryDto)
+    public async Task<IActionResult> UpdateDelivery(int id, [FromBody] DeliveryDto deliveryDto)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryService.UpdateDelivery(id, deliveryDto));
     }
 
     /// <summary>
@@ -49,9 +51,9 @@ public class DeliveriesController : ControllerBase
     /// <param name="deliveryDto"></param>
     /// <returns></returns>
     [HttpPost("create")]
-    public async Task<ActionResult<DeliveryDto>> PostNewDelivery([FromBody] NewDeliveryDto deliveryDto)
+    public async Task<IActionResult> PostNewDelivery([FromBody] NewDeliveryDto deliveryDto)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryService.AddDelivery(deliveryDto));
     }
 
     /// <summary>
@@ -60,9 +62,9 @@ public class DeliveriesController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpPost("start/{id:int}")]
-    public async Task<ActionResult<DeliveryDto>> PostStartDelivery(int id)
+    public async Task<IActionResult>PostStartDelivery(int id)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryService.StartDelivery(id));
     }
 
     /// <summary>
@@ -71,19 +73,19 @@ public class DeliveriesController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpPost("finish/{id:int}")]
-    public async Task<ActionResult<DeliveryDto>> PostFinishDelivery(int id)
+    public async Task<IActionResult> PostFinishDelivery(int id)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryService.FinishDelivery(id));
     }
     /// <summary>
-    /// Cancels delivery setting its status to canels and disabled editing
+    /// Cancels delivery setting its status to cancels and disabled editing
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpPost("cancel/{id:int}")]
-    public async Task<ActionResult<DeliveryDto>> PostCancelDelivery(int id)
+    public async Task<IActionResult> PostCancelDelivery(int id)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryService.CancelDelivery(id));
     }
     
 }

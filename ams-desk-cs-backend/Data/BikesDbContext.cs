@@ -7,9 +7,9 @@ namespace ams_desk_cs_backend.Data;
 
 public partial class BikesDbContext : DbContext
 {
-    public BikesDbContext()
-    {
-    }
+    // public BikesDbContext()
+    // {
+    // }
 
     public BikesDbContext(DbContextOptions<BikesDbContext> options)
         : base(options)
@@ -46,6 +46,7 @@ public partial class BikesDbContext : DbContext
     public virtual DbSet<DeliveryDocument> DeliveryDocuments { get; set; }
     public virtual DbSet<DeliveryItem> DeliveryItems { get; set; }
     public virtual DbSet<TemporaryModel> TemporaryModels { get; set; }
+    public virtual DbSet<Invoice> Invoices { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
