@@ -7,6 +7,7 @@ public interface IInvoiceService
 {
     Task<ErrorOr<InvoiceDto>> GetInvoice(int invoiceId);
     Task<ErrorOr<InvoiceDto[]>> GetInvoices();
+    Task<ErrorOr<NotAssignedInvoiceDto[]>> NotAssignedInvoices( int? invoiceId);
     Task<ErrorOr<InvoiceDto>> CreateInvoice(NewInvoiceDto invoiceDto);
     Task<ErrorOr<InvoiceDto>> UpdateInvoice(InvoiceDto invoiceDto);
     Task<ErrorOr<Success>> DeleteInvoice(int invoiceId);

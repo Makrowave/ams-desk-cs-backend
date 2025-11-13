@@ -51,12 +51,16 @@ public partial class BikesDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DeliveryItem>(entity =>
-            entity.ToTable(tb =>
-            {
-                tb.HasCheckConstraint("CK_DeliveredItem_OneItemRef",
-                    "(\"model_id\" IS NOT NULL AND \"temporary_model_id\" IS NULL) OR (\"temporary_model_id\" IS NULL AND \"model_id\" IS NOT NULL)");
-            })
+    entity.ToTable(tb =>
+    {
+        tb.HasCheckConstraint(
+            "CK_DeliveryItem_OneItemRef",
+            "(\"model_id\" IS NOT NULL AND \"temporary_model_id\" IS NULL) " +
+            "OR (\"model_id\" IS NULL AND \"temporary_model_id\" IS NOT NULL)"
         );
+    })
+);
+
 
         modelBuilder.Entity<RepairStatus>().HasData([
             new RepairStatus {Id = 1, Color = "#FFA500", Name = "Przyjęto"},

@@ -1,4 +1,6 @@
-﻿using ams_desk_cs_backend.Shared;
+﻿using ams_desk_cs_backend.Deliveries.Dtos;
+using ams_desk_cs_backend.Deliveries.Interfaces;
+using ams_desk_cs_backend.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,12 +9,12 @@ namespace ams_desk_cs_backend.Deliveries.Controllers;
 [Authorize(Policy = "AccessToken")]
 [Route("api/[controller]")]
 [ApiController]
-public class DeliveryItemsController : ErrorOrController
+public class DeliveryItemsController(IDeliveryItemService deliveryItemService) : ErrorOrController
 {
-    [HttpPost("{deliveryId:int}")]
-    public async Task<IActionResult> PostNewItem(int deliveryId, [FromBody] string ean)
+    [HttpPost]
+    public async Task<IActionResult> PostNewItem(NewDeliveryItemDto item)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryItemService.AddDeliveryItemAsync(item));
     }
 
     [HttpDelete("{id:int}")]

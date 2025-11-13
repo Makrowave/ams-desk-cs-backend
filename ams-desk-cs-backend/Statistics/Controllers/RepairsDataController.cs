@@ -46,7 +46,7 @@ public class RepairsDataController: ControllerBase
             result.Add(new SeriesDto<DateAndPriceDto>
                 {
                     Label = place.Name,
-                    Data = (await CreateSeriesAsync(dateRange.Since.Value, dateRange.Until.Value, interval,
+                    Data = (await CreateRepairsSeriesAsync(dateRange.Since.Value, dateRange.Until.Value, interval,
                         place.Id)).ToList(),
                 }
             );
@@ -80,7 +80,7 @@ public class RepairsDataController: ControllerBase
     /// <param name="interval">Grouping interval - day, month, year. Defaults to day</param>
     /// <param name="placeId">Id of place to create the series. -1 for internet sales</param>
     /// <returns>Enumerable of DateAndPriceDto - Date and Int</returns>
-    public async Task<IEnumerable<DateAndPriceDto>> CreateSeriesAsync(DateOnly since, DateOnly until, string interval,
+    private async Task<IEnumerable<DateAndPriceDto>> CreateRepairsSeriesAsync(DateOnly since, DateOnly until, string interval,
         short placeId)
     {
         // Create tuples of dates and prices

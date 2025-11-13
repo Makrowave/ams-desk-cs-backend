@@ -11,11 +11,6 @@ public record DeliveryDto
 
     public DeliveryDto(Delivery delivery)
     {
-        if (delivery.Invoice == null)
-        {
-            throw new ArgumentException("Invalid delivery invoice.");
-        }
-        
         Id = delivery.Id;
         PlannedArrivalDate = delivery.PlannedArrivalDate;
         StartDate = delivery.StartDate;
@@ -24,7 +19,7 @@ public record DeliveryDto
         PlaceId = delivery.PlaceId;
         Status = (DeliveryStatus)delivery.Status;
         Place = delivery.Place;
-        Invoice = new InvoiceDto(delivery.Invoice);
+        Invoice = delivery.Invoice != null ? new InvoiceDto(delivery.Invoice) : null;
         DeliveryDocuments = delivery.DeliveryDocuments
             .Select(doc => new DeliveryDocumentDto(doc))
             .ToList();
@@ -34,7 +29,7 @@ public record DeliveryDto
     public DateTime PlannedArrivalDate { get; init; }
     public DateTime? StartDate { get; init; }
     public DateTime? FinishDate { get; init; }
-    public int InvoiceId { get; init; }
+    public int? InvoiceId { get; init; }
     public short PlaceId { get; init; }
     public DeliveryStatus Status { get; init; }
     public Place? Place { get; init; }

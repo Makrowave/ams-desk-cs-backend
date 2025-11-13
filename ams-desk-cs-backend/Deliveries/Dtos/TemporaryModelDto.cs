@@ -1,9 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ams_desk_cs_backend.Data.Models.Deliveries;
 
 namespace ams_desk_cs_backend.Deliveries.Dtos;
 
 public record TemporaryModelDto
 {
+    public TemporaryModelDto() {}
+
+    public TemporaryModelDto(TemporaryModel temporaryModel)
+    {
+        Id = temporaryModel.Id;
+        ProductCode = temporaryModel.ProductCode;
+        EanCode = temporaryModel.EanCode;
+        Name = temporaryModel.Name;
+        FrameSize = temporaryModel.FrameSize;
+        IsWoman = temporaryModel.IsWoman;
+        WheelSizeId = temporaryModel.WheelSizeId;
+        ManufacturerId = temporaryModel.ManufacturerId;
+        ColorId = temporaryModel.ColorId;
+        CategoryId = temporaryModel.CategoryId;
+        Price = temporaryModel.Price;
+        PrimaryColor = temporaryModel.PrimaryColor;
+        SecondaryColor = temporaryModel.SecondaryColor;
+        IsElectric = temporaryModel.IsElectric;
+        Link = temporaryModel.Link;
+    }
+    
     public int Id { get; init; }
     
     [MaxLength(30)]

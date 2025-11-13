@@ -20,7 +20,7 @@ public class DeliveryItemService(ITemporaryModelService temporaryModelService, B
         {
             var model = await dbContext.Models.FindAsync(deliveryItemDto.ModelId.Value);
             
-            if (model is null) return Error.NotFound("Model not found");
+            if (model is null) return Error.NotFound("Nie znaleziono modelu");
             
             var modelDeliveryItem = new DeliveryItem
             {
@@ -39,8 +39,6 @@ public class DeliveryItemService(ITemporaryModelService temporaryModelService, B
         
         var temporaryModel = await temporaryModelService.CreateTemporaryModelAsync(deliveryItemDto.Ean);
         if (temporaryModel.IsError) return temporaryModel.Errors;
-        
-        dbContext.TemporaryModels.Add(temporaryModel.Value);
 
         var temporaryModelDeliveryItem = new DeliveryItem
         {
@@ -62,12 +60,12 @@ public class DeliveryItemService(ITemporaryModelService temporaryModelService, B
         throw new NotImplementedException();
     }
 
-    public async Task<ErrorOr<DeliveryItemDto>> IncrementCountAsync(DeliveryItemDto deliveryItemDto)
+    public async Task<ErrorOr<int>> IncrementCountAsync(DeliveryItemDto deliveryItemDto)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ErrorOr<DeliveryItemDto>> DecrementCountAsync(DeliveryItemDto deliveryItemDto)
+    public async Task<ErrorOr<int>> DecrementCountAsync(DeliveryItemDto deliveryItemDto)
     {
         throw new NotImplementedException();
     }

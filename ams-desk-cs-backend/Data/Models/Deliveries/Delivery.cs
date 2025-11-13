@@ -20,7 +20,7 @@ public class Delivery
     public DateTime? FinishDate { get; set; }
 
     [Column("invoice_id")]
-    public int InvoiceId { get; set; }
+    public int? InvoiceId { get; set; }
     
     [Column("placeId")]
     public short PlaceId { get; set; }

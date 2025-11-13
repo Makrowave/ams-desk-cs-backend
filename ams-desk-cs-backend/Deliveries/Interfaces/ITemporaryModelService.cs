@@ -7,6 +7,6 @@ namespace ams_desk_cs_backend.Deliveries.Interfaces;
 public interface ITemporaryModelService
 {
     Task<ErrorOr<TemporaryModel>> CreateTemporaryModelAsync(string ean);
-    Task<ErrorOr<DeliveryModelDto>> UpdateTemporaryModelAsync(DeliveryModelDto deliveryModelDto);
-    Task<ErrorOr<Success>> DeleteTemporaryModelAsync(DeliveryModelDto deliveryModelDto);
+    Task<ErrorOr<TemporaryModelDto>> UpdateTemporaryModelAsync(TemporaryModelDto deliveryModelDto);
+    Task<ErrorOr<Success>> DeleteTemporaryModelAsync(int id);
 }

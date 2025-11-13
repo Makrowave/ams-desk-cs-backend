@@ -22,6 +22,12 @@ public class InvoiceService(BikesDbContext context): IInvoiceService
         return invoices.Select(invoice => new InvoiceDto(invoice)).ToArray();
     }
 
+    public async Task<ErrorOr<NotAssignedInvoiceDto[]>> NotAssignedInvoices(int? invoiceId)
+    {
+        var invoices = await context.Invoices.Where(invoice => invoice.DeliveryId == null || invoice.Id == invoiceId).ToListAsync();
+        return invoices.Select(invoice => new NotAssignedInvoiceDto {Id = invoice.Id, Name = invoice.InvoiceNumber}).ToArray();
+    }
+
     public async Task<ErrorOr<InvoiceDto>> CreateInvoice(NewInvoiceDto invoiceDto)
     {
         var invoice = new Invoice

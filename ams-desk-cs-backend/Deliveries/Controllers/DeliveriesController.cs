@@ -27,7 +27,7 @@ public class DeliveriesController(IDeliveryService deliveryService) : ErrorOrCon
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetDelivery(int id)
     {
         return ErrorOrToResponse(await deliveryService.GetDelivery(id));
@@ -39,7 +39,7 @@ public class DeliveriesController(IDeliveryService deliveryService) : ErrorOrCon
     /// <param name="id"></param>
     /// <param name="deliveryDto"></param>
     /// <returns></returns>
-    [HttpPut("update/{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateDelivery(int id, [FromBody] DeliveryDto deliveryDto)
     {
         return ErrorOrToResponse(await deliveryService.UpdateDelivery(id, deliveryDto));

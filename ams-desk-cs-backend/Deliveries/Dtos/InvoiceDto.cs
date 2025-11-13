@@ -18,7 +18,6 @@ public record InvoiceDto
         NettoAmount = invoice.NettoAmount;
         BruttoAmount = invoice.BruttoAmount;
         DeliveryId = invoice.DeliveryId;
-        Delivery = invoice.Delivery is not null ? new DeliveryDto(invoice.Delivery) : null;
     }
 
     public int Id { get; init; }
@@ -39,6 +38,4 @@ public record InvoiceDto
     public decimal BruttoAmount { get; init; }
     
     public int? DeliveryId { get; init; }
-    
-    public DeliveryDto? Delivery { get; init; }
 }

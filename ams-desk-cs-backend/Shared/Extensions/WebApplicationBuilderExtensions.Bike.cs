@@ -39,6 +39,8 @@ namespace ams_desk_cs_backend.Shared.Extensions
             builder.Services.AddScoped<IInvoiceService, InvoiceService>();
             builder.Services.AddScoped<ITemporaryModelService, TemporaryModelService>();
             builder.Services.AddScoped<IDeliveryItemService, DeliveryItemService>();
+            builder.Services.AddScoped<IDeliveryDocumentService, DeliveryDocumentService>();
+            
             
             return builder;
         }

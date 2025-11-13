@@ -14,6 +14,7 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
     public async Task<ErrorOr<List<DeliverySummaryDto>>> GetDeliveries()
     {
         var result = await dbContext.Deliveries.Include(delivery => delivery.Place)
+            .Include(delivery => delivery.Invoice)
             .Select(delivery => new DeliverySummaryDto(delivery)).ToListAsync();
         return result;
     }
@@ -23,6 +24,11 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
         var result = await dbContext.Deliveries.Include(delivery => delivery.Place)
             .Include(delivery => delivery.DeliveryDocuments)
             .ThenInclude(document => document.DeliveryItems)
+            .ThenInclude(deliveryItem => deliveryItem.TemporaryModel)
+            .Include(delivery => delivery.DeliveryDocuments)
+            .ThenInclude(document => document.DeliveryItems)
+            .ThenInclude(deliveryItem => deliveryItem.Model)
+            .Include(delivery => delivery.Invoice)
             .FirstOrDefaultAsync(delivery => delivery.Id == deliveryId);
         return result == null ? Error.NotFound(description: "Nie znaleziono dostawy") : new DeliveryDto(result);
     }
@@ -32,8 +38,8 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
         var delivery = await dbContext.Deliveries.FirstOrDefaultAsync(delivery => delivery.Id == id);
         if (delivery == null) return Error.NotFound(description: "Nie znaleziono dostawy");
         delivery.Place = deliveryDto.Place;
-        delivery.Status = (int)deliveryDto.Status;
         delivery.PlaceId = deliveryDto.PlaceId;
+        delivery.PlannedArrivalDate = deliveryDto.PlannedArrivalDate;
         await dbContext.SaveChangesAsync();
         return new DeliveryDto(delivery);
     }
@@ -48,7 +54,15 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
             Status = (int)DeliveryStatus.Pending,
         };
         dbContext.Add(delivery);
+        
         await dbContext.SaveChangesAsync();
+        
+        var invoice = await dbContext.Invoices.FirstOrDefaultAsync(invoice => invoice.Id == delivery.InvoiceId);
+        if (invoice == null) return Error.NotFound(description: "Nie znaleziono faktury");
+        
+        invoice.DeliveryId = delivery.Id;
+        await dbContext.SaveChangesAsync();
+        
         return new DeliveryDto(delivery);
     }
 
@@ -58,7 +72,7 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
         if (delivery == null) return Error.NotFound(description: "Nie znaleziono dostawy");
         if (delivery.Status != (int)DeliveryStatus.Pending) return Error.Validation(description: "Nie można rozpocząć dostawy");
         delivery.Status = (int)DeliveryStatus.Started;
-        delivery.StartDate = DateTime.Now;
+        delivery.StartDate = DateTime.UtcNow;
         await dbContext.SaveChangesAsync();
         return new DeliveryDto(delivery);
     }
@@ -76,7 +90,7 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
         if (delivery == null) return Error.NotFound(description: "Nie znaleziono dostawy");
         if (delivery.Status != (int)DeliveryStatus.Started) return Error.Validation(description: "Nie można zakończyć dostawy");;
         delivery.Status = (int)DeliveryStatus.Finished;
-        delivery.FinishDate = DateTime.Now;
+        delivery.FinishDate = DateTime.UtcNow;
         await dbContext.SaveChangesAsync();
         var modelsResolved = await ResolveTemporaryModels(delivery);
 
@@ -88,9 +102,18 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
     {
         var delivery = await dbContext.Deliveries.FirstOrDefaultAsync(delivery => delivery.Id == id);
         if (delivery == null) return Error.NotFound(description: "Nie znaleziono dostawy");
-        if (delivery.Status != (int)DeliveryStatus.Finished) return Error.Validation(description: "Nie można anulować dostawy");;
+        if (delivery.Status == (int)DeliveryStatus.Finished) return Error.Validation(description: "Nie można anulować dostawy");;
         delivery.Status = (int)DeliveryStatus.Cancelled;
-        delivery.FinishDate = DateTime.Now;
+        delivery.FinishDate = DateTime.UtcNow;
+        
+        
+        var invoice = await dbContext.Invoices.FirstOrDefaultAsync(invoice => invoice.Id == delivery.InvoiceId);
+
+        if (invoice == null) return Error.NotFound(description: "Nie znaleziono faktury");
+
+        invoice.DeliveryId = null;
+        delivery.InvoiceId = null;
+        
         await dbContext.SaveChangesAsync();
         return new DeliveryDto(delivery);
     }

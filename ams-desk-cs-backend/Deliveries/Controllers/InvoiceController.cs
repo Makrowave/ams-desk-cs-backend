@@ -24,6 +24,12 @@ public class InvoiceController(IInvoiceService service) : ErrorOrController
     {
         return ErrorOrToResponse(await service.GetInvoices());
     }
+    [HttpGet]
+    [Route("NotAssignedInvoice")]
+    public async Task<IActionResult> GetNotAssignedInvoices([FromQuery]int? invoiceId)
+    {
+        return ErrorOrToResponse(await service.NotAssignedInvoices(invoiceId));
+    }
     
     [HttpPost]
     public async Task<IActionResult> PostInvoice([FromBody] NewInvoiceDto invoice)

@@ -13,14 +13,20 @@ public class TemporaryModelService(BikesDbContext dbContext) : ITemporaryModelSe
     {
         if (await ModelWithEanExistsAsync(ean)) return Error.Conflict("Model o danym kodzie EAN istnieje");
         
-        var temporaryModel = new TemporaryModel { EanCode = ean };
+        var temporaryModel = new TemporaryModel
+        {
+            EanCode = ean, 
+            IsElectric = false, 
+            IsWoman = false, 
+            InsertionDate = DateOnly.FromDateTime(DateTime.UtcNow)
+        };
         dbContext.TemporaryModels.Add(temporaryModel);
         await dbContext.SaveChangesAsync();
         
         return temporaryModel;
     }
 
-    public async Task<ErrorOr<DeliveryModelDto>> UpdateTemporaryModelAsync(DeliveryModelDto deliveryModelDto)
+    public async Task<ErrorOr<TemporaryModelDto>> UpdateTemporaryModelAsync(TemporaryModelDto deliveryModelDto)
     {
         if(deliveryModelDto.EanCode is null) return Error.Validation("Kod EAN musi być podany");
         
@@ -33,27 +39,27 @@ public class TemporaryModelService(BikesDbContext dbContext) : ITemporaryModelSe
         }
         
         temporaryModel.EanCode = deliveryModelDto.EanCode;
-        temporaryModel.ProductCode = deliveryModelDto.ProductCode;
-        temporaryModel.Name = deliveryModelDto.Name;
-        temporaryModel.FrameSize = deliveryModelDto.FrameSize;
-        temporaryModel.IsWoman = deliveryModelDto.IsWoman;
-        temporaryModel.WheelSizeId = deliveryModelDto.WheelSizeId;
-        temporaryModel.ManufacturerId = deliveryModelDto.ManufacturerId;
-        temporaryModel.CategoryId = deliveryModelDto.CategoryId;
-        temporaryModel.PrimaryColor = deliveryModelDto.PrimaryColor;
-        temporaryModel.SecondaryColor = deliveryModelDto.SecondaryColor;
-        temporaryModel.Price = deliveryModelDto.Price;
-        temporaryModel.IsElectric = deliveryModelDto.IsElectric;
-        temporaryModel.Link = deliveryModelDto.Link;
+        temporaryModel.ProductCode = deliveryModelDto.ProductCode ?? temporaryModel.ProductCode;
+        temporaryModel.Name = deliveryModelDto.Name ?? temporaryModel.Name;
+        temporaryModel.FrameSize = deliveryModelDto.FrameSize ?? temporaryModel.FrameSize;
+        temporaryModel.IsWoman = deliveryModelDto.IsWoman ?? temporaryModel.IsWoman;
+        temporaryModel.WheelSizeId = deliveryModelDto.WheelSizeId ?? temporaryModel.WheelSizeId;
+        temporaryModel.ManufacturerId = deliveryModelDto.ManufacturerId ?? temporaryModel.ManufacturerId;
+        temporaryModel.CategoryId = deliveryModelDto.CategoryId ?? temporaryModel.CategoryId;
+        temporaryModel.PrimaryColor = deliveryModelDto.PrimaryColor ?? temporaryModel.PrimaryColor;
+        temporaryModel.SecondaryColor = deliveryModelDto.SecondaryColor ?? temporaryModel.SecondaryColor;
+        temporaryModel.Price = deliveryModelDto.Price ?? temporaryModel.Price;
+        temporaryModel.IsElectric = deliveryModelDto.IsElectric ?? temporaryModel.IsElectric;
+        temporaryModel.Link = deliveryModelDto.Link ?? temporaryModel.Link;
         
         await dbContext.SaveChangesAsync();
         
-        return new DeliveryModelDto(temporaryModel);
+        return new TemporaryModelDto(temporaryModel);
     }
 
-    public async Task<ErrorOr<Success>> DeleteTemporaryModelAsync(DeliveryModelDto deliveryModelDto)
+    public async Task<ErrorOr<Success>> DeleteTemporaryModelAsync(int id)
     {
-        await dbContext.TemporaryModels.Where(temporaryModel => temporaryModel.Id == deliveryModelDto.Id).ExecuteDeleteAsync();
+        await dbContext.TemporaryModels.Where(temporaryModel => temporaryModel.Id == id).ExecuteDeleteAsync();
         return new Success();
     }
 
