@@ -7,9 +7,9 @@ namespace ams_desk_cs_backend.Deliveries.Interfaces;
 public interface IDeliveryItemService
 {
     Task<ErrorOr<DeliveryItemDto>> AddDeliveryItemAsync(NewDeliveryItemDto deliveryItemDto);
-    Task<ErrorOr<Success>> DeleteDeliveryItemAsync(DeliveryItemDto deliveryItemDto);
-    Task<ErrorOr<int>> IncrementCountAsync(DeliveryItemDto deliveryItemDto);
-    Task<ErrorOr<int>> DecrementCountAsync(DeliveryItemDto deliveryItemDto);
-    Task<ErrorOr<DeliveryItem>> MoveToStorageAsync(int deliveryItemId);
+    Task<ErrorOr<Success>> DeleteDeliveryItemAsync(int id);
+    Task<ErrorOr<int>> IncrementCountAsync(int id);
+    Task<ErrorOr<int>> DecrementCountAsync(int id);
+    Task<ErrorOr<DeliveryItemDto>> MoveToStorageAsync(int deliveryItemId);
     Task<ErrorOr<DeliveryDocument>> MoveMultipleToStorageAsync(int deliveryDocumentId);
 }

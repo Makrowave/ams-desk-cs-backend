@@ -20,18 +20,24 @@ public class DeliveryItemsController(IDeliveryItemService deliveryItemService) :
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteItem(int id)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryItemService.DeleteDeliveryItemAsync(id));
     }
 
     [HttpPost("increment/{id:int}")]
     public async Task<IActionResult> Increment(int id)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryItemService.IncrementCountAsync(id));
     }
     
     [HttpPost("decrement/{id:int}")]
     public async Task<IActionResult> Decrement(int id)
     {
-        throw new NotImplementedException();
+        return ErrorOrToResponse(await deliveryItemService.DecrementCountAsync(id));
+    }
+
+    [HttpPost("addToStorage/{id:int}")]
+    public async Task<IActionResult> AddToStorage(int id)
+    {
+        return ErrorOrToResponse(await deliveryItemService.MoveToStorageAsync(id));
     }
 }

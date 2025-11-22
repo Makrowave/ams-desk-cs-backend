@@ -13,7 +13,7 @@ public record DeliveryDocumentDto
         Name = deliveryDocument.Name;
         Date = deliveryDocument.DocumentDate;
         DeliveryId = deliveryDocument.DeliveryId;
-        Items = deliveryDocument.DeliveryItems.Select(deliveryItem => new DeliveryItemDto(deliveryItem)).ToList();
+        DeliveryItems = deliveryDocument.DeliveryItems.Select(deliveryItem => new DeliveryItemDto(deliveryItem)).ToList();
     }
     
     
@@ -22,5 +22,5 @@ public record DeliveryDocumentDto
     [MaxLength(60)] public string Name { get; init; } = null!;
     public int DeliveryId { get; init; }
     
-    public ICollection<DeliveryItemDto>? Items { get; init; }
+    public ICollection<DeliveryItemDto>? DeliveryItems { get; init; }
 }
