@@ -25,9 +25,22 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
             .Include(delivery => delivery.DeliveryDocuments)
             .ThenInclude(document => document.DeliveryItems)
             .ThenInclude(deliveryItem => deliveryItem.TemporaryModel)
+            // Model then color include
             .Include(delivery => delivery.DeliveryDocuments)
             .ThenInclude(document => document.DeliveryItems)
             .ThenInclude(deliveryItem => deliveryItem.Model)
+            .ThenInclude(model => model.Color)
+            // Manufacturer
+            .Include(delivery => delivery.DeliveryDocuments)
+            .ThenInclude(document => document.DeliveryItems)
+            .ThenInclude(deliveryItem => deliveryItem.Model)
+            .ThenInclude(model => model.Manufacturer)
+            // Category
+            .Include(delivery => delivery.DeliveryDocuments)
+            .ThenInclude(document => document.DeliveryItems)
+            .ThenInclude(deliveryItem => deliveryItem.Model)
+            .ThenInclude(model => model.Category)
+            // Invoice
             .Include(delivery => delivery.Invoice)
             .FirstOrDefaultAsync(delivery => delivery.Id == deliveryId);
         return result == null ? Error.NotFound(description: "Nie znaleziono dostawy") : new DeliveryDto(result);
