@@ -9,40 +9,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ams_desk_cs_backend.Deliveries.Services;
 
-public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
+public class DeliveryService(BikesDbContext dbContext, IDeliveryItemService deliveryItemService) : IDeliveryService
 {
     public async Task<ErrorOr<List<DeliverySummaryDto>>> GetDeliveries()
     {
         var result = await dbContext.Deliveries.Include(delivery => delivery.Place)
             .Include(delivery => delivery.Invoice)
+            .OrderByDescending(delivery => delivery.PlannedArrivalDate)
             .Select(delivery => new DeliverySummaryDto(delivery)).ToListAsync();
         return result;
     }
 
     public async Task<ErrorOr<DeliveryDto>> GetDelivery(int deliveryId)
     {
-        var result = await dbContext.Deliveries.Include(delivery => delivery.Place)
-            .Include(delivery => delivery.DeliveryDocuments)
-            .ThenInclude(document => document.DeliveryItems)
-            .ThenInclude(deliveryItem => deliveryItem.TemporaryModel)
-            // Model then color include
-            .Include(delivery => delivery.DeliveryDocuments)
-            .ThenInclude(document => document.DeliveryItems)
-            .ThenInclude(deliveryItem => deliveryItem.Model)
-            .ThenInclude(model => model.Color)
-            // Manufacturer
-            .Include(delivery => delivery.DeliveryDocuments)
-            .ThenInclude(document => document.DeliveryItems)
-            .ThenInclude(deliveryItem => deliveryItem.Model)
-            .ThenInclude(model => model.Manufacturer)
-            // Category
-            .Include(delivery => delivery.DeliveryDocuments)
-            .ThenInclude(document => document.DeliveryItems)
-            .ThenInclude(deliveryItem => deliveryItem.Model)
-            .ThenInclude(model => model.Category)
-            // Invoice
-            .Include(delivery => delivery.Invoice)
-            .FirstOrDefaultAsync(delivery => delivery.Id == deliveryId);
+        var result = await GetCompleteDeliveryAsync(deliveryId);
         return result == null ? Error.NotFound(description: "Nie znaleziono dostawy") : new DeliveryDto(result);
     }
 
@@ -131,67 +111,148 @@ public class DeliveryService(BikesDbContext dbContext) : IDeliveryService
         return new DeliveryDto(delivery);
     }
 
-    public async Task<ErrorOr<Delivery>> ResolveTemporaryModels(Delivery delivery)
+    public async Task<ErrorOr<Delivery?>> ResolveTemporaryModels(Delivery delivery)
     {
-        var documents = delivery.DeliveryDocuments.ToList();
-        
-        var unresolvedDeliveryItems = documents
-            .SelectMany(document => document.DeliveryItems)
-            .ToList();
+        await using var transaction = await dbContext.Database.BeginTransactionAsync();
 
-        foreach (var item in unresolvedDeliveryItems)
+        try
         {
-            if (item.TemporaryModelId.HasValue && item.ModelId.HasValue)
+            var documents = delivery.DeliveryDocuments.ToList();
+
+            var deliveryItems = documents
+                .SelectMany(document => document.DeliveryItems)
+                .ToList();
+
+            // Validate XOR constraint
+            foreach (var item in deliveryItems)
             {
-                return Error.Validation();
+                var hasTemp = item.TemporaryModelId.HasValue;
+                var hasModel = item.ModelId.HasValue;
+                if (hasTemp == hasModel)
+                    return Error.Validation(description: "Item must have either ModelId or TemporaryModelId");
             }
+
+            var temporaryModels = deliveryItems
+                .Where(item => item.TemporaryModel != null && item.TemporaryModelId.HasValue)
+                .Select(item => item.TemporaryModel!)
+                .ToList();
+
+            if (temporaryModels.Count == 0)
+            {
+                return delivery;
+            }
+
+            // Get all existing models with EAN codes that match our temporary models
+            var tempEanCodes = temporaryModels
+                .Where(tm => !string.IsNullOrEmpty(tm.EanCode))
+                .Select(tm => tm.EanCode!)
+                .ToList();
+
+            var existingModels = await dbContext.Models
+                .Where(m => m.EanCode != null && tempEanCodes.Contains(m.EanCode))
+                .ToListAsync();
+
+            var existingEanCodes = existingModels.Select(m => m.EanCode).ToHashSet();
+
+            // Only create models for temporary models that don't already exist
+            var temporaryModelsToInsert = temporaryModels
+                .Where(tm => string.IsNullOrEmpty(tm.EanCode) || !existingEanCodes.Contains(tm.EanCode))
+                .ToList();
+
+            // Create models from temporary models
+            var resolvedModelsOptional = temporaryModelsToInsert
+                .Select(Model.ModelFromTemporaryModel)
+                .ToList();
+
+            if (resolvedModelsOptional.Contains(null))
+                return Error.Validation(description: "Cannot create model from temporary model");
+
+            var newModels = resolvedModelsOptional.Where(m => m != null).ToList();
+
+            // Insert only new models
+            if (newModels.Count > 0)
+            {
+                dbContext.Models.AddRange(newModels!);
+                await dbContext.SaveChangesAsync(); // Get IDs assigned
+            }
+
+            // Combine existing and newly created models
+            var allResolvedModels = existingModels.Concat(newModels).ToList();
+
+            // Update delivery items - map to either existing or newly created models
+            foreach (var item in deliveryItems.Where(i => i.TemporaryModelId.HasValue))
+            {
+                var tempModel = item.TemporaryModel;
+                if (tempModel == null) continue;
+
+                // Find matching model by EAN code
+                var matchingModel = allResolvedModels.FirstOrDefault(m =>
+                    !string.IsNullOrEmpty(m.EanCode) &&
+                    m.EanCode == tempModel.EanCode);
+
+                if (matchingModel != null)
+                {
+                    item.ModelId = matchingModel.Id;
+                    item.TemporaryModelId = null;
+                    item.TemporaryModel = null;
+                }
+                else
+                {
+                    // This shouldn't happen, but handle gracefully
+                    return Error.Validation(
+                        description: $"Could not resolve temporary model with EAN: {tempModel.EanCode}");
+                }
+            }
+
+            dbContext.DeliveryItems.UpdateRange(deliveryItems);
+            dbContext.TemporaryModels.RemoveRange(temporaryModels);
+
+            await dbContext.SaveChangesAsync();
             
-            if (!(item.TemporaryModelId.HasValue || item.ModelId.HasValue))
+            
+            var moveAllToStorageResult = await deliveryItemService.MoveMultipleToStorageAsync(delivery);
+
+            if (moveAllToStorageResult.IsError)
             {
-                return Error.Validation();
+                return Error.Conflict();
             }
+
+            await transaction.CommitAsync();
+            
+            return delivery;
         }
-
-        var temporaryModels =  unresolvedDeliveryItems.Where(item => item.TemporaryModel != null && item.TemporaryModelId.HasValue)
-            .Select(item => item.TemporaryModel!).ToList();
-        
-        // Add deduplication
-
-        var models = await dbContext.Models.Where(m => m.EanCode != null).ToListAsync();
-
-        var temporaryModelsNotInserted = temporaryModels
-            .Where(temp => models.All(m => m.EanCode != temp.EanCode));
-        
-        var resolvedModels = temporaryModels
-            .Select(Model.ModelFromTemporaryModel).ToList();
-        
-        if(resolvedModels.Contains(null)) return Error.Validation();
-        
-        dbContext.Models.AddRange(resolvedModels!);
-        await dbContext.SaveChangesAsync();
-        
-        unresolvedDeliveryItems.ForEach(item =>
+        catch
         {
-            item.TemporaryModelId = null;
-            item.ModelId = resolvedModels.Find(model => model!.EanCode == item.TemporaryModel!.EanCode)?.Id;
-            item.TemporaryModel = null;
-        });
+            await transaction.RollbackAsync();
+            return Error.Validation(description: "Nie udało się ukończyć zadania");
+        }
         
-        dbContext.DeliveryItems.UpdateRange(unresolvedDeliveryItems);
-        
-        dbContext.TemporaryModels.RemoveRange(temporaryModels);
-        
-        await dbContext.SaveChangesAsync();
-        
-        var updatedDelivery =  (await dbContext.Deliveries
-            .Include(d => d.DeliveryDocuments)
-            .ThenInclude(dd => dd.DeliveryItems)
-            .ThenInclude(di => di.Model)
-            .Include(d => d.DeliveryDocuments)
-            .ThenInclude(dd => dd.DeliveryItems)
-            .ThenInclude(di => di.TemporaryModel)
-            .FirstOrDefaultAsync(d => d.Id == delivery.Id))!;
+    }
 
-        return updatedDelivery;
+
+    private async Task<Delivery?> GetCompleteDeliveryAsync(int deliveryId)
+    {
+        return await dbContext.Deliveries.Include(delivery => delivery.Place)
+            .Include(delivery => delivery.DeliveryDocuments)
+            .ThenInclude(document => document.DeliveryItems)
+            .ThenInclude(deliveryItem => deliveryItem.TemporaryModel)
+            // Model then color include
+            .Include(delivery => delivery.DeliveryDocuments)
+            .ThenInclude(document => document.DeliveryItems)
+            .ThenInclude(deliveryItem => deliveryItem.Model)
+            .ThenInclude(model => model.Color)
+            // Manufacturer
+            .Include(delivery => delivery.DeliveryDocuments)
+            .ThenInclude(document => document.DeliveryItems)
+            .ThenInclude(deliveryItem => deliveryItem.Model)
+            .ThenInclude(model => model.Manufacturer)
+            // Category
+            .Include(delivery => delivery.DeliveryDocuments)
+            .ThenInclude(document => document.DeliveryItems)
+            .ThenInclude(deliveryItem => deliveryItem.Model)
+            .ThenInclude(model => model.Category)
+            // Invoice
+            .Include(delivery => delivery.Invoice)
+            .FirstOrDefaultAsync(delivery => delivery.Id == deliveryId);
     }
 }

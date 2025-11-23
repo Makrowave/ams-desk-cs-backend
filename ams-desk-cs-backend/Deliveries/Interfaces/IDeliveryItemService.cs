@@ -11,5 +11,5 @@ public interface IDeliveryItemService
     Task<ErrorOr<int>> IncrementCountAsync(int id);
     Task<ErrorOr<int>> DecrementCountAsync(int id);
     Task<ErrorOr<DeliveryItemDto>> MoveToStorageAsync(int deliveryItemId);
-    Task<ErrorOr<DeliveryDocument>> MoveMultipleToStorageAsync(int deliveryDocumentId);
+    Task<ErrorOr<Success>> MoveMultipleToStorageAsync(Delivery delivery);
 }

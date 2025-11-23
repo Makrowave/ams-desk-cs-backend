@@ -46,6 +46,7 @@ public class TemporaryModelService(BikesDbContext dbContext) : ITemporaryModelSe
         temporaryModel.WheelSizeId = deliveryModelDto.WheelSizeId ?? temporaryModel.WheelSizeId;
         temporaryModel.ManufacturerId = deliveryModelDto.ManufacturerId ?? temporaryModel.ManufacturerId;
         temporaryModel.CategoryId = deliveryModelDto.CategoryId ?? temporaryModel.CategoryId;
+        temporaryModel.ColorId = deliveryModelDto.ColorId ?? temporaryModel.ColorId;
         temporaryModel.PrimaryColor = deliveryModelDto.PrimaryColor ?? temporaryModel.PrimaryColor;
         temporaryModel.SecondaryColor = deliveryModelDto.SecondaryColor ?? temporaryModel.SecondaryColor;
         temporaryModel.Price = deliveryModelDto.Price ?? temporaryModel.Price;

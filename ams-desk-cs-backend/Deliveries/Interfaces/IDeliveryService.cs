@@ -13,5 +13,5 @@ public interface IDeliveryService
     Task<ErrorOr<DeliveryDto>> StartDelivery(int id);
     Task<ErrorOr<DeliveryDto>> FinishDelivery(int id);
     Task<ErrorOr<DeliveryDto>> CancelDelivery(int id);
-    Task<ErrorOr<Delivery>> ResolveTemporaryModels(Delivery delivery);
+    Task<ErrorOr<Delivery?>> ResolveTemporaryModels(Delivery delivery);
 }

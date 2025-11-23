@@ -98,7 +98,10 @@ public partial class Model
             temp.ManufacturerId == null ||
             temp.CategoryId == null ||
             temp.Price == null ||
-            temp.IsElectric == null)
+            temp.IsElectric == null ||
+            temp.ColorId == null ||
+            temp.PrimaryColor == null ||
+            temp.SecondaryColor == null)
         {
             return null;
         }

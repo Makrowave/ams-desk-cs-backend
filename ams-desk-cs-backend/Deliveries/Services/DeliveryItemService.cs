@@ -135,9 +135,25 @@ public class DeliveryItemService(ITemporaryModelService temporaryModelService, B
         }
     }
 
-    public async Task<ErrorOr<DeliveryDocument>> MoveMultipleToStorageAsync(int deliveryDocumentId)
+    public async Task<ErrorOr<Success>> MoveMultipleToStorageAsync(Delivery delivery)
     {
-        throw new NotImplementedException();
+
+        var deliveryItemIds = delivery.DeliveryDocuments
+            .SelectMany(dd => dd.DeliveryItems)
+            .Select(di => di.Id)
+            .ToList();
+
+        if (deliveryItemIds.Count == 0) return Result.Success;
+
+        foreach (var deliveryItemId in deliveryItemIds)
+        {
+            var result = await MoveToStorageAsync(deliveryItemId);
+        
+            if (result.IsError)
+                return result.FirstError;
+        }
+
+        return Result.Success;
     }
 
     private IEnumerable<Bike> CreateBikesToStore(DeliveryItem deliveryItem)
