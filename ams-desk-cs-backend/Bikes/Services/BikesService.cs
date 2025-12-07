@@ -1,4 +1,4 @@
-﻿using ams_desk_cs_backend.BikeFilters.Enums;
+﻿using ams_desk_cs_backend.BikeProperties.Enums;
 using ams_desk_cs_backend.Bikes.Dtos;
 using ams_desk_cs_backend.Bikes.Interfaces;
 using ams_desk_cs_backend.Data;

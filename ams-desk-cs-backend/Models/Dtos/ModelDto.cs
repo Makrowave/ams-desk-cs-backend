@@ -19,7 +19,7 @@ public class ModelDto
     public short FrameSize { get; set; }
     [Required]
     [Range(10, 30, ErrorMessage = "Niepoprawny rozmiar koła")]
-    public decimal WheelSize { get; set; }
+    public int WheelSize { get; set; }
     [Required]
     public bool IsWoman { get; set; }
     [Required]

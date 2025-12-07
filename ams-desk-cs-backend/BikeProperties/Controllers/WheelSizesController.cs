@@ -1,9 +1,9 @@
-using ams_desk_cs_backend.BikeFilters.Interfaces;
+using ams_desk_cs_backend.BikeProperties.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ams_desk_cs_backend.BikeFilters.Controllers;
+namespace ams_desk_cs_backend.BikeProperties.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -40,7 +40,7 @@ public class WheelSizesController : ControllerBase
     }
     [HttpDelete("{id}")]
     [Authorize(Policy = "AdminAccessToken")]
-    public async Task<IActionResult> DeleteWheelSize(decimal id)
+    public async Task<IActionResult> DeleteWheelSize(int id)
     {
         var result = await _wheelSizesService.DeleteWheelSize(id);
         if (result.Status == ServiceStatus.NotFound)

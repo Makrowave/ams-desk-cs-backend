@@ -1,4 +1,4 @@
-﻿namespace ams_desk_cs_backend.BikeFilters.Enums;
+﻿namespace ams_desk_cs_backend.BikeProperties.Enums;
 
 public enum BikeStatus : short
 {

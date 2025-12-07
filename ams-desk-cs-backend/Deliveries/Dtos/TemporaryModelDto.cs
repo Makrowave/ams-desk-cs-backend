@@ -41,7 +41,7 @@ public record TemporaryModelDto
     
     public bool? IsWoman { get; init; }
     
-    public decimal? WheelSizeId { get; init; }
+    public int? WheelSizeId { get; init; }
     
     public short? ManufacturerId { get; init; }
     

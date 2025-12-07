@@ -1,11 +1,11 @@
-﻿using ams_desk_cs_backend.BikeFilters.Dtos;
-using ams_desk_cs_backend.BikeFilters.Interfaces;
+﻿using ams_desk_cs_backend.BikeProperties.Dtos;
+using ams_desk_cs_backend.BikeProperties.Interfaces;
 using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Data.Models;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.EntityFrameworkCore;
 
-namespace ams_desk_cs_backend.BikeFilters.Services;
+namespace ams_desk_cs_backend.BikeProperties.Services;
 
 public class StatusService : IStatusService
 {

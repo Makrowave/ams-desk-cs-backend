@@ -1,5 +1,6 @@
-﻿using ams_desk_cs_backend.BikeFilters.Interfaces;
-using ams_desk_cs_backend.BikeFilters.Services;
+﻿using ams_desk_cs_backend.BikeProperties.Interfaces;
+using ams_desk_cs_backend.BikeProperties.Services;
+using ams_desk_cs_backend.BikeProperties.Services;
 using ams_desk_cs_backend.Bikes.Interfaces;
 using ams_desk_cs_backend.Bikes.Services;
 using ams_desk_cs_backend.Deliveries.Interfaces;

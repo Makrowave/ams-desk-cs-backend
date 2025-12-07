@@ -1,7 +1,7 @@
-﻿using ams_desk_cs_backend.BikeFilters.Dtos;
+﻿using ams_desk_cs_backend.BikeProperties.Dtos;
 using ams_desk_cs_backend.Shared.Results;
 
-namespace ams_desk_cs_backend.BikeFilters.Interfaces;
+namespace ams_desk_cs_backend.BikeProperties.Interfaces;
 
 public interface IStatusService
 {

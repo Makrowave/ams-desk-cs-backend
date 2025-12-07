@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using ams_desk_cs_backend.BikeFilters.Enums;
+using ams_desk_cs_backend.BikeProperties.Enums;
 using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Data.Models;
 using ams_desk_cs_backend.Models.Dtos;

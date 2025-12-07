@@ -1,10 +1,10 @@
-﻿using ams_desk_cs_backend.BikeFilters.Dtos;
-using ams_desk_cs_backend.BikeFilters.Interfaces;
+﻿using ams_desk_cs_backend.BikeProperties.Dtos;
+using ams_desk_cs_backend.BikeProperties.Interfaces;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ams_desk_cs_backend.BikeFilters.Controllers;
+namespace ams_desk_cs_backend.BikeProperties.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

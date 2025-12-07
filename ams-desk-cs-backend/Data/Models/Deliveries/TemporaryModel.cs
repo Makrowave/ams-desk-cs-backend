@@ -31,8 +31,8 @@ public partial class TemporaryModel
     [Column("is_woman")]
     public bool? IsWoman { get; set; }
 
-    [Column("wheel_size", TypeName = "decimal(3,1)")]
-    public decimal? WheelSizeId { get; set; }
+    [Column("wheel_size")]
+    public int? WheelSizeId { get; set; }
 
     [Column("manufacturer_id")]
     public short? ManufacturerId { get; set; }

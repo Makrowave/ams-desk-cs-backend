@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ams_desk_cs_backend.Shared;
 
-namespace ams_desk_cs_backend.BikeFilters.Dtos;
+namespace ams_desk_cs_backend.BikeProperties.Dtos;
 
 public class ColorDto
 {

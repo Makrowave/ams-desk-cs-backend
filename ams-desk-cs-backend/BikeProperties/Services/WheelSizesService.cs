@@ -1,11 +1,11 @@
-using ams_desk_cs_backend.BikeFilters.Dtos;
-using ams_desk_cs_backend.BikeFilters.Interfaces;
+using ams_desk_cs_backend.BikeProperties.Dtos;
+using ams_desk_cs_backend.BikeProperties.Interfaces;
 using ams_desk_cs_backend.Data;
 using ams_desk_cs_backend.Data.Models;
 using ams_desk_cs_backend.Shared.Results;
 using Microsoft.EntityFrameworkCore;
 
-namespace ams_desk_cs_backend.BikeFilters.Services;
+namespace ams_desk_cs_backend.BikeProperties.Services;
 
 
 public class WheelSizesService : IWheelSizesService
@@ -17,7 +17,7 @@ public class WheelSizesService : IWheelSizesService
     }
     public async Task<ServiceResult<IEnumerable<WheelSizeDto>>> GetWheelSizes()
     {
-        var wheelSizes = await _context.WheelSizes.Select(wheelSize => wheelSize.WheelSizeId).OrderBy(wheelSize => wheelSize).ToListAsync();
+        var wheelSizes = await _context.WheelSizes.Select(wheelSize => wheelSize.Size).OrderBy(wheelSize => wheelSize).ToListAsync();
         var wheelSizesDto = wheelSizes.Select(value => new WheelSizeDto(value));
         return new ServiceResult<IEnumerable<WheelSizeDto>>(ServiceStatus.Ok, string.Empty, wheelSizesDto);
     }
@@ -29,7 +29,7 @@ public class WheelSizesService : IWheelSizesService
         {
             return ServiceResult<WheelSizeDto>.BadRequest("Rozmiar koła już istnieje");
         }
-        _context.WheelSizes.Add(new WheelSize { WheelSizeId = wheelSize });
+        _context.WheelSizes.Add(new WheelSize { Id = (int)wheelSize, Size = wheelSize });
         await _context.SaveChangesAsync();
         return new ServiceResult<WheelSizeDto>(
             ServiceStatus.Ok, 
@@ -37,7 +37,7 @@ public class WheelSizesService : IWheelSizesService
             new WheelSizeDto(wheelSize)
             );
     }
-    public async Task<ServiceResult> DeleteWheelSize(decimal wheelSize)
+    public async Task<ServiceResult> DeleteWheelSize(int wheelSize)
     {
         try
         {

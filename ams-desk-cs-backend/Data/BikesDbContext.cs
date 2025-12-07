@@ -138,14 +138,14 @@ public partial class BikesDbContext : DbContext
         ]);
 
         modelBuilder.Entity<WheelSize>().HasData([
-            new WheelSize {WheelSizeId = 12},
-            new WheelSize {WheelSizeId = 16},
-            new WheelSize {WheelSizeId = 20},
-            new WheelSize {WheelSizeId = 24},
-            new WheelSize {WheelSizeId = 26},
-            new WheelSize {WheelSizeId = 27},
-            new WheelSize {WheelSizeId = 28},
-            new WheelSize {WheelSizeId = 29},
+            new WheelSize {Id = 12, Size = 12},
+            new WheelSize {Id = 16, Size = 16},
+            new WheelSize {Id = 20, Size = 20},
+            new WheelSize {Id = 24, Size = 24},
+            new WheelSize {Id = 26, Size = 26},
+            new WheelSize {Id = 27, Size = (decimal)27.5},
+            new WheelSize {Id = 28, Size = 28},
+            new WheelSize {Id = 29, Size = 29},
         ]);
         
         const string defaultPass = "administrator";
